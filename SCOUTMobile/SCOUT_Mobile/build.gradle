@@ -1,0 +1,37 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "25.0.3"
+
+    defaultConfig {
+        applicationId "scout.edu.mit.ll.nics.android"
+        minSdkVersion 16
+        targetSdkVersion 19
+
+        //Added by Luis to resolve 64K methods .dex file issue on building APK
+        //multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile project(':SCOUTAndroidAPI')
+    compile project(':nmeahandler_lib')
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.android.support:gridlayout-v7:19.1.0'
+    compile 'com.android.support:appcompat-v7:19.1.0'
+    compile files('libs/acra-4.3.0.jar')
+    compile files('libs/activation.jar')
+    compile files('libs/additionnal.jar')
+    compile files('libs/commons-lang3-3.3.2.jar')
+    compile files('libs/mail.jar')
+    compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
+    compile 'com.loopj.android:android-async-http:1.4.9'
+}
