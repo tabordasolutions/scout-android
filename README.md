@@ -6,9 +6,9 @@ Contains the projects files for the Android version of SCOUT Mobile
 
 SCOUT Mobile is a derivative if NICS Mobile, hence the interchangeability of the names.
 
-##Dependencies
+## Dependencies
 
-###Android
+### Android
 
 This is an Android Studio project.
 
@@ -43,7 +43,7 @@ Steps required to resolve configuration files to get the projects in working ord
 
 
 
-###Android
+### Android
 
 You need to enter your Google Maps API key here which you can register for on Googles developer console: https://developers.google.com/maps/documentation/android-api/signup. That key needs to be placed in the config_strings.xml config file template mentioned above.
 
