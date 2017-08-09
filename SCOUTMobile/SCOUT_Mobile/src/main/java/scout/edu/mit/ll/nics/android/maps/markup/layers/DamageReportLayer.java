@@ -173,7 +173,7 @@ public class DamageReportLayer extends MarkupLayer {
 			attr.addProperty("icon", R.drawable.damage_advisory);
 			attr.addProperty(resources.getString(R.string.markup_user), data.getUser());
 			attr.addProperty(resources.getString(R.string.markup_timestamp), payload.getSeqTime());
-			attr.addProperty(resources.getString(R.string.markup_message), data.getDamageInformationAsString());			
+			attr.addProperty(resources.getString(R.string.markup_message), data.getDamageInformationAsString());
 		} catch (Exception e) {
 		}
 		

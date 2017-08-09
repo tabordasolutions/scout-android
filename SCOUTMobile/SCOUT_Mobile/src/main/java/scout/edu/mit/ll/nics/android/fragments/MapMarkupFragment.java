@@ -1523,71 +1523,110 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 				try {
 					extentBuilder = LatLngBounds.builder();
-					for (final MarkupFeature feature : mFeatures) {
-						for (Vector2 point : feature.getGeometryVector2()) {
+					for (final MarkupFeature feature : mFeatures)
+					{
+						for (Vector2 point : feature.getGeometryVector2())
+						{
 							extentBuilder.include(new LatLng(point.x, point.y));
 						}
 
-						if (!feature.isRendered()) {
-							try {
-								if(feature.getStrokeColor() != null){
+						if (!feature.isRendered())
+						{
+							try
+							{
+								if(feature.getStrokeColor() != null)
+								{
 										color = Color.parseColor(feature.getStrokeColor());
-									}else{
-										color = Color.WHITE;
-									}
-							} catch (IllegalArgumentException e) {
+								}
+								else
+								{
+									color = Color.WHITE;
+								}
+							} catch (IllegalArgumentException e)
+							{
 								color = Color.WHITE;
 							}
 							serverColor = new int[] { Color.alpha(color), Color.red(color), Color.green(color), Color.blue(color) };
 
-							if(feature.getFillColor() != null){
+							if(feature.getFillColor() != null)
+							{
 								fillColor = Color.parseColor(feature.getFillColor());
-							}else{
+							}
+							else
+							{
 								fillColor = Color.WHITE;
 							}
 							alpha = 61.2; // default opacity for fill?
 
-							if (feature.getOpacity() != -1) {
+							if (feature.getOpacity() != -1)
+							{
 								alpha = (feature.getOpacity() * 255);
 							}
 
 							lastFillColor = new int[] { alpha.intValue(), Color.red(fillColor), Color.green(fillColor), Color.blue(fillColor) };
 
-							if (feature.getType().equals(MarkupType.marker.toString()) || feature.getType().equals("marker")) {
+							if (feature.getType().equals(MarkupType.marker.toString()) || feature.getType().equals("marker"))
+							{
 								String symbolPath = feature.getGraphic();
 								symbolPath = symbolPath.substring(symbolPath.lastIndexOf("images"));
 								final MarkupSymbol symbol = new MarkupSymbol(mDataManager, feature, generateRotatedBitmap(symbolPath), symbolPath, serverColor);
 								mMarkupShapes.put(feature.getFeatureId(), symbol);
 
-								mContext.runOnUiThread(new Runnable() {
+								mContext.runOnUiThread(
+										new Runnable()
+										{
+											@Override
+											public void run()
+											{
+												symbol.setMarker(mMap.addMarker(symbol.getOptions()));
+												feature.setRendered(true);
+											}
+										});
 
-									@Override
-									public void run() {
-										symbol.setMarker(mMap.addMarker(symbol.getOptions()));
-										feature.setRendered(true);
-									}
-								});
+							}
+							else if (feature.getType().equals(MarkupType.marker.toString()) || feature.getType().equals("sketch") || feature.getType().equals("line"))
+							{
+								//FIXME: how can I pull out the solid line styles from here and pass them to the styling function?
+								//FIXME: planned fire lines appear to have a null dash style, though that's not right
+								if (feature.getDashStyle() == null/* || feature.getDashStyle().equals("solid") || feature.getDashStyle().equals("completedLine")*/)
+								{
+									//String feat = "null";
+									//if (feature.getDashStyle() != null)
+									//{
+									//	feat = feature.getDashStyle();
+									//}
 
-							} else if (feature.getType().equals(MarkupType.marker.toString()) || feature.getType().equals("sketch") || feature.getType().equals("line")) {
+									//if(feat.compareTo("primary-fire-line") == 0)
+									//{
 
-//								if (feature.getDashStyle() == null || feature.getDashStyle().equals("solid") || feature.getDashStyle().equals("completedLine")) {
-//									final MarkupSegment segment = new MarkupSegment(mDataManager, feature, serverColor);
-//									mMarkupShapes.put(feature.getFeatureId(), segment);
-//
-//									mContext.runOnUiThread(new Runnable() {
-//
-//										@Override
-//										public void run() {
-//											segment.setPolyline(mMap.addPolyline(segment.getOptions()));
-//											feature.setRendered(true);
-//										}
-//									});
-//								} else {
-////									final MarkupFireLine fireline = new MarkupFireLine(mDataManager, feature, serverColor, zoom);
-////									mMarkupShapes.put(feature.getFeatureId(), fireline);
-////									mFirelineFeatures.add(fireline);
-//								}
-							} else if (feature.getType().equals(MarkupType.square.toString())) {
+										//Log.v("W", "Line with dash style: " + feat + ", ID: " + feature.getFeatureId() + ", Color: " + feature.getStrokeColor());
+
+
+										final MarkupSegment segment = new MarkupSegment(mDataManager, feature, serverColor);
+										mMarkupShapes.put(feature.getFeatureId(), segment);
+
+										mContext.runOnUiThread(new Runnable()
+										{
+											@Override
+											public void run()
+											{
+												segment.setPolyline(mMap.addPolyline(segment.getOptions()));
+												feature.setRendered(true);
+											}
+										});
+									//}
+								}
+								else
+								{
+									Log.v("W","Fireline being drawn of style: " + feature.getDashStyle() + "\n");
+									//NOTE: All line styles do pass through here, so the difference happens somewhere after this
+									final MarkupFireLine fireline = new MarkupFireLine(mDataManager, feature, serverColor, zoom);
+									mMarkupShapes.put(feature.getFeatureId(), fireline);
+									mFirelineFeatures.add(fireline);
+								}
+							}
+							else if (feature.getType().equals(MarkupType.square.toString()))
+							{
 								final MarkupRectangle rectangle = new MarkupRectangle(mDataManager, feature, serverColor, lastFillColor);
 								mMarkupShapes.put(feature.getFeatureId(), rectangle);
 
@@ -1600,7 +1639,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 									}
 								});
 
-							} else if (feature.getType().equals(MarkupType.polygon.toString()) || feature.getType().equals("box") || feature.getType().equals(MarkupType.circle.toString())
+							}
+							else if (feature.getType().equals(MarkupType.polygon.toString()) || feature.getType().equals("box") || feature.getType().equals(MarkupType.circle.toString())
 									|| (feature.getType().equals("circle") && feature.getGeometryVector2().size() > 1) || feature.getType().equals("triangle") || feature.getType().equals("polygon") || feature.getType().equals("hexagon")) {
 								final MarkupRectangle trapezoid = new MarkupRectangle(mDataManager, feature, serverColor, lastFillColor);
 								mMarkupShapes.put(feature.getFeatureId(), trapezoid);

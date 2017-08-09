@@ -65,7 +65,7 @@ public class AboutActivity extends ActionBarActivity {
 		try {			
 			object.put("funding", getResources().getString(R.string.funding));
 			object.put("icons", getResources().getString(R.string.nounproject));
-			
+
 			String googleLegal = GooglePlayServicesUtil.getOpenSourceSoftwareLicenseInfo(this);
 			if(googleLegal != null){
 				object.put("google", googleLegal);

@@ -44,6 +44,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.text.format.DateFormat;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;

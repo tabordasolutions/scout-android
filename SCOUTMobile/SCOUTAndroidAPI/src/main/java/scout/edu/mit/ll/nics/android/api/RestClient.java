@@ -586,7 +586,7 @@ public class RestClient {
 				String content = (responseBody != null) ? new String(responseBody) : "error";
 				
 				IncidentMessage message = mBuilder.create().fromJson(content, IncidentMessage.class);
-				
+				//FIXME: insert incidents in whatever order they were given to us by server
 				HashMap<String, IncidentPayload> incidents = new HashMap<String, IncidentPayload>();
 				for(IncidentPayload incident : message.getIncidents()) {
 					incidents.put(incident.getIncidentName(), incident);
