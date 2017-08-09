@@ -36,6 +36,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.Tile;
 import com.google.android.gms.maps.model.TileProvider;
@@ -94,6 +95,7 @@ public abstract class MarkupCanvasTileProvider implements TileProvider {
 	class BitmapThreadLocal extends ThreadLocal<Bitmap> {
 		@Override
 		protected Bitmap initialValue() {
+			Log.w("W","new Bitmap created");
 			Bitmap image = Bitmap.createBitmap(TILE_SIZE, TILE_SIZE, Config.ARGB_4444);
 			return image;
 		}

@@ -41,7 +41,6 @@ import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Path.Direction;
 import android.graphics.PathDashPathEffect;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -115,7 +114,7 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 
 			boolean outOfBounds = true;
 
-			Log.w("W", "Bounds calculated: NE: " + ne.x + "," + ne.y + ")  SW: (" + sw.x + "," + sw.y + ")");
+			//Log.w("W", "Bounds calculated: NE: " + ne.x + "," + ne.y + ")  SW: (" + sw.x + "," + sw.y + ")");
 
 
 			for (int i = 0; i < coordinates.size(); i++)
@@ -136,9 +135,31 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 				float buffer = 32;
 				if(outOfBounds)
 				{
+					//Check if the current point is in the tile bounds
 					if (x >= sw.x - buffer && x <= ne.x + buffer && y <= sw.y + buffer && y >= ne.y - buffer)
 					{
 						outOfBounds = false;
+					}
+
+					//Check if the previous to current points cross the tile bounds
+					if(i > 0)
+					{
+						float prevX = floatPoints[((i-1)*2)];
+						float prevY = floatPoints[((i-1)*2) + 1];
+
+						//Getting tile bounds
+						float minX = (float) sw.x;//0
+						float minY = (float) ne.y;//0
+						float maxX = (float) ne.x;//512
+						float maxY = (float) sw.y;//512
+
+						//Checking if the previous point to this point crosses the tile bounds, with a buffer size of 10px
+						//(tile bounds are increased by 10px in every direction to account for slight errors)
+						// NOTE: Buffer size for intersection checking must be < buffer size used when checking if point is in tile
+						if(intersectsTile(prevX, prevY, x, y, minX, minY, maxX, maxY, 10))
+						{
+							outOfBounds = false;
+						}
 					}
 				}
 			}
@@ -287,6 +308,32 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 
 		p.addCircle(15, -2, size * 2, Direction.CCW);
 		return p;
+	}
+
+
+	//Returns true if the line (p1X,p1Y) -> (p2X,p2Y) intersects the tile defined by (tileMinX,tileMinY) -> (tileMaxX,tileMaxY)
+	//Allows for a buffer size with which to increase the tile bounds by (thereby intersecting with lines that are near the boundary)
+	public boolean intersectsTile(float p1X, float p1Y, float p2X, float p2Y, float tileMinX, float tileMinY, float tileMaxX, float tileMaxY, float buffer)
+	{
+		//Checks if all four corners of the tile bbox are on the same side of the line
+
+		//Getting top left side
+		boolean tlSide = onLeft(tileMinX - buffer,tileMinY - buffer, p1X,p1Y,p2X,p2Y);
+		//Getting top right side
+		boolean trSide = onLeft(tileMaxX + buffer,tileMinY - buffer, p1X,p1Y,p2X,p2Y);
+		//Getting bottom right side
+		boolean brSide = onLeft(tileMaxX + buffer,tileMaxY + buffer, p1X,p1Y,p2X,p2Y);
+		//Getting bottom left side
+		boolean blSide = onLeft(tileMinX - buffer,tileMaxY + buffer, p1X,p1Y,p2X,p2Y);
+
+		//Return true if they are all on the same side
+		return (tlSide == trSide) && (trSide == brSide) && (brSide == blSide);
+	}
+
+	//Returns if point p is to the left of line l1 -> l2
+	public boolean onLeft(float px, float py, float l1x, float l1y, float l2x, float l2y)
+	{
+		return ((l2x - l1x) * (py - l1y) - (l2y - l1y)*(px - l1x)) > 0;
 	}
 
 }
