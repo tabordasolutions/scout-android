@@ -1,0 +1,3 @@
+include ':SCOUTAndroidAPI'
+include ':nmeahandler_lib'
+include ':SCOUT_Mobile'
