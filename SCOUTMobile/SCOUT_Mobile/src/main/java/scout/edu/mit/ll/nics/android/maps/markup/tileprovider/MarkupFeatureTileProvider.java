@@ -70,7 +70,7 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 
 
 		//This draws a black transparent grid
-		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		/*paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setColor(Color.BLACK);
 		paint.setAlpha(30);
 		float gridSpacing = 10;
@@ -87,7 +87,7 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 		canvas.drawLine(0,0,canvas.getWidth(),0,paint);
 		canvas.drawLine(0,canvas.getHeight(),canvas.getWidth(),canvas.getHeight(),paint);
 		canvas.drawLine(canvas.getWidth(),0,canvas.getWidth(),canvas.getHeight(),paint);
-		canvas.drawLine(0,0,0,canvas.getHeight(),paint);
+		canvas.drawLine(0,0,0,canvas.getHeight(),paint);*/
 
 
 		for (MarkupFireLine feature : mFirelineFeatures)
@@ -115,13 +115,13 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 				continue;
 
 			//Debug drawing of bounding line box
-			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			/*paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 			paint.setStrokeWidth(5);
 			paint.setColor(Color.GREEN);
 			canvas.drawLine((float)bboxSW.x,(float)bboxNE.y,(float)bboxNE.x,(float)bboxNE.y,paint);
 			canvas.drawLine((float)bboxNE.x,(float)bboxNE.y,(float)bboxNE.x,(float)bboxSW.y,paint);
 			canvas.drawLine((float)bboxNE.x,(float)bboxSW.y,(float)bboxSW.x,(float)bboxSW.y,paint);
-			canvas.drawLine((float)bboxSW.x,(float)bboxSW.y,(float)bboxSW.x,(float)bboxNE.y,paint);
+			canvas.drawLine((float)bboxSW.x,(float)bboxSW.y,(float)bboxSW.x,(float)bboxNE.y,paint);*/
 
 
 			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
