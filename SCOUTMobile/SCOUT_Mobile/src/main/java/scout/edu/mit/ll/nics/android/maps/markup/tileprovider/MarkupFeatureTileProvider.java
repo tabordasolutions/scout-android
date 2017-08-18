@@ -70,34 +70,28 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 
 
 		//This draws a black transparent grid
-		/*paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setColor(Color.BLACK);
-		paint.setAlpha(50);
+		paint.setAlpha(30);
 		float gridSpacing = 10;
 		for(int i = 0; i <= canvas.getWidth(); i+= gridSpacing)
 		{
 			canvas.drawLine(0,i,canvas.getWidth(),i,paint);
 			canvas.drawLine(i,0,i,canvas.getHeight(),paint);
-		}*/
+		}
 
 		//This draws a blue border at the edge of each tile
-		/*paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setStrokeWidth(5);
 		paint.setColor(Color.BLUE);
 		canvas.drawLine(0,0,canvas.getWidth(),0,paint);
 		canvas.drawLine(0,canvas.getHeight(),canvas.getWidth(),canvas.getHeight(),paint);
 		canvas.drawLine(canvas.getWidth(),0,canvas.getWidth(),canvas.getHeight(),paint);
-		canvas.drawLine(0,0,0,canvas.getHeight(),paint);*/
+		canvas.drawLine(0,0,0,canvas.getHeight(),paint);
+
 
 		for (MarkupFireLine feature : mFirelineFeatures)
 		{
-			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-			paint.setStyle(Style.STROKE);
-			int red = feature.getStrokeColor()[1];
-			int green = feature.getStrokeColor()[2];
-			int blue = feature.getStrokeColor()[3];
-
-			paint.setColor(Color.rgb(red, green, blue));
 			LatLngBounds bounds = projection.getTileBounds();
 
 			DoublePoint sw = new DoublePoint(0, 0);
@@ -105,6 +99,39 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 
 			projection.latLngToPoint(bounds.southwest, sw);
 			projection.latLngToPoint(bounds.northeast, ne);
+
+
+			//Doing an early rejection test to make sure the line's bounding box intersects the current projection bounding box
+
+
+			DoublePoint bboxSW = new DoublePoint(0,0);
+			DoublePoint bboxNE = new DoublePoint(0,0);
+
+			projection.latLngToPoint(feature.boundsSW, bboxSW);
+			projection.latLngToPoint(feature.boundsNE, bboxNE);
+
+			//If the line's bounding box does not intersect the view bounding box, skip the line
+			if(!bboxesIntersect(bboxSW.x, bboxNE.y, bboxNE.x, bboxSW.y, sw.x, ne.y, ne.x, sw.y))
+				continue;
+
+			//Debug drawing of bounding line box
+			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			paint.setStrokeWidth(5);
+			paint.setColor(Color.GREEN);
+			canvas.drawLine((float)bboxSW.x,(float)bboxNE.y,(float)bboxNE.x,(float)bboxNE.y,paint);
+			canvas.drawLine((float)bboxNE.x,(float)bboxNE.y,(float)bboxNE.x,(float)bboxSW.y,paint);
+			canvas.drawLine((float)bboxNE.x,(float)bboxSW.y,(float)bboxSW.x,(float)bboxSW.y,paint);
+			canvas.drawLine((float)bboxSW.x,(float)bboxSW.y,(float)bboxSW.x,(float)bboxNE.y,paint);
+
+
+			paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			paint.setStyle(Style.STROKE);
+			int red = feature.getStrokeColor()[1];
+			int green = feature.getStrokeColor()[2];
+			int blue = feature.getStrokeColor()[3];
+
+			paint.setColor(Color.rgb(red, green, blue));
+
 
 			ArrayList<LatLng> coordinates = new ArrayList<LatLng>(feature.getPoints());
 
@@ -258,6 +285,12 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 				paint.setStrokeWidth(feature.getFeature().getStrokeWidth().floatValue());
 				paint.setPathEffect(new DashPathEffect(new float[]{20,10}, 0));
 			}
+			else if(dashStyle.equals("solid"))
+			{
+				int[] strokeColor = feature.getStrokeColor();
+				paint.setColor(Color.argb(strokeColor[0],strokeColor[1],strokeColor[2],strokeColor[3]));
+				paint.setStrokeWidth(feature.getFeature().getStrokeWidth().floatValue());
+			}
 
 			canvas.drawPath(path, paint);
 		}
@@ -334,6 +367,24 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 	public boolean onLeft(float px, float py, float l1x, float l1y, float l2x, float l2y)
 	{
 		return ((l2x - l1x) * (py - l1y) - (l2y - l1y)*(px - l1x)) > 0;
+	}
+
+	public boolean bboxesIntersect(double bbox1Minx, double bbox1Miny, double bbox1Maxx, double bbox1Maxy,
+								   double bbox2Minx, double bbox2Miny, double bbox2Maxx, double bbox2Maxy)
+	{
+		//Check if bbox1 is to the left of bbox2
+		if(bbox1Maxx <= bbox2Minx)
+			return false;
+		//Check if bbox1 is to the right of bbox2
+		if(bbox1Minx >= bbox2Maxx)
+			return false;
+		//Check if bbox1 is above bbox2
+		if(bbox1Miny >= bbox2Maxy)
+			return false;
+		//Check if bbox1 is below bbox2
+		if(bbox1Maxy <= bbox2Miny)
+			return false;
+		return true;
 	}
 
 }

@@ -40,6 +40,7 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.GroundOverlayOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 
 import scout.edu.mit.ll.nics.android.api.DataManager;
 import scout.edu.mit.ll.nics.android.api.data.MarkupFeature;
@@ -47,7 +48,10 @@ import scout.edu.mit.ll.nics.android.api.data.Vector2;
 
 
 public class MarkupFireLine extends MarkupBaseShape {
-	
+
+	public LatLng boundsSW;
+	public LatLng boundsNE;
+
 	public MarkupFireLine(DataManager manager, String title, LatLng coordinate, int[] strokeColor) {
 		super(manager);
 
@@ -70,13 +74,14 @@ public class MarkupFireLine extends MarkupBaseShape {
 
 		Log.v("W","Drawing line of type: " + item.getDashStyle() + " Color: " + strokeColor);
 		
-		if (item.getDashStyle().equals("fire-edge-line")) {
+		/*if (item.getDashStyle().equals("fire-edge-line")) {
 			int[] redStrokeColor = new int[] {255, 255, 0, 0};
 			setStrokeColor(redStrokeColor);
 		} else {
 			Log.v("IMPORTANT", item.getDashStyle());
 			setStrokeColor(strokeColor);
-		}
+		}*/
+		setStrokeColor(strokeColor);
 		
 		setCreator(item.getUsername());
 		setDraft(false);
@@ -84,17 +89,109 @@ public class MarkupFireLine extends MarkupBaseShape {
 		setFeature(item);
 		
 		ArrayList<Vector2> points = item.getGeometryVector2();
+
 		Vector2 point;
 		LatLng coordinate;
 
 		final ArrayList<LatLng> coordinates = new ArrayList<LatLng>();
+
+		//Initializing lastCoord to point[0]
+		point = points.get(0);
+		LatLng lastCoord = new LatLng(point.x,point.y );
+
+
+		//Creating a bounding box
+		//Google's LatLngBounds class won't work for us because consecutive points MUST contain the area between them,
+		// and LatLngBounds handles only a discrete set of points
+
+		//We will iteratively increase the size of the bounding box
+		coordinate = new LatLng(point.x, point.y);
+
+		mutableLatLng bboxMins = new mutableLatLng(coordinate.latitude, coordinate.longitude);
+		mutableLatLng bboxMaxs = new mutableLatLng(bboxMins.latitude,bboxMins.longitude);
+
+		//Keeps track of how many antimeridians (180 degrees) we have crossed
+		//negative means we crossed to the left
+		//positive means we crossed to the right
+		int antimeridiansCrossed = 0;
+
+		//The longitude of the previous point
+		double lastLong = coordinate.longitude;
+		double curLong = coordinate.longitude;
+
+
 		for (int i = 0; i < points.size(); i++) {
 			point = points.get(i);
+
 			coordinate = new LatLng(point.x, point.y);
+
 			coordinates.add(coordinate);
+
+
+			//Updating the bounding box
+
+			//============ Latitude =============
+
+			if(coordinate.latitude < bboxMins.latitude)
+				bboxMins.latitude = coordinate.latitude;
+			if(coordinate.latitude > bboxMaxs.latitude)
+				bboxMaxs.latitude = coordinate.latitude;
+
+
+			//============ Longitude ============
+
+			//Check if we have crossed an antimeridian:
+			antimeridiansCrossed += deltaAntimeridians(lastLong, coordinate.longitude);
+
+			//Offset the longitudes by the amount of antimeridians we have crossed
+			//This will be the absolute longitude of the point, relative to the first point in the line
+			curLong = coordinate.longitude + (antimeridiansCrossed * 360.0f);
+
+			if(curLong < bboxMins.longitude)
+				bboxMins.longitude = curLong;
+			if(curLong > bboxMaxs.longitude)
+				bboxMaxs.longitude = curLong;
+
+			lastLong = curLong;
+
+			//======================================
 		}
+
+		//Setting the calculated bbox values
+		boundsSW = new LatLng(bboxMins.latitude,bboxMins.longitude);
+		boundsNE = new LatLng(bboxMaxs.latitude,bboxMaxs.longitude);
 		
 		setPoints(coordinates);
+	}
+
+	//Have to create a class to be able to modify a LatLng instance (LatLng's member variables are final)
+	//The alternative to this is to instantiate a new LatLng every time we wish to modify
+	class mutableLatLng {
+		public double latitude;
+		public double longitude;
+
+		mutableLatLng(double latitude, double longitude) {
+			this.latitude = latitude;
+			this.longitude = longitude;
+		}
+
+	}
+
+	//Returns how many antimeridians we crossed from longitude a to longitude b along the shortest path (<= 180 degrees)
+	//Along the shortest path implies this can only return -1, 0, or 1
+	private int deltaAntimeridians(double lng1, double lng2) {
+		//If the distance between a and b < 180, the shortest path from a to b does not cross the antimeridian
+		if(Math.abs(lng1 - lng2) <= 180) {
+			return 0;
+		}
+		//Otherwise, the shortest path from a to b does cross the antimeridian
+
+		//If lng1 > 0, and we crossed the antimeridian in the positive direction ( to the right from + to - )
+		if(lng1 >= 0)
+			return 1;
+
+		//else, we crossed the antimeridian in the negative direction ( to the left from - to + )
+		return -1;
 	}
 
 	public void setPoint(LatLng coordinate) {

@@ -1590,7 +1590,10 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 								//FIXME: planned fire lines appear to have a null dash style, though that's not right
 								if (feature.getDashStyle() == null/* || feature.getDashStyle().equals("solid") || feature.getDashStyle().equals("completedLine")*/)
 								{
-									//String feat = "null";
+
+									feature.setDashStyle("solid");
+
+									/*//String feat = "null";
 									//if (feature.getDashStyle() != null)
 									//{
 									//	feat = feature.getDashStyle();
@@ -1614,7 +1617,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 												feature.setRendered(true);
 											}
 										});
-									//}
+									//}*/
 								}
 								else
 								{
