@@ -69,7 +69,7 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 		paint.setColor(Color.RED);
 
 
-		//This draws a black transparent grid
+		//This draws black transparent grid lines
 		/*paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		paint.setColor(Color.BLACK);
 		paint.setAlpha(30);

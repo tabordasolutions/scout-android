@@ -711,10 +711,10 @@ public class RestClient {
 					getResourceRequests(-1, -1, incidentId);
 					getWeatherReports(-1, -1, incidentId);
 					
-					if(collabRoomName.contains("-")) {
+//					if(collabRoomName.contains("-")) {
 //						getChatHistory(incident.getIncidentName(), collabRoomName.split("-")[1]);
 //						getMarkupHistory(collabRoomId);
-					}
+//					}
 					
 			        mContext.sendBroadcast (assignmentIntent);
 		        }

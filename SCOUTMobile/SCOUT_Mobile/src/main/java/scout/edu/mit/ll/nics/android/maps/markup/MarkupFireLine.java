@@ -72,15 +72,6 @@ public class MarkupFireLine extends MarkupBaseShape {
 		setType(MarkupType.sketch);
 		setTime(item.getSeqTime());
 
-		Log.v("W","Drawing line of type: " + item.getDashStyle() + " Color: " + strokeColor);
-		
-		/*if (item.getDashStyle().equals("fire-edge-line")) {
-			int[] redStrokeColor = new int[] {255, 255, 0, 0};
-			setStrokeColor(redStrokeColor);
-		} else {
-			Log.v("IMPORTANT", item.getDashStyle());
-			setStrokeColor(strokeColor);
-		}*/
 		setStrokeColor(strokeColor);
 		
 		setCreator(item.getUsername());
