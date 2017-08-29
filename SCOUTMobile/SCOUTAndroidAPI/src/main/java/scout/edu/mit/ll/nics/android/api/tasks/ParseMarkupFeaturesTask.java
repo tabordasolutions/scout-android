@@ -75,7 +75,7 @@ public class ParseMarkupFeaturesTask extends AsyncTask<MarkupPayload, Object, In
 			for(String featureId : mFeaturesToRemove) {
 				mDataManager.deleteMarkupHistoryForCollabroomByFeatureId(collabroomId, featureId);
 			}
-			Log.i("nicsParseMarkupFeaturesTask", "Successfully removed " + mFeaturesToRemove.size() + " markup features.");
+			Log.i("nicsParseMarkup", "Successfully removed " + mFeaturesToRemove.size() + " markup features.");
 			
 			ArrayList<MarkupFeature> features = payload.getFeatures();
 			
@@ -100,33 +100,62 @@ public class ParseMarkupFeaturesTask extends AsyncTask<MarkupPayload, Object, In
 	
 	@Override
 	protected void onPostExecute(Integer numParsed) {
+
 		super.onPostExecute(numParsed);
-			
-		if(numParsed > 0 || mFeaturesToRemove.size() > 0){
+
+
+		int ftrsToAdd = mFeaturesToAdd.size();
+		int ftrsToRemove = mFeaturesToRemove.size();
+
+		Log.i("nicsParseMarkup", "about to parse markup features ( +" + ftrsToAdd + ", -" + ftrsToRemove + ")");
+
+		//The intents expect a string array, but we are not passing in the markup data to the intent
+		//(too much data crashes the intent)
+		//So we need an empty string array to pass in
+		String[] emptyStringArr = new String[1];
+		emptyStringArr[0] = "nothing to see here";
+
+		ReceivedMarkupFeaturesData.clearFeatureData();
+
+		if(ftrsToAdd > 0 || ftrsToRemove > 0){
 
 			Intent intent = new Intent();
 			intent.putExtra("collabroomId", collabroomId);
 			intent.setAction(Intents.nics_NEW_MARKUP_RECEIVED);
 			
-			if(numParsed > 0){
+			if(ftrsToAdd > 0){
 		        String[] addStrings = mFeaturesToAdd.toArray(new String[0]);
-		        intent.putExtra("featuresToAdd", addStrings);
+
+				//We are no longer sending the features to add through the intent
+				//intent.putExtra("featuresToAdd", addStrings);
+				intent.putExtra("featuresToAdd",emptyStringArr);
+				//We are instead sending them through this data class (that was created for this purpose)
+				ReceivedMarkupFeaturesData.setFeaturesToAdd(addStrings);
+
 				mDataManager.setNewMapAvailable(true);
 			}
-			if(mFeaturesToRemove.size() > 0){
+			if(ftrsToRemove > 0){
 				String[] removeStrings = mFeaturesToRemove.toArray(new String[0]);
-				intent.putExtra("featuresToRemove", removeStrings);
-			}	
+
+				//We are no longer sending the features to remove through the intent
+				//intent.putExtra("featuresToRemove", removeStrings);
+				intent.putExtra("featuresToRemove",emptyStringArr);
+				//We are instead sending them through this data class (that was created for this purpose)
+				ReceivedMarkupFeaturesData.setFeaturesToRemove(removeStrings);
+			}
 			mContext.sendBroadcast (intent);
+			Log.i("nicsParseMarkup", "Successfully parsed features: ( +" + ftrsToAdd + ", -" + ftrsToRemove + ")");
 		}
-		Log.i("nicsParseMarkupFeaturesTask", "Successfully parsed " + numParsed + " markup features.");
-		
+		else
+		{
+			Log.i("nicsParseMarkup", "no features to parse");
+		}
 		mFeaturesToAdd.clear();
 		mFeaturesToRemove.clear();
 		
 		RestClient.clearParseMarkupFeaturesTask();
 	
-		
+
 
 	}
 

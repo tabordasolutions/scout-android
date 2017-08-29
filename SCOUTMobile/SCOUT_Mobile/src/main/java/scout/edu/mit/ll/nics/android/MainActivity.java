@@ -1150,7 +1150,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						mMapMarkupFragment = new MapMarkupFragment();
 					}
 					fragment = mMapMarkupFragment;
-					
+
 					if(mDataManager.getTabletLayoutOn()){
 						mMapMarkupOpenTablet = !mMapMarkupOpenTablet;
 					}

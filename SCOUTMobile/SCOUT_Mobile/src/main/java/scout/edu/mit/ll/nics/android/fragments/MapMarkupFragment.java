@@ -117,6 +117,7 @@ import scout.edu.mit.ll.nics.android.api.RestClient;
 import scout.edu.mit.ll.nics.android.api.data.MarkupFeature;
 import scout.edu.mit.ll.nics.android.api.data.Vector2;
 import scout.edu.mit.ll.nics.android.api.payload.TrackingLayerPayload;
+import scout.edu.mit.ll.nics.android.api.tasks.ReceivedMarkupFeaturesData;
 import scout.edu.mit.ll.nics.android.maps.markup.MapMarkupInfoWindowAdapter;
 import scout.edu.mit.ll.nics.android.maps.markup.MarkupBaseShape;
 import scout.edu.mit.ll.nics.android.maps.markup.MarkupCircle;
@@ -236,7 +237,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		mMarkupFailedToPostFilter = new IntentFilter(Intents.nics_FAILED_TO_POST_MARKUP);
 		
 		if (!markerReceiverRegistered) {
-			Log.d("MarkupFragment", "receivers registereed onCreate");
+			Log.d("MarkupFragment", "receivers registered onCreate");
 			mContext.registerReceiver(markupReceiver, mMarkupReceiverFilter);
 			mContext.registerReceiver(collabRoomSwitchedReceiver,mCollabRoomSwitchedFilter);
 			mContext.registerReceiver(incidentSwitchedReceiver,mIncidentSwitchedFilter);
@@ -429,7 +430,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		setUpMapIfNeeded();
 
 		if (!markerReceiverRegistered) {
-			Log.d("MarkupFragment", "receivers registereed onResume");
+			Log.d("MarkupFragment", "receivers registered onResume");
 			mContext.registerReceiver(markupReceiver, mMarkupReceiverFilter);
 			mContext.registerReceiver(collabRoomSwitchedReceiver,mCollabRoomSwitchedFilter);
 			mContext.registerReceiver(incidentSwitchedReceiver,mIncidentSwitchedFilter);
@@ -753,8 +754,11 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 				}
 				mDataManager.forceLocationUpdate();
 				mIgnoreUpdate = false;
+				//LUIS FIXME: add the line below this to this block, that should proabbly update the map.
+				//addMarkupFromServer();
 			}
 		} else {
+
 			addMarkupFromServer();
 		}
 
@@ -769,8 +773,9 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		mShapesAdapter = new ArrayAdapter<MarkupFeature>(mContext, android.R.layout.simple_list_item_1, mFeatures);
 		mShapesListView.setAdapter(mShapesAdapter);
 
-		if (mMap != null) {
 
+
+		if (mMap != null) {
 			if (mInfoWindowAdapter != null) {
 				mMap.setInfoWindowAdapter(mInfoWindowAdapter);
 				mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
@@ -1183,8 +1188,13 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 								
 				Log.i(Constants.nics_DEBUG_ANDROID_TAG, "Rendering shapes");
 				if (intent.getLongExtra("collabroomId", -99) == mDataManager.getSelectedCollabRoom().getCollabRoomId()) {
-					String[] addMarkup = intent.getStringArrayExtra("featuresToAdd");
-					String[] removeMarkup = intent.getStringArrayExtra("featuresToRemove");
+					//String[] addMarkup = intent.getStringArrayExtra("featuresToAdd");
+					String[] addMarkup = ReceivedMarkupFeaturesData.getFeaturesToAdd();
+
+					//String[] removeMarkup = intent.getStringArrayExtra("featuresToRemove");
+
+					String[] removeMarkup = ReceivedMarkupFeaturesData.getFeaturesToRemove();
+
 					if (addMarkup != null) {
 						for (String markupPayloadString : addMarkup) {
 							MarkupFeature feature = mBuilder.create().fromJson(markupPayloadString, MarkupFeature.class);
@@ -1196,12 +1206,14 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 								mMarkupShapes.remove(shape);
 							}
 							mFeatures.add(feature);
+
 						}
 					}
 
 					if (removeMarkup != null) {
 						for (String featureId : removeMarkup) {
 							MarkupBaseShape shape = mMarkupShapes.get(featureId);
+
 							if (shape != null) {
 								shape.removeFromMap();
 								mFeatures.remove(shape.getFeature());
@@ -1212,6 +1224,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 					mFirelineFeatures.clear();
 
+					//LUIS FIXME
 					if (markupTileProvider != null) {
 						markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 					}
@@ -1483,7 +1496,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 					}
 
 					mFeatures.addAll(mDataManager.getAllMarkupFeaturesStoreAndForwardReadyToSend());
-					
+
 					//Flippeding lat and lon values of draft features.
 					//currently the web api accepts these coordinates backwards. so they don't show up properly on mobile when they are a draft
 					//this can be removed once the lat lon web bug is fixed
@@ -1499,7 +1512,6 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 						}
 						mFeatures.get(i).setGeometryVector2(latLonList);
 					}
-					
 					mFeatures.addAll(mDataManager.getMarkupHistoryForCollabroom(mDataManager.getSelectedCollabRoom().getCollabRoomId()));
 
 					if (mFeatures.size() > 0) {
@@ -1586,11 +1598,12 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 							}
 							else if (feature.getType().equals(MarkupType.marker.toString()) || feature.getType().equals("sketch") || feature.getType().equals("line"))
 							{
-								//FIXME: how can I pull out the solid line styles from here and pass them to the styling function?
-								//FIXME: planned fire lines appear to have a null dash style, though that's not right
 								if (feature.getDashStyle() == null/* || feature.getDashStyle().equals("solid") || feature.getDashStyle().equals("completedLine")*/)
 								{
-									//String feat = "null";
+
+									feature.setDashStyle("solid");
+
+									/*//String feat = "null";
 									//if (feature.getDashStyle() != null)
 									//{
 									//	feat = feature.getDashStyle();
@@ -1614,16 +1627,15 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 												feature.setRendered(true);
 											}
 										});
-									//}
+									//}*/
 								}
-								else
-								{
-									Log.v("W","Fireline being drawn of style: " + feature.getDashStyle() + "\n");
-									//NOTE: All line styles do pass through here, so the difference happens somewhere after this
+								//else
+								//{
 									final MarkupFireLine fireline = new MarkupFireLine(mDataManager, feature, serverColor, zoom);
 									mMarkupShapes.put(feature.getFeatureId(), fireline);
+								//LUIS FIXME: disabled this to test
 									mFirelineFeatures.add(fireline);
-								}
+								//}
 							}
 							else if (feature.getType().equals(MarkupType.square.toString()))
 							{
@@ -1705,6 +1717,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 								mShapesListProgress.setVisibility(View.GONE);
 							}
 
+							//LUIS FIXME
+							//This assigns the fireline features as well, this plays a part in why / how the markup is being drawn though I've disabled parseMarkupFeatures
 							markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 							tileOverlay.clearTileCache();
 						}
@@ -1750,6 +1764,9 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			}
 
 			if (mClearTiles) {
+				//LUIS FIXME
+				//okay: so disabling this line makes the markup not appear when the app is in the background... interesting
+				//I believe they intended for this is to clear the tiles from rendering... but why does this serve to set them?
 				markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 				tileOverlay.clearTileCache();
 				mClearTiles = false;
@@ -1877,7 +1894,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			
 			mMap.clear();
 			mFeatures.clear();
-			mMarkupShapes.clear();	
+			mMarkupShapes.clear();
 			setUpMapIfNeeded();
 			
 			mShapesAdapter.notifyDataSetChanged();

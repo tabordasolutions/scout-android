@@ -313,12 +313,8 @@ public class OpenAMAuthProvider extends AuthProvider {
 						mClient.addHeader("Content-Type", "application/json");
 
 						mClient.setEnableRedirects(true, true, true);
-						//FIXME: cannot cast entity to HttpEntity
 
-						Log.d("W","pre cast attempt");
-						Log.d("W","about to cast");
 						mClient.post(null, getAbsoluteUrl(url) , (cz.msebera.android.httpclient.HttpEntity) entity, "application/json", new OpenAMAuthResponseHandler(responseHandler, Looper.myLooper()));
-						Log.d("W","post cast attempt");
 
 					}
 		    	
