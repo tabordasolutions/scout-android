@@ -118,11 +118,11 @@ public class GeneralMessageFragment extends Fragment {
 				mFormFragment = (FormFragment) getFragmentManager().findFragmentById(id);
 
 				if (mFormFragment != null) {
-					mRootView = container.findViewById(R.layout.fragment_generalmessage);
+					mRootView = container.findViewById(R.id.generalMessageFragment);
 				}
 			}
 		} else if(mRootView == null) {
-			mRootView = container.findViewById(R.layout.fragment_generalmessage);
+			mRootView = container.findViewById(R.id.generalMessageFragment);
 		}
 		
 		mSaveDraftButton = (Button) mRootView.findViewById(R.id.generalMessageSaveButton);

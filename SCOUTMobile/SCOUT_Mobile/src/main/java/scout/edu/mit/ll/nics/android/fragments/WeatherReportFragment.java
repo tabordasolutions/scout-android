@@ -123,11 +123,11 @@ public class WeatherReportFragment extends Fragment {
 				mFormFragment = (FormFragment) getFragmentManager().findFragmentById(id);
 
 				if (mFormFragment != null) {
-					mRootView = container.findViewById(R.layout.fragment_weatherreport);
+					mRootView = container.findViewById(R.id.weatherReportFragment);
 				}
 			}
 		} else if(mRootView == null) {
-			mRootView = container.findViewById(R.layout.fragment_weatherreport);
+			mRootView = container.findViewById(R.id.weatherReportFragment);
 		}
 		
 		mSaveDraftButton = (Button) mRootView.findViewById(R.id.weatherReportSaveButton);

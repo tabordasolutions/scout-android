@@ -10,6 +10,8 @@ android {
         minSdkVersion 16
         //targetSdkVersion 25
         targetSdkVersion 19
+        multiDexEnabled true
+
     }
 
     buildTypes {
@@ -21,7 +23,6 @@ android {
 
 dependencies {
     compile 'gov.nasa.worldwind.android:worldwind:0.6.0@aar'
-    //compile 'com.android.support:support-v4:25.3.1'
     compile 'com.android.support:support-v4:19.1.0'
     compile 'com.google.android.gms:play-services:5.+'
     compile 'com.google.code.gson:gson:2.2.4'
@@ -32,4 +33,5 @@ dependencies {
     //compile files('libs/org.apache.http.legacy.jar')
     //compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
     compile 'com.loopj.android:android-async-http:1.4.9'
+    compile 'com.android.support:multidex:1.0.1'
 }

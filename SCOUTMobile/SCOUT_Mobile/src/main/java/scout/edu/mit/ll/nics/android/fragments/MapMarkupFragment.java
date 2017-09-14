@@ -287,7 +287,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 							wmsTileOverlay = mMap.addTileOverlay(wmsOverlayOptions);
 						}
 					}
-					mRootView = container.findViewById(R.layout.fragment_mapmarkup);
+					mRootView = container.findViewById(R.id.markupMapFragment);
 				}
 			}
 

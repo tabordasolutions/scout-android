@@ -93,7 +93,7 @@ public class MapMarkupInfoWindowAdapter implements InfoWindowAdapter {
 			
 				if(data.get("type").getAsString().equals("sr") || data.get("type").getAsString().equals("dmgrpt") || data.get("type").getAsString().equals("ur")) {
 					TextView clickView = new TextView(mContext);
-					clickView.setTextAppearance(mContext, android.R.attr.textAppearanceMedium);
+					clickView.setTextAppearance(mContext, android.R.style.TextAppearance_Medium);
 					clickView.setTextColor(mContext.getResources().getColor(R.color.holo_blue_dark));
 					clickView.setTypeface(null, Typeface.BOLD);
 					clickView.setPadding(0, 5, 0, 0);
@@ -132,7 +132,7 @@ public class MapMarkupInfoWindowAdapter implements InfoWindowAdapter {
 					mGridLayout.addView(titleView, new LayoutParams(rowSpec, colSpec));
 					
 					TextView valueView = new TextView(mContext);
-					valueView.setTextAppearance(mContext, android.R.attr.textAppearanceSmall);
+					valueView.setTextAppearance(mContext, android.R.style.TextAppearance_Small);
 					valueView.setTextColor(Color.BLACK);
 					valueView.setText(Html.fromHtml(value));
 					valueView.setMaxWidth(350);
@@ -142,7 +142,7 @@ public class MapMarkupInfoWindowAdapter implements InfoWindowAdapter {
 			
 			if(data.get("type").getAsString().equals("sr") || data.get("type").getAsString().equals("dmgrpt") || data.get("type").getAsString().equals("ur")) {
 				TextView clickView = new TextView(mContext);
-				clickView.setTextAppearance(mContext, android.R.attr.textAppearanceSmall);
+				clickView.setTextAppearance(mContext, android.R.style.TextAppearance_Small);
 				clickView.setTextSize(10);
 				clickView.setTextColor(mContext.getResources().getColor(R.color.holo_blue_dark));
 				clickView.setTypeface(null, Typeface.ITALIC);
