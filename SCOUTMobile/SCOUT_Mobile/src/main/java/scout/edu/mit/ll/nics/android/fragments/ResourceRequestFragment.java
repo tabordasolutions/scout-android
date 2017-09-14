@@ -112,7 +112,7 @@ public class ResourceRequestFragment extends Fragment {
 				mFormFragment = (FormFragment) getFragmentManager().findFragmentById(id);
 
 				if (mFormFragment != null) {
-					mRootView = container.findViewById(R.layout.fragment_resourcerequest);
+					mRootView = container.findViewById(R.id.resourceRequestFragment);
 				}
 			}
 

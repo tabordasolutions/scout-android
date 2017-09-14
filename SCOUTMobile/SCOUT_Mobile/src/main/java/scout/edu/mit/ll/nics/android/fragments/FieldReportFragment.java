@@ -119,11 +119,11 @@ public class FieldReportFragment extends Fragment {
 				mFormFragment = (FormFragment) getFragmentManager().findFragmentById(id);
 
 				if (mFormFragment != null) {
-					mRootView = container.findViewById(R.layout.fragment_fieldreport);
+					mRootView = container.findViewById(R.id.fieldReportFragment);
 				}
 			}
 		} else if(mRootView == null) {
-			mRootView = container.findViewById(R.layout.fragment_fieldreport);
+			mRootView = container.findViewById(R.id.fieldReportFragment);
 		}
 		
 		mSaveDraftButton = (Button) mRootView.findViewById(R.id.fieldReportSaveButton);

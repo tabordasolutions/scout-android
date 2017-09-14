@@ -69,11 +69,11 @@ public class AboutFragment extends Fragment {
 				mFormFragment = (FormFragment) getFragmentManager().findFragmentById(id);
 
 				if (mFormFragment != null) {
-					mRootView = container.findViewById(R.layout.fragment_about);
+					mRootView = container.findViewById(R.id.aboutFragment);
 				}
 			}
 		} else if(mRootView == null) {
-			mRootView = container.findViewById(R.layout.fragment_about);
+			mRootView = container.findViewById(R.id.aboutFragment);
 		}
 		return mRootView;
 	}
