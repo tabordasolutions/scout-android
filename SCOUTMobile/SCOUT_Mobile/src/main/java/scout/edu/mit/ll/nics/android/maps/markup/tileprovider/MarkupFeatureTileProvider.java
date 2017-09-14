@@ -372,17 +372,19 @@ public class MarkupFeatureTileProvider extends MarkupCanvasTileProvider {
 	public boolean bboxesIntersect(double bbox1Minx, double bbox1Miny, double bbox1Maxx, double bbox1Maxy,
 								   double bbox2Minx, double bbox2Miny, double bbox2Maxx, double bbox2Maxy)
 	{
+		//Adding a slight buffer to not truncate styling at tile edges
+		float buffer = 30;
 		//Check if bbox1 is to the left of bbox2
-		if(bbox1Maxx <= bbox2Minx)
+		if(bbox1Maxx + buffer <= bbox2Minx)
 			return false;
 		//Check if bbox1 is to the right of bbox2
-		if(bbox1Minx >= bbox2Maxx)
+		if(bbox1Minx - buffer >= bbox2Maxx)
 			return false;
 		//Check if bbox1 is above bbox2
-		if(bbox1Miny >= bbox2Maxy)
+		if(bbox1Miny - buffer >= bbox2Maxy)
 			return false;
 		//Check if bbox1 is below bbox2
-		if(bbox1Maxy <= bbox2Miny)
+		if(bbox1Maxy + buffer <= bbox2Miny)
 			return false;
 		return true;
 	}
