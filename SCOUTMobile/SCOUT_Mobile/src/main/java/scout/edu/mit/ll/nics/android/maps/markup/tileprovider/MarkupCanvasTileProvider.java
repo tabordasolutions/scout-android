@@ -79,6 +79,7 @@ public abstract class MarkupCanvasTileProvider implements TileProvider {
 	 * @return
 	 */
 	private Bitmap getNewBitmap() {
+		//Log.v("thread","get bitmap: Thread ID: " + 	Thread.currentThread().getId());
 		Bitmap bitmap = tlBitmap.get();
 		// Clear the previous bitmap
 		bitmap.eraseColor(Color.TRANSPARENT);
@@ -95,6 +96,7 @@ public abstract class MarkupCanvasTileProvider implements TileProvider {
 	class BitmapThreadLocal extends ThreadLocal<Bitmap> {
 		@Override
 		protected Bitmap initialValue() {
+			//Log.v("thread"," new bitmap being instantiated: Thread ID: " + 	Thread.currentThread().getId());
 			Bitmap image = Bitmap.createBitmap(TILE_SIZE, TILE_SIZE, Config.ARGB_4444);
 			return image;
 		}
