@@ -599,26 +599,29 @@ public class OverviewFragment extends Fragment {
 		
 		@Override
 		public void onClick(View v) {
+
 			mDialogBuilder.setTitle(R.string.select_report_type);
+
 			mDialogBuilder.setMessage(R.string.feature_coming_soon);
 			mDialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-				
+
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}
 			});
-		    
-//		    for(int i = 0; i < activeReports.size(); i++) {
-//		    	activeReports.set(i, activeReports.get(i).replace(mDataManager.getActiveIncidentName() + "-", ""));
-//		    }
-//		    
-//		    if(activeReports.size() == 0)
-//		    {
-//		    	activeReports.add(getString(R.string.reports_not_available_for_your_organization));
-//		    }
-//
-//			mDialogBuilder.setItems(activeReports.toArray(new String[activeReports.size()]), reportSelected);
+
+			//These lines enable the reports dialog menu
+		    /*for(int i = 0; i < activeReports.size(); i++) {
+		    	activeReports.set(i, activeReports.get(i).replace(mDataManager.getActiveIncidentName() + "-", ""));
+		    }
+
+		    if(activeReports.size() == 0)
+		    {
+		    	activeReports.add(getString(R.string.reports_not_available_for_your_organization));
+		    }*/
+
+			mDialogBuilder.setItems(activeReports.toArray(new String[activeReports.size()]), reportSelected);
 			mReportPopupMenu = mDialogBuilder.create();
 			
 		    mReportPopupMenu.show();

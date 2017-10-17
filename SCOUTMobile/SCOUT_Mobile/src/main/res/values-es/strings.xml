@@ -49,7 +49,7 @@
 	<string name="nounproject">Various icons are used from The Noun Project (http://thenounproject.com) under Creative Commons – Attribution (CC BY 3.0)</string>
 	<string name="DAMAGESURVEY">Informe de daños</string>
 	<string name="FIELDREPORT">Informe de campo</string>
-	<string name="GENERALMESSAGE">Mensaje general</string>
+	<string name="GENERALMESSAGE">Informe de campo</string>
 	<string name="WEATHERREPORT">Weather Report</string>
 	<string name="CATANREQUEST">Catan Request</string>
 	<string name="LOGOUT">Desconexión</string>
@@ -115,7 +115,7 @@
 	<string name="no_damage_reports_exist">No damage surveys exist - please click the \&#39;+\&#39; sign to create a new survey.</string>
 	<string name="no_field_reports_exist">No field reports exist - please click the \&#39;+\&#39; sign to create a new report.</string>
 	<string name="no_resource_requests_exist">No resource requests exist - please click the \&#39;+\&#39; sign to create a new request.</string>
-	<string name="no_simple_reports_exist">No general messages exist - please click the \&#39;+\&#39; sign to create a new message.</string>
+	<string name="no_simple_reports_exist">No field reports exist - please click the \&#39;+\&#39; sign to create a new message.</string>
 	<string name="no_weather_reports_exist">No weather reports exist - please click the \&#39;+\&#39; sign to create a new report.</string>
 	<string name="go_to_report_on_map">Go to report on map</string>
 	<string name="no_rooms_accessible">You do not have access to any collaboration rooms for this incident. Please contact the owner of this incident.</string>
@@ -132,7 +132,7 @@
 	<string name="missing_image_capture_description">Selecciona o genera una imagen para enviar.</string>
 	<string name="selected_image_not_available_title">Selected image is not on the local phone.</string>
 	<string name="selected_image_not_available_desc">Please select an image that is available locally on the phone.</string>
-	<string name="using_alt_image_path_for_general_message">Using alternate image path for general message.</string>
+	<string name="using_alt_image_path_for_general_message">Using alternate image path for field report.</string>
 	<string name="damage_item_not_set_title">Damage Type Not Selected</string>
 	<string name="damage_item_not_set_desc">One or more damaged items do not have a type selected. Please select an item type to submit this survey.</string>
 	<string name="collecting_lrf_data">Collecting LRF Data…</string>
@@ -279,7 +279,7 @@
 	<string name="markup_course">Course:</string>
 	<string name="markup_speed">Velocidad:</string>
 	<string name="markup_description">Descripción:</string>
-	<string name="markup_press_to_view">Press to view message…</string>
+	<string name="markup_press_to_view">Press to view report…</string>
 	<string name="about_legal_section_google_display_name">Legal Notices - Google Maps(es translate)</string>
 	<string name="about_funding_display_name">(es translate)</string>
 	<string name="about_google_display_name">(es translate)</string>
