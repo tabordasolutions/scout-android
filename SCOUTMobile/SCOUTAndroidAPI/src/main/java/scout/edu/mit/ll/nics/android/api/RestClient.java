@@ -1349,7 +1349,6 @@ public class RestClient {
 				try {
 		        	if(!report.isDraft()) {
 						cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(report.toJsonString());
-		    			
 		    			mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId() + "/FR", entity, new FieldReportResponseHandler(mContext, mDataManager, report.getId()));
 		    			mSendingFieldReports = true;
 		        	}
