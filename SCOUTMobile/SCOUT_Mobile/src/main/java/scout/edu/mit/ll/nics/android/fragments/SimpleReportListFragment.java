@@ -328,7 +328,7 @@ public class SimpleReportListFragment extends FormListFragment {
 						index = -1;
 						top = -1;
 					}catch(IllegalStateException e){
-						Log.e("SimpleReportListFragment",e.toString());
+						Log.e("SimpleReportListFrag",e.toString());
 						e.printStackTrace();
 					}
 				}

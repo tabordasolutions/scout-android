@@ -351,15 +351,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			other.setHeight(0);
 			mBreadcrumbTextView = new TextView(this);
 			mBreadcrumbTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-			
-			CollabroomPayload payload = mDataManager.getSelectedCollabRoom();
-			
-			if(payload.getCollabRoomId() > -1) {
-				mBreadcrumbTextView.setText(payload.getName());
-			} else {
-				mBreadcrumbTextView.setText(mDataManager.getActiveIncidentName());
-			}
-			
 			mBreadcrumbTextView.setGravity(Gravity.CENTER_VERTICAL| Gravity.RIGHT);
 			mBreadcrumbTextView.setTextSize(18);
 			if(!mDataManager.getTabletLayoutOn()){
@@ -369,24 +360,72 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		}
 
 		if(mLastPosition != NavigationOptions.OVERVIEW.getValue()) {
-			
-			CollabroomPayload payload = mDataManager.getSelectedCollabRoom();
-			
-			if(payload.getCollabRoomId() > -1) {
-				mBreadcrumbTextView.setText(payload.getName());
-			} else {
-				mBreadcrumbTextView.setText(mDataManager.getActiveIncidentName());
-			}
-			
-			mBreadcrumbTextView.setVisibility(View.VISIBLE);
+			restoreViewTitle();
+
 		} else {
-			mBreadcrumbTextView.setText("");
-			mBreadcrumbTextView.setVisibility(View.GONE);
+			clearViewTitle();
 		}
+	}
+
+	// Restores the view title using current fragments to deduce title
+	public void restoreViewTitle()
+	{
+		Fragment currentFragment =  mFragmentManager.findFragmentById(R.id.container);
+		Fragment currentFragment2 = mFragmentManager.findFragmentById(R.id.container2);
+		setViewTitle(currentFragment,currentFragment2);
+	}
+
+	// Updates the title textView depending on what room we are in
+	public void setViewTitle(Fragment currentFragment, Fragment currentFragment2)
+	{
+		if(mBreadcrumbTextView != null) {
+
+			CollabroomPayload collabRoom = mDataManager.getSelectedCollabRoom();
+
+			// IF we haven't selected a room
+			if(collabRoom.getName().equals(getString(R.string.no_selection))){
+				setBreadcrumbText("No Room Selected");
+			}
+			else {
+				if(currentFragment == mSimpleReportFragment)
+				{
+					// have to choose between chat and field report
+					if(currentFragment2 == mChatFragment)
+						mBreadcrumbTextView.setText(R.string.fragment_title_chat);
+					else if(currentFragment2 == mSimpleReportListFragment)
+						mBreadcrumbTextView.setText(R.string.fragment_title_field_report);
+					else
+						mBreadcrumbTextView.setText(R.string.fragment_title_simple_report);
+				}
+				else if(currentFragment == mFieldReportFragment)
+					mBreadcrumbTextView.setText(R.string.fragment_title_field_report);
+				else if(currentFragment == mDamageReportFragment)
+					mBreadcrumbTextView.setText(R.string.fragment_title_damage_report);
+				else if(currentFragment == mWeatherReportFragment)
+					mBreadcrumbTextView.setText(R.string.fragment_title_weather_report);
+				else if(currentFragment == mMapMarkupFragment)
+					mBreadcrumbTextView.setText(R.string.fragment_title_map);
+				else if(currentFragment == mChatFragment)
+					mBreadcrumbTextView.setText(R.string.fragment_title_chat);
+				else if(currentFragment == mSimpleReportListFragment)
+					mBreadcrumbTextView.setText(R.string.fragment_title_field_report);
+				else
+					mBreadcrumbTextView.setText(collabRoom.getName());
+			}
+
+			mBreadcrumbTextView.setVisibility(View.VISIBLE);
+		}
+	}
+
+	public void clearViewTitle()
+	{
+		setBreadcrumbText("");
+		mBreadcrumbTextView.setVisibility(View.GONE);
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
+
 		if(savedInstanceState.containsKey(STATE_BACK_STACK)) {
 			mBackStack = new Stack<Integer>();
 			mBackStack.addAll(savedInstanceState.getIntegerArrayList(STATE_BACK_STACK));
@@ -593,7 +632,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		mEditSimpleReport = true;
 		mViewSimpleReport = false;
 	}
-	
+
 	public void addDamageReportToDetailView(boolean isCopy){
 		if(mDamageReportFragment == null) {
 			mDamageReportFragment = new DamageReportFragment();
@@ -1188,7 +1227,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					
 					break;
 				case RESOURCEREQUEST:
-					
+
 					if(currentFragment != null && currentFragment2 != null ){
 						if(currentFragment == mResourceRequestFragment && currentFragment2 ==  mResourceRequestListFragment){
 							break;
@@ -1329,24 +1368,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				mLastPosition = position;
 			}
 
+			//Set the view title depending on what view we are in
 			if(mBreadcrumbTextView != null) {
-				if(position == NavigationOptions.OVERVIEW.getValue()) {
-					setBreadcrumbText("");
-					mBreadcrumbTextView.setVisibility(View.GONE);
-	
+				if (position == NavigationOptions.OVERVIEW.getValue()) {
+					clearViewTitle();
 				} else {
-					if(showIncidentName) {
-						setBreadcrumbText(mDataManager.getActiveIncidentName() + "\n" + NavigationOptions.values()[position]);
+
+					setViewTitle(fragment,fragment2);
+
+					if(showIncidentName)
+					{
 						mDataManager.setCurrentNavigationView(NavigationOptions.values()[position].toString());
-					} else {
-						CollabroomPayload collabRoom = mDataManager.getSelectedCollabRoom();
-						if(collabRoom.getName().equals(getString(R.string.no_selection))){
-							setBreadcrumbText("No Room Selected");
-						}else{
-							setBreadcrumbText(collabRoom.getName());
-						}
 					}
-					mBreadcrumbTextView.setVisibility(View.VISIBLE);
 				}
 			}
 		}

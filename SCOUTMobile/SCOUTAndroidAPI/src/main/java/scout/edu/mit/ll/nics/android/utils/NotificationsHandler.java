@@ -116,7 +116,7 @@ public class NotificationsHandler {
 	
 	public void createSimpleReportNotification(ArrayList<SimpleReportPayload> payloads, long activeIncidentId) {
 		mBuilder.setContentTitle("NICS");
-		mBuilder.setContentText("General Message(s) Receieved");
+		mBuilder.setContentText("Field Report(s) Receieved");
 		
 		for(SimpleReportPayload payload : payloads) {
 			if(payload.getIncidentId() == activeIncidentId) {
