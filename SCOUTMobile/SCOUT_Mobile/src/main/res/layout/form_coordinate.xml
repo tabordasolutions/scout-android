@@ -54,7 +54,7 @@
             android:layout_weight="1"
             android:ems="5"
             android:inputType="text|textNoSuggestions"
-            android:nextFocusDown="@+id/formCoordinateLongitudeInput"
+            android:nextFocusDown="@+id/formCoordinateLatitudeInput"
             android:textSize="14sp"
             android:visibility="gone" />
 
@@ -80,7 +80,9 @@
             android:nextFocusDown="@+id/formCoordinateLRF"
             android:textSize="14sp" />
 
-        <ImageButton
+
+
+    <ImageButton
             android:id="@+id/formCoordinateLRF"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="38dp"

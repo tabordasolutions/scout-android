@@ -57,12 +57,33 @@ public class SimpleReportData {
 		fullpath = messageData.getFullpath();
 		
 		if(messageData.getLatitude() != null) {
-			lat = Double.valueOf(messageData.getLatitude());
+
+			try
+			{
+				lat = Double.valueOf(messageData.getLatitude());
+			}
+			catch(Exception e)
+			{
+				lat = 0;
+			}
 		}
 		
 		if(messageData.getLongitude() != null) {
-			lon = Double.valueOf(messageData.getLongitude());
+			try
+			{
+				lon = Double.valueOf(messageData.getLongitude());
+			}
+			catch(Exception e)
+			{
+				lon = 0;
+			}
 		}
+
+		//Make sure lat / long are valid numbers
+		if(lat < -90 || lat > 90)
+			lat = 0;
+		if(lon > 180 || lon < -180)
+			lon = 0;
 	}
     
 	public String getAssign() {

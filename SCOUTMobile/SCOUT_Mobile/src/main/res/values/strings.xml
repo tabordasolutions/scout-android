@@ -42,6 +42,12 @@
 	<string name="button_save_draft">Save As Draft</string>
 	<string name="button_submit">Submit</string>
 	<string name="button_clear">Clear</string>
+	<string name="button_cancel">Cancel</string>
+	<string name="exit_report_draft_dialog_title">Cancel Report</string>
+	<string name="exit_report_draft_dialog_msg">Your report progress will be lost if you leave the report.</string>
+	<string name="exit_report_draft_dialog_save">Save Draft and Close</string>
+	<string name="exit_report_draft_dialog_ok">Don\'t Save and Close</string>
+	<string name="exit_report_draft_dialog_cancel">Continue Editing</string>
 	<string name="chat_log">Chat</string>
 	<string name="chat_is_loading">Chat is Loading…</string>
 	<string name="chat_enter_message">Enter chat message…</string>
@@ -67,7 +73,7 @@
 	<string name="browse_gallery">Browse Gallery</string>
 	<string name="capture_image">Capture Image</string>
 	<string name="cancel">Cancel</string>
-	<string name="recipient">Recipient</string>
+	<string name="recipient">Please Forward Information to:</string>
 	<string name="select_color">Select Color</string>
 	<string name="color_picker_title">Color Picker</string>
 	<string name="common">Common</string>

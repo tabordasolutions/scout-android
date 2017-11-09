@@ -38,6 +38,7 @@ import java.util.Stack;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -56,6 +57,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
@@ -920,31 +922,52 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	    	mPreventNavigation = false;
 		} else if(position == mLastPosition && position == id) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			String title = getString(R.string.confirm_continue_to_title, navDropdownOptions[position]);
-			String message = getString(R.string.confirm_continue_to_description);
-			
+
+
+			String title = getString(R.string.exit_report_draft_dialog_title);
+			String message = getString(R.string.exit_report_draft_dialog_msg);
+
 			if(mEditFieldReport) {
 				prompt = true;
-				message = String.format(message, getString(R.string.FIELDREPORT));
+		//		message = String.format(message, getString(R.string.FIELDREPORT));
 			} else if(mEditSimpleReport) {
 				prompt = true;
-				message = String.format(message, getString(R.string.GENERALMESSAGE));
+		//		message = String.format(message, getString(R.string.GENERALMESSAGE));
 			} else if(mEditResourceRequest) {
 				prompt = true;
-				message = String.format(message, getString(R.string.RESOURCEREQUEST));
+		//		message = String.format(message, getString(R.string.RESOURCEREQUEST));
 			} else if(mEditDamageReport) {
 				prompt = true;
-				message = String.format(message, getString(R.string.DAMAGESURVEY));
+		//		message = String.format(message, getString(R.string.DAMAGESURVEY));
 			}else if(mEditWeatherReport) {
 				prompt = true;
-				message = String.format(message, getString(R.string.WEATHERREPORT));
+		//		message = String.format(message, getString(R.string.WEATHERREPORT));
 			}
-				
+
 			if(prompt) {
 				builder.setTitle(title);
 				builder.setMessage(message);
-				
-				builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+
+
+				// Exit without saving button
+				builder.setNeutralButton(R.string.exit_report_draft_dialog_ok,
+						new DialogInterface.OnClickListener()
+						{
+							public void onClick(DialogInterface dialog, int id)
+							{
+								mPreventNavigation = false;
+
+								mEditDamageReport = false;
+								mEditFieldReport = false;
+								mEditResourceRequest = false;
+								mEditSimpleReport = false;
+								mEditWeatherReport = false;
+								onNavigationItemSelected(position, id);
+							}
+						});
+
+				// Save draft and close button
+				builder.setPositiveButton(R.string.exit_report_draft_dialog_save, new DialogInterface.OnClickListener() {
 		            public void onClick(DialogInterface dialog, int id) {
 		            	mPreventNavigation = false;
 		            	
@@ -954,9 +977,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		            	mEditSimpleReport = false;
 		            	mEditWeatherReport = false; 
 		            	onNavigationItemSelected(position, id);
+
+						// This saves a simpleReport draft, but this code is only ever called from a simpleReport
+						// SimpleReport draft applies to GeneralMessages (which have been renamed to Field Reports)
+						mSimpleReportFragment.saveDraft();
 		            }
 		        });
-				builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+
+				// Continue editing button
+				builder.setNegativeButton(R.string.exit_report_draft_dialog_cancel, new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface dialog, int id) {
 		            	dialog.dismiss();
@@ -966,8 +995,27 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		            }
 		        });
 				
-				AlertDialog dialog = builder.create();
-				dialog.show();
+				final AlertDialog alertdialog = builder.create();
+
+				// Changing the dialog text button text sizes
+				alertdialog.setOnShowListener(new DialogInterface.OnShowListener()
+				{
+					@Override
+					public void onShow(DialogInterface dialog)
+					{
+						Button btnPositive = alertdialog.getButton(Dialog.BUTTON_POSITIVE);
+						btnPositive.setTextSize(13);
+						Button btnNegative = alertdialog.getButton(Dialog.BUTTON_NEGATIVE);
+						btnNegative.setTextSize(13);
+						Button btnNeutral = alertdialog.getButton(Dialog.BUTTON_NEUTRAL);
+						btnNeutral.setTextSize(13);
+
+						btnNeutral.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+					}
+
+				});
+
+				alertdialog.show();
 			}
 		}
 		
