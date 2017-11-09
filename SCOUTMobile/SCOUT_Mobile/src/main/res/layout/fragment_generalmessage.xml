@@ -73,13 +73,22 @@
                 android:text="@string/button_submit"
                 style="?android:attr/buttonBarButtonStyle" />
 
-            <Button
+            <!-- Replaced clear button with cancel button -->
+            <!--<Button
                 android:id="@+id/generalMessageClearButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".33"
                 android:text="@string/button_clear"
-                style="?android:attr/buttonBarButtonStyle" />
+                style="?android:attr/buttonBarButtonStyle" />-->
+
+            <Button
+                android:id="@+id/generalMessageCancelButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".33"
+                android:text="@string/button_cancel"
+                style="?android:attr/buttonBarButtonStyle"/>
 
         </LinearLayout>
 

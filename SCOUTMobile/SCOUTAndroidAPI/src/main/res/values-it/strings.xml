@@ -134,7 +134,7 @@
 	<string name="sr_categorytype_public_information_officer">Public Information Officer(italian)</string>
 	<string name="sr_categorytype_safety_officer">Safety Officer(italian)</string>
 	<string name="sr_categorytype_suppression_repair">Suppression Repair(italian)</string>
-	<string name="sr_category_displayname">Recipient(italian)</string>
+	<string name="sr_category_displayname">Please Forward Information to:(italian)</string>
 	<string name="sr_location_displayname">Location(italian)</string>
 	<string name="sr_message_displayname">Message(italian)</string>
 	<string name="sr_message_hint">Message(italian)</string>

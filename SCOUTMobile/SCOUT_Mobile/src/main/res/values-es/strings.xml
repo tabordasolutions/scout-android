@@ -42,6 +42,12 @@
 	<string name="button_save_draft">Guardad borrador</string>
 	<string name="button_submit">Enviar</string>
 	<string name="button_clear">Claro</string>
+	<string name="button_cancel">Cancelar</string>
+	<string name="exit_report_draft_dialog_title">Cancelar Informe</string>
+	<string name="exit_report_draft_dialog_msg">El progreso de su informe se perderá si abandona el informe.</string>
+	<string name="exit_report_draft_dialog_save">Guardar Borrador y Cerrar</string>
+	<string name="exit_report_draft_dialog_ok">No Guardar y Cerrar</string>
+	<string name="cexit_fieldreport_draft_dialog_cancel">Continuar Editando</string>
 	<string name="chat_log">Conversación</string>
 	<string name="chat_is_loading">Chat is Loading…</string>
 	<string name="chat_enter_message">Enter chat message…</string>
@@ -67,7 +73,7 @@
 	<string name="browse_gallery">Explorar la galería</string>
 	<string name="capture_image">Capturar imagen</string>
 	<string name="cancel">Cancelar</string>
-	<string name="recipient">Destinatario</string>
+	<string name="recipient">Envie informacion a:</string>
 	<string name="select_color">Select Color (es translate)</string>
 	<string name="color_picker_title">Color Picker</string>
 	<string name="common">Common</string>

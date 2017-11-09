@@ -45,6 +45,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -140,6 +141,7 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 	
 	@Override
 	public void setValue(String value) {
+
 		double lat = -360;
 		double lng = -360;
 		
@@ -158,14 +160,24 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 			mLongitudeInput.setVisibility(View.GONE);
 			mOtherInput.setVisibility(View.VISIBLE);
 		}
-				
+
+		/*if(value != null && !value.isEmpty())
+		{
+			String[] coordArray = value.split(";");
+			if(coordArray.length == 2)
+			{
+				mLatitudeInput.setText(coordArray[0]);
+				mLongitudeInput.setText(coordArray[1]);
+			}
+		}*/
+
+
 		if(value != null && !value.isEmpty()) {
 			String[] coordinateArray = value.split(";");
 			
 			if(coordinateArray.length == 2) {
 				try {
-					
-					if(!coordinateArray[0].equals("null") && !coordinateArray[1].equals("null)")) {
+					if(!coordinateArray[0].equals("null") && !coordinateArray[1].equals("null")) {
 						lat = Double.valueOf(coordinateArray[0]);
 						lng = Double.valueOf(coordinateArray[1]);
 					}
@@ -201,18 +213,22 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 		int currentRepresentation = -1;
 		double lat = -360;
 		double lng = -360;
-		try {
 
-		// TODO: Rewrite
+
+		//MGRS Coordinates
+//		try {
+//		// TODO: Rewrite
 //			MGRSCoord mgrs = MGRSCoord.fromString(mOtherInput.getText().toString());
 //
 //			lat = mgrs.getLatitude().degrees;
 //			lng = mgrs.getLongitude().degrees;
-			currentRepresentation = Constants.LOCATION_MGRS;
-		} catch (Exception e) {
-		}
-		
-		if(currentRepresentation == -1) {
+//			currentRepresentation = Constants.LOCATION_MGRS;
+//		} catch (Exception e) {
+//		}
+
+
+		//UTM Coordinates
+		/*if(currentRepresentation == -1) {
 			try {
 				String[] utmParts = mOtherInput.getText().toString().split(" ");
 				// TODO: rewrite
@@ -227,11 +243,12 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 //
 //				lat = utm.getLatitude().degrees;
 //				lng = utm.getLongitude().degrees;
-				currentRepresentation = Constants.LOCATION_UTM; 
+				currentRepresentation = Constants.LOCATION_UTM;
 			} catch (Exception e) {
 			}
-		}
-		
+		}*/
+
+		//Degrees, getting it from the current text field
 		if(currentRepresentation == -1) {
 			try {
 				lat = Location.convert(mLatitudeInput.getText().toString());
@@ -240,11 +257,12 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 			} catch (Exception e) {
 			}
 		}
-		
+
+		//Degrees, getting it from otherInput field
 		if(currentRepresentation == -1) {
 			try {
 				String[] coordinateArray = mOtherInput.getText().toString().split(";");
-				
+
 				if(coordinateArray.length == 2 && !coordinateArray[0].equals("null") && !coordinateArray[1].equals("null)")) {
 					lat = Double.valueOf(coordinateArray[0]);
 					lng = Double.valueOf(coordinateArray[1]);
@@ -253,7 +271,8 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 			} catch (Exception e) {
 			}
 		}
-		
+
+
 		String value = lat + ";" + lng;
 		
 		if(lat == -360 || lng == -360) {
@@ -262,7 +281,7 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 		if(currentRepresentation != mDataManager.getCoordinateRepresentation()) {
 			setValue(value);
 		}
-		
+
 		return value;
 	}
 

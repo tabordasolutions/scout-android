@@ -50,5 +50,9 @@
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
+    <style name="CancelReportDialogStyle" parent="AppBaseTheme">
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@android:color/white</item>
+    </style>
 
 </resources>

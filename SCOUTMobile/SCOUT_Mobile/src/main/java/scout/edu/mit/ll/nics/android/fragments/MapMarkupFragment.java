@@ -754,8 +754,6 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 				}
 				mDataManager.forceLocationUpdate();
 				mIgnoreUpdate = false;
-				//LUIS FIXME: add the line below this to this block, that should proabbly update the map.
-				//addMarkupFromServer();
 			}
 		} else {
 
@@ -1224,7 +1222,6 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 					mFirelineFeatures.clear();
 
-					//LUIS FIXME
 					if (markupTileProvider != null) {
 						markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 					}
@@ -1633,7 +1630,6 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 								//{
 									final MarkupFireLine fireline = new MarkupFireLine(mDataManager, feature, serverColor, zoom);
 									mMarkupShapes.put(feature.getFeatureId(), fireline);
-								//LUIS FIXME: disabled this to test
 									mFirelineFeatures.add(fireline);
 								//}
 							}
@@ -1717,8 +1713,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 								mShapesListProgress.setVisibility(View.GONE);
 							}
 
-							//LUIS FIXME
-							//This assigns the fireline features as well, this plays a part in why / how the markup is being drawn though I've disabled parseMarkupFeatures
+							//This assigns the fireline features as well, this plays a part in why / how the markup is being drawn
 							markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 							tileOverlay.clearTileCache();
 						}
@@ -1764,9 +1759,6 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			}
 
 			if (mClearTiles) {
-				//LUIS FIXME
-				//okay: so disabling this line makes the markup not appear when the app is in the background... interesting
-				//I believe they intended for this is to clear the tiles from rendering... but why does this serve to set them?
 				markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 				tileOverlay.clearTileCache();
 				mClearTiles = false;

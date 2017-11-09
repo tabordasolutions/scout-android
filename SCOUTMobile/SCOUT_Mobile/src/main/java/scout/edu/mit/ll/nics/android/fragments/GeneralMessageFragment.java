@@ -31,6 +31,7 @@
 package scout.edu.mit.ll.nics.android.fragments;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,6 +39,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -66,7 +68,9 @@ public class GeneralMessageFragment extends Fragment {
 	private LinearLayout mFormButtons;
 	private Button mSaveDraftButton;
 	private Button mSubmitButton;
-	private Button mClearAllButton;
+	//Replaced clear button with Cancel button
+	//private Button mClearAllButton;
+	private Button mCancelButton;
 
 	private View mRootView;
 	private DataManager mDataManager;
@@ -127,13 +131,15 @@ public class GeneralMessageFragment extends Fragment {
 		
 		mSaveDraftButton = (Button) mRootView.findViewById(R.id.generalMessageSaveButton);
 		mSubmitButton = (Button) mRootView.findViewById(R.id.generalMessageSubmitButton);
-		mClearAllButton = (Button) mRootView.findViewById(R.id.generalMessageClearButton);
+		//mClearAllButton = (Button) mRootView.findViewById(R.id.generalMessageClearButton);
+		mCancelButton = (Button) mRootView.findViewById(R.id.generalMessageCancelButton);
 		
 		mFormButtons = (LinearLayout) mRootView.findViewById(R.id.generalMessageButtons);
 
 		mSaveDraftButton.setOnClickListener(onActionButtonClick);
 		mSubmitButton.setOnClickListener(onActionButtonClick);
-		mClearAllButton.setOnClickListener(onActionButtonClick);
+		//mClearAllButton.setOnClickListener(onActionButtonClick);
+		mCancelButton.setOnClickListener(onActionButtonClick);
 		mDataManager = DataManager.getInstance(getActivity());
 
 		return mRootView;
@@ -223,6 +229,43 @@ public class GeneralMessageFragment extends Fragment {
 		((ViewGroup) mRootView.getParent()).removeView(mRootView);
 	}
 
+	// Saves the current General Message to draft
+	public void saveDraft() {
+		isDraft = true;
+
+		if(isDraft) {
+			mDataManager.deleteSimpleReportStoreAndForward(mReportId);
+		}
+		SimpleReportData messageData;
+		SimpleReportPayload payload;
+		long currentTime = System.currentTimeMillis ();
+
+		messageData = new SimpleReportData((new Gson().fromJson(mFormFragment.save().toString(), SimpleReportFormData.class)));
+		messageData.setUser(mDataManager.getUsername());
+		messageData.setUserFull(mDataManager.getUserNickname());
+
+		//FIXME: get lat/long from form
+		//messageData.setLatitude(10);
+		//messageData.setLongitude(10);
+
+		payload = new SimpleReportPayload();
+
+		payload.setId(mReportId);
+		payload.setDraft(isDraft);
+		payload.setIncidentId(mDataManager.getActiveIncidentId());
+		payload.setIncidentName(mDataManager.getActiveIncidentName());
+		payload.setFormTypeId(FormType.DR.ordinal());
+//					payload.setSenderUserId(mDataManager.getUserId());
+		payload.setUserSessionId(mDataManager.getUserSessionId());
+		payload.setMessageData(messageData);
+//					payload.setCreatedUTC(currentTime);
+//					payload.setLastUpdatedUTC(currentTime);
+		payload.setSeqTime(currentTime);
+
+		mDataManager.addSimpleReportToStoreAndForward(payload);
+	}
+
+
 	private OnClickListener onActionButtonClick = new OnClickListener() {
 
 		private AlertDialog mAlertDialog;
@@ -235,31 +278,7 @@ public class GeneralMessageFragment extends Fragment {
 			
 	    	switch (v.getId()) {
 				case R.id.generalMessageSaveButton:
-					isDraft = true;
-					
-					if(isDraft) {
-						mDataManager.deleteSimpleReportStoreAndForward(mReportId);
-					}
-					
-					messageData = new SimpleReportData((new Gson().fromJson(mFormFragment.save().toString(), SimpleReportFormData.class)));
-					messageData.setUser(mDataManager.getUsername());
-					messageData.setUserFull(mDataManager.getUserNickname());
-					
-					payload = new SimpleReportPayload();
-					
-					payload.setId(mReportId);
-					payload.setDraft(isDraft);
-					payload.setIncidentId(mDataManager.getActiveIncidentId());
-					payload.setIncidentName(mDataManager.getActiveIncidentName());
-					payload.setFormTypeId(FormType.DR.ordinal());
-//					payload.setSenderUserId(mDataManager.getUserId());
-					payload.setUserSessionId(mDataManager.getUserSessionId());
-					payload.setMessageData(messageData);
-//					payload.setCreatedUTC(currentTime);
-//					payload.setLastUpdatedUTC(currentTime);
-					payload.setSeqTime(currentTime);
-					
-					mDataManager.addSimpleReportToStoreAndForward(payload);
+					saveDraft();
 					mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
 
 					break;
@@ -306,13 +325,78 @@ public class GeneralMessageFragment extends Fragment {
 //						mAlertDialog = builder.create();
 //	                    mAlertDialog.show();
 //					}
-	
-				case R.id.generalMessageClearButton:
-					mFormFragment.populate("", true);
+
+				// I replaced the clear button with the cancel button
+				//case R.id.generalMessageClearButton:
+				//	mFormFragment.populate("", true);
+				//	break;
+				case R.id.generalMessageCancelButton:
+					confirmCancelDialog();
 					break;
 			}
 		}
 	};
+
+	//Prompts a user asking if they want to cancel
+	public void confirmCancelDialog()
+	{
+		String title = getString(R.string.exit_report_draft_dialog_title);
+		String message = getString(R.string.exit_report_draft_dialog_msg);
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setTitle(title);
+		builder.setMessage(message);
+
+
+		// Exit without saving button
+		builder.setNeutralButton(R.string.exit_report_draft_dialog_ok,
+				new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int id)
+					{
+						mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
+					}
+				});
+
+		// Save draft and close button
+		builder.setPositiveButton(R.string.exit_report_draft_dialog_save, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				saveDraft();
+				mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
+
+			}
+		});
+
+		// Continue editing button
+		builder.setNegativeButton(R.string.exit_report_draft_dialog_cancel, new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.dismiss();
+			}
+		});
+
+		final AlertDialog alertdialog = builder.create();
+
+		// Changing the dialog text button text sizes
+		alertdialog.setOnShowListener(new DialogInterface.OnShowListener()
+		{
+			@Override
+			public void onShow(DialogInterface dialog)
+			{
+				Button btnPositive = alertdialog.getButton(Dialog.BUTTON_POSITIVE);
+				btnPositive.setTextSize(13);
+				Button btnNegative = alertdialog.getButton(Dialog.BUTTON_NEGATIVE);
+				btnNegative.setTextSize(13);
+				Button btnNeutral = alertdialog.getButton(Dialog.BUTTON_NEUTRAL);
+				btnNeutral.setTextSize(13);
+
+				btnNeutral.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+			}
+
+		});
+
+		alertdialog.show();
+	}
+
 
 	public String toJson() {
 		return mFormFragment.save().toString();
