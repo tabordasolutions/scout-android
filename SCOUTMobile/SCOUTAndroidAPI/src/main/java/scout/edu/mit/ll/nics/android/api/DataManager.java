@@ -1480,47 +1480,49 @@ public class DataManager {
 	}
 	
 	public String getServer() {
-		if(mGlobalPreferences.getBoolean("custom_server_enabled", false)) {
+		/*if(mGlobalPreferences.getBoolean("custom_server_enabled", false)) {
 			return mGlobalPreferences.getString("custom_server_url", getContext().getResources().getString(R.string.config_server_default));
-		}
-		
-		return mGlobalPreferences.getString("server_list", getContext().getResources().getString(R.string.config_server_default));
+		}*/
+		//return mGlobalPreferences.getString("server_list", getContext().getResources().getString(R.string.config_server_default));
+		return getContext().getResources().getString(R.string.config_server_default);
 	}
 	
 	public void setIplanetCookieDomain(String value){
 		mSharedPreferences.savePreferenceString(Constants.IPLANET_COOKIE_DOMAIN, value);
 	}
 	public String getIplanetCookieDomain(){
-		if(isCustomDomainEnabled()){
-			String test = mGlobalPreferences.getString("custom_cookie_domain","");
-			return mGlobalPreferences.getString("custom_cookie_domain","");
-		}else{
-			return mSharedPreferences.getPreferenceString(Constants.IPLANET_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default));
-		}
+		/*if(isCustomDomainEnabled()){
+			String test = mGlobalPreferences.getString("custom_cookie_domain", "");
+			return mGlobalPreferences.getString("custom_cookie_domain", "");
+		}*/
+		//return mSharedPreferences.getPreferenceString(Constants.IPLANET_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default));
+		return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default);
 	}
 	
 	public void setAmAuthCookieDomain(String value){
 		mSharedPreferences.savePreferenceString(Constants.AMAUTH_COOKIE_DOMAIN, value);
 	}
 	public String getAmAuthCookieDomain(){
-		if(isCustomDomainEnabled()){
+		/*if(isCustomDomainEnabled()){
 			return mGlobalPreferences.getString("custom_cookie_domain","");
-		}else{
-			return mSharedPreferences.getPreferenceString(Constants.AMAUTH_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_amauth_cookie_domain_default));	
-		}
+		}*/
+		//return mSharedPreferences.getPreferenceString(Constants.AMAUTH_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_amauth_cookie_domain_default));
+		return getContext().getResources().getString(R.string.config_amauth_cookie_domain_default);
 	}
 	
 	public boolean isCustomDomainEnabled() {
-		return mGlobalPreferences.getBoolean("custom_domain_name_enabled", false);
+		//return mGlobalPreferences.getBoolean("custom_domain_name_enabled", false);
+		return false;
 	}
 	
 	public boolean isMDTEnabled() {
 		return mGlobalPreferences.getBoolean("tracking_checkbox", true);
 	}
 	
-	public boolean isLRFEnabled() {
-		return mGlobalPreferences.getBoolean("lrf_checkbox", false);
-	}
+	/*public boolean isLRFEnabled() {
+		return false;
+		//return mGlobalPreferences.getBoolean("lrf_checkbox", false);
+	}*/
 	
 	public boolean isPushNotificationsDisabled(){
 		return mGlobalPreferences.getBoolean("disable_notifications_checkbox", false);
@@ -1537,7 +1539,8 @@ public class DataManager {
 		if(LowDataMode){
 			return LowDataRate;
 		}else{
-			return Integer.parseInt(mGlobalPreferences.getString("incident_sync_frequency", "60"));
+			return Integer.parseInt(mGlobalPreferences.getString("sync_frequency", "60"));
+			//return Integer.parseInt(mGlobalPreferences.getString("incident_sync_frequency", "60"));
 		}
 	}
 	
@@ -1545,7 +1548,8 @@ public class DataManager {
 		if(LowDataMode){
 			return LowDataRate;
 		}else{
-			return Integer.parseInt(mGlobalPreferences.getString("collabroom_sync_frequency", "30"));
+			return Integer.parseInt(mGlobalPreferences.getString("sync_frequency", "60"));
+			//return Integer.parseInt(mGlobalPreferences.getString("collabroom_sync_frequency", "30"));
 		}
 	}
 	
@@ -1553,7 +1557,8 @@ public class DataManager {
 	if(LowDataMode){
 			return LowDataRate;
 		}else{
-			return Integer.parseInt(mGlobalPreferences.getString("mdt_sync_frequency", "60"));
+			return Integer.parseInt(mGlobalPreferences.getString("sync_frequency", "60"));
+			//return Integer.parseInt(mGlobalPreferences.getString("mdt_sync_frequency", "60"));
 		}
 	}
 	
@@ -1561,7 +1566,8 @@ public class DataManager {
 	if(LowDataMode){
 			return LowDataRate;
 		}else{
-			return Integer.parseInt(mGlobalPreferences.getString("wfs_sync_frequency", "90"));
+			return Integer.parseInt(mGlobalPreferences.getString("sync_frequency", "60"));
+			//return Integer.parseInt(mGlobalPreferences.getString("wfs_sync_frequency", "90"));
 		}
 	}
 	
@@ -1571,20 +1577,20 @@ public class DataManager {
 	
 	public String getGeoServerURL() {
 		
-		if(mGlobalPreferences.getBoolean("custom_geo_server_enabled", false)) {
-			return mGlobalPreferences.getString("custom_geo_server_url", getContext().getResources().getString(R.string.config_geo_server_default));
-		}
-		
-		return mGlobalPreferences.getString("geo_server_list", getContext().getResources().getString(R.string.config_geo_server_default));
+		//if(mGlobalPreferences.getBoolean("custom_geo_server_enabled", false)) {
+		//	return mGlobalPreferences.getString("custom_geo_server_url", getContext().getResources().getString(R.string.config_geo_server_default));
+		//}
+		//return mGlobalPreferences.getString("geo_server_list", getContext().getResources().getString(R.string.config_geo_server_default));
+		return getContext().getResources().getString(R.string.config_geo_server_default);
 	}
 	
 	public String getAuthServerURL() {
 	
-		if(mGlobalPreferences.getBoolean("custom_auth_server_enabled", false)) {
-			return mGlobalPreferences.getString("custom_auth_server_url", getContext().getResources().getString(R.string.config_auth_server_default));
-		}
-		
-		return mGlobalPreferences.getString("auth_server_list", getContext().getResources().getString(R.string.config_auth_server_default));
+		//if(mGlobalPreferences.getBoolean("custom_auth_server_enabled", false)) {
+		//	return mGlobalPreferences.getString("custom_auth_server_url", getContext().getResources().getString(R.string.config_auth_server_default));
+		//}
+		//return mGlobalPreferences.getString("auth_server_list", getContext().getResources().getString(R.string.config_auth_server_default));
+		return getContext().getResources().getString(R.string.config_auth_server_default);
 		
 	}
 	

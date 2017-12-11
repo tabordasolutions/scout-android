@@ -114,7 +114,8 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 		mMyLocationButton.setOnClickListener(myLocationClickListener);
 		
 		mBluetoothLRF = BluetoothLRF.getInstance(mContext, this);
-			if (mDataManager.isLRFEnabled()) {
+		/*if (mDataManager.isLRFEnabled())
+		{
 			mLRFButton.setVisibility(View.VISIBLE);
 			mBluetoothLRF.setOnLRFListener(this);
 
@@ -133,10 +134,12 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 				mLRFDialog = ProgressDialog.show(mContext, mContext.getString(R.string.reconnecting_bt_device), mContext.getString(R.string.reconnecting_to_device, mBluetoothLRF.getName()), true, true);
 				mBluetoothLRF.findBT();
 			}
-		} else {
-		mBluetoothLRF.closeBT();
-		mLRFButton.setVisibility(View.GONE);
 		}
+		else
+		{*/
+			mBluetoothLRF.closeBT();
+			mLRFButton.setVisibility(View.GONE);
+		//}
 	}
 	
 	@Override

@@ -137,7 +137,7 @@ public class MarkupCoordinateManager implements OnLRFDataListener {
 		mLRFButton3 = (ImageButton) view.findViewById(R.id.markupLRF3);
 
         mBluetoothLRF = BluetoothLRF.getInstance((MainActivity)mContext, this);
-		if(mDataManager.isLRFEnabled() && owner.isAddingMarkupEnabled()) {
+		/*if(mDataManager.isLRFEnabled() && owner.isAddingMarkupEnabled()) {
 			mLRFButton0.setVisibility(View.VISIBLE);
 			mLRFButton1.setVisibility(View.VISIBLE);
 			mLRFButton2.setVisibility(View.VISIBLE);
@@ -165,13 +165,13 @@ public class MarkupCoordinateManager implements OnLRFDataListener {
 				mLRFDialog = ProgressDialog.show(mContext, mContext.getString(R.string.reconnecting_bt_device), mContext.getString(R.string.reconnecting_to_device, mBluetoothLRF.getName()), true, true);
 	        	mBluetoothLRF.findBT();
 	        }
-		} else {
+		} else {*/
 			mBluetoothLRF.closeBT();
 			mLRFButton0.setVisibility(View.GONE);
 			mLRFButton1.setVisibility(View.GONE);
 			mLRFButton2.setVisibility(View.GONE);
 			mLRFButton3.setVisibility(View.GONE);
-		}
+		//}
 		
 		mButtonsPanel = view.findViewById(R.id.markupButtonsPanel);
         mCoordinatesPanel = view.findViewById(R.id.markupCoordinatesPanel);

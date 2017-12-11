@@ -312,6 +312,7 @@ public class GeneralMessageFragment extends Fragment {
 						mDataManager.sendSimpleReports();
 	
 						mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
+					break;
 //					} else {
 //						AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 //						

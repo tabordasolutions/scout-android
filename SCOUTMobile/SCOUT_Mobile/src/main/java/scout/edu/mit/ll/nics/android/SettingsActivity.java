@@ -77,22 +77,22 @@ public class SettingsActivity extends PreferenceActivity {
 	private static Intent mIntent;
 	
 	private static String mCurrentServer;
-	private static CheckBoxPreference mUseCustomServer;
-	private static Preference mCustomServerPref;
-	private static Preference mServerListPref;
+	//private static CheckBoxPreference mUseCustomServer;
+	//private static Preference mCustomServerPref;
+	//private static Preference mServerListPref;
 	
 	private static String mCurrentGeoServer;
-	private static CheckBoxPreference mUseCustomGeoServer;
-	private static Preference mCustomGeoServerPref;
-	private static Preference mGeoServerListPref;
+	//private static CheckBoxPreference mUseCustomGeoServer;
+	//private static Preference mCustomGeoServerPref;
+	//private static Preference mGeoServerListPref;
 	
 	private static String mCurrentAuthServer;
-	private static CheckBoxPreference mUseCustomAuthServer;
-	private static Preference mCustomAuthServerPref;
-	private static Preference mAuthServerListPref;
+	//private static CheckBoxPreference mUseCustomAuthServer;
+	//private static Preference mCustomAuthServerPref;
+	//private static Preference mAuthServerListPref;
 	
-	private static CheckBoxPreference mUseCustomDomain;
-	private static Preference mCustomDomainPref;
+	//private static CheckBoxPreference mUseCustomDomain;
+	//private static Preference mCustomDomainPref;
 	
 	private static boolean mServerChanged = false;
 	private static DataManager mDataManager;
@@ -138,7 +138,7 @@ public class SettingsActivity extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.pref_data_sync);
 		//addPreferencesFromResource(R.xml.pref_other);
 
-		mUseCustomServer = (CheckBoxPreference) findPreference("custom_server_enabled");
+		/*mUseCustomServer = (CheckBoxPreference) findPreference("custom_server_enabled");
 		mUseCustomServer.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 		
 		mCustomServerPref = findPreference("custom_server_url");
@@ -160,20 +160,21 @@ public class SettingsActivity extends PreferenceActivity {
 		
 		mUseCustomDomain = (CheckBoxPreference) findPreference("custom_domain_name_enabled");
 		mUseCustomDomain.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-		mCustomDomainPref = findPreference("custom_cookie_domain");
+		mCustomDomainPref = findPreference("custom_cookie_domain");*/
 		
 		mLanguageListPref = findPreference("language_select_list");
-		
-		bindPreferenceSummaryToValue(findPreference("incident_sync_frequency"));
-		bindPreferenceSummaryToValue(findPreference("collabroom_sync_frequency"));
-		bindPreferenceSummaryToValue(findPreference("mdt_sync_frequency"));
-		bindPreferenceSummaryToValue(findPreference("wfs_sync_frequency"));
-		bindPreferenceSummaryToValue(findPreference("server_list"));
-		bindPreferenceSummaryToValue(findPreference("geo_server_list"));
-		bindPreferenceSummaryToValue(findPreference("auth_server_list"));
+
+		bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+		//bindPreferenceSummaryToValue(findPreference("incident_sync_frequency"));
+		//bindPreferenceSummaryToValue(findPreference("collabroom_sync_frequency"));
+		//bindPreferenceSummaryToValue(findPreference("mdt_sync_frequency"));
+		//bindPreferenceSummaryToValue(findPreference("wfs_sync_frequency"));
+		//bindPreferenceSummaryToValue(findPreference("server_list"));
+		//bindPreferenceSummaryToValue(findPreference("geo_server_list"));
+		//bindPreferenceSummaryToValue(findPreference("auth_server_list"));
 		bindPreferenceSummaryToValue(findPreference("language_select_list"));
 		
-		if(mUseCustomServer.isChecked()) {
+		/*if(mUseCustomServer.isChecked()) {
 			mCustomServerPref.setEnabled(true);
 			mServerListPref.setEnabled(false);
 		} else {
@@ -201,7 +202,7 @@ public class SettingsActivity extends PreferenceActivity {
 			mCustomDomainPref.setEnabled(true);
 		} else {
 			mCustomDomainPref.setEnabled(false);
-		}
+		}*/
 		
 
 		Preference garButton = findPreference("gar_button");
@@ -331,7 +332,7 @@ public class SettingsActivity extends PreferenceActivity {
 				int index = listPreference.findIndexOfValue(stringValue);
 
 				// Set the summary to reflect the new value.
-				if (preference.getKey().equals("server_list")) {
+				/*if (preference.getKey().equals("server_list")) {
 					preference.setEnabled(true);
 					String selectServerNote = preference.getContext().getString(R.string.pref_description_select_server);
 					preference.setSummary(index >= 0 ? listPreference.getEntries()[index] + "\n\n" + selectServerNote : selectServerNote);
@@ -370,26 +371,27 @@ public class SettingsActivity extends PreferenceActivity {
 						mDataManager.requestLogout();
 						mServerChanged = true;
 					}
-				
-				}else if (preference.getKey().equals("language_select_list")) {
+				}
+				else */
+				if (preference.getKey().equals("language_select_list")) {
 		
-					String newLanguage = listPreference.getEntryValues()[index].toString();
-					if(newLanguage.equals("Device Default")){
-						newLanguage = Locale.getDefault().getISO3Language().substring(0,2);
-					}
-					String storedLanguage = mDataManager.getSelectedLanguage();
-					if(!newLanguage.equals(storedLanguage)){
+						String newLanguage = listPreference.getEntryValues()[index].toString();
+						if(newLanguage.equals("Device Default")){
+							newLanguage = Locale.getDefault().getISO3Language().substring(0,2);
+						}
+						String storedLanguage = mDataManager.getSelectedLanguage();
+						if(!newLanguage.equals(storedLanguage)){
 
-						mDataManager.setCurrentLocale(newLanguage);
-					    Intent refresh = new Intent(mActivity ,LoginActivity.class);
-					    mActivity.startActivity(refresh); 
-					    mActivity.finish();
+							mDataManager.setCurrentLocale(newLanguage);
+							Intent refresh = new Intent(mActivity ,LoginActivity.class);
+							mActivity.startActivity(refresh);
+							mActivity.finish();
 					}
 					
 					
-			}else if(preference.getKey().equals("mdt_sync_frequency")) {
-					String selectMDTNote = preference.getContext().getString(R.string.pref_description_mdt_sync_rate);
-					preference.setSummary(index >= 0 ? listPreference.getEntries()[index] + "\n\n" + selectMDTNote : selectMDTNote);
+			//}else if(preference.getKey().equals("mdt_sync_frequency")) {
+			//		String selectMDTNote = preference.getContext().getString(R.string.pref_description_mdt_sync_rate);
+			//		preference.setSummary(index >= 0 ? listPreference.getEntries()[index] + "\n\n" + selectMDTNote : selectMDTNote);
 				} else {
 					preference.setSummary(index >= 0 ? listPreference.getEntries()[index] : null);
 				}
@@ -417,7 +419,7 @@ public class SettingsActivity extends PreferenceActivity {
 			} else {
 				// For all other preferences, set the summary to the value's
 				// simple string representation.
-				if(preference.getKey().equals("custom_server_enabled")) {
+				/*if(preference.getKey().equals("custom_server_enabled")) {
 					mDataManager.stopPollingAlarms();
 					mDataManager.requestLogout();
 					mServerChanged = true;
@@ -467,9 +469,9 @@ public class SettingsActivity extends PreferenceActivity {
 						mCustomDomainPref.setEnabled(false);
 					}
 						
-				} else {
+				} else {*/
 					preference.setSummary(stringValue);
-				}
+				/*}*/
 			}
 
 			return true;
@@ -515,7 +517,11 @@ public class SettingsActivity extends PreferenceActivity {
 			Preference mCategory = findPreference("header");
 			getPreferenceScreen().removePreference(mCategory);
 
-			mUseCustomServer = (CheckBoxPreference) findPreference("custom_server_enabled");
+			mLanguageListPref = findPreference("language_select_list");
+			bindPreferenceSummaryToValue(findPreference("language_select_list"));
+
+
+			/*mUseCustomServer = (CheckBoxPreference) findPreference("custom_server_enabled");
 			mUseCustomServer.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
 			mCustomServerPref = findPreference("custom_server_url");
@@ -575,7 +581,7 @@ public class SettingsActivity extends PreferenceActivity {
 				mCustomDomainPref.setEnabled(true);
 			} else {
 				mCustomDomainPref.setEnabled(false);
-			}
+			}*/
 		}
 	}
 	
@@ -593,10 +599,12 @@ public class SettingsActivity extends PreferenceActivity {
 			// to their values. When their values change, their summaries are
 			// updated to reflect the new value, per the Android Design
 			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("incident_sync_frequency"));
-			bindPreferenceSummaryToValue(findPreference("collabroom_sync_frequency"));
-			bindPreferenceSummaryToValue(findPreference("mdt_sync_frequency"));
-			bindPreferenceSummaryToValue(findPreference("wfs_sync_frequency"));
+
+			bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+			//bindPreferenceSummaryToValue(findPreference("incident_sync_frequency"));
+			//bindPreferenceSummaryToValue(findPreference("collabroom_sync_frequency"));
+			//bindPreferenceSummaryToValue(findPreference("mdt_sync_frequency"));
+			//bindPreferenceSummaryToValue(findPreference("wfs_sync_frequency"));
 			bindPreferenceSummaryToValue(findPreference("language_select_list"));
 			
 			Preference clearLocalMapFeaturesButton = (Preference)findPreference("clear_local_map_data");

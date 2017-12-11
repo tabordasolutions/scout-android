@@ -212,22 +212,13 @@
                 android:layout_weight=".33"
                 android:text="@string/button_submit" />
 
-            <!-- Replaced clear button with cancel button -->
-            <!--<Button
+            <Button
                 android:id="@+id/simpleReportClearButton"
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".33"
-                android:text="@string/button_clear" />-->
-
-            <Button
-                android:id="@+id/simpleReportCancelButton"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight=".33"
-                android:text="@string/button_cancel" />
+                android:text="@string/button_clear" />
         </LinearLayout>
     </LinearLayout>
 

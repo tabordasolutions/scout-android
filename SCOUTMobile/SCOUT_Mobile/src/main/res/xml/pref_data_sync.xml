@@ -49,6 +49,16 @@
         android:defaultValue="60"
         android:entries="@array/pref_sync_frequency_titles"
         android:entryValues="@array/pref_sync_frequency_values"
+        android:key="sync_frequency"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_sync_frequency" />
+    <!--
+    Combined all frequency settings below into one (key=sync_frequency)
+    <ListPreference
+        android:defaultValue="60"
+        android:entries="@array/pref_sync_frequency_titles"
+        android:entryValues="@array/pref_sync_frequency_values"
         android:key="incident_sync_frequency"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
@@ -77,7 +87,7 @@
         android:key="wfs_sync_frequency"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="@string/pref_title_wfs_sync_frequency" />
+        android:title="@string/pref_title_wfs_sync_frequency" />-->
     <Preference 
         android:title="@string/pref_title_clear_local_map_data"
         android:key="clear_local_map_data"/>
