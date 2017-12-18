@@ -43,10 +43,10 @@
         android:defaultValue="false"
         android:key="disable_notifications_checkbox"
         android:title="@string/pref_title_disable_notifications" />
-    <CheckBoxPreference
+    <!--<CheckBoxPreference
         android:defaultValue="true"
         android:key="tracking_checkbox"
-        android:title="@string/pref_title_tracking" />
+        android:title="@string/pref_title_tracking" />-->
     
     <ListPreference
      android:defaultValue="@string/language_code"

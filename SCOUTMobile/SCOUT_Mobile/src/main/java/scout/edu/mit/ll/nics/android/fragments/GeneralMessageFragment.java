@@ -283,7 +283,7 @@ public class GeneralMessageFragment extends Fragment {
 
 					break;
 	
-				case R.id.generalMessageSubmitButton:						
+				case R.id.generalMessageSubmitButton:
 					messageData = new SimpleReportData((new Gson().fromJson(mFormFragment.save().toString(), SimpleReportFormData.class)));
 					messageData.setUser(mDataManager.getUsername());
 					messageData.setUserFull(mDataManager.getUserNickname());
@@ -307,7 +307,7 @@ public class GeneralMessageFragment extends Fragment {
 //						payload.setCreatedUTC(currentTime);
 //						payload.setLastUpdatedUTC(currentTime);
 						payload.setSeqTime(currentTime);
-						
+
 						mDataManager.addSimpleReportToStoreAndForward(payload);
 						mDataManager.sendSimpleReports();
 	
