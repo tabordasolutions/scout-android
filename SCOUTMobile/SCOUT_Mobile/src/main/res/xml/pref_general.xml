@@ -34,21 +34,21 @@
         android:key="header"
         android:title="@string/pref_header_general" />
 
-    <CheckBoxPreference
+    <!--<CheckBoxPreference
         android:defaultValue="false"
         android:key="lrf_checkbox"
         android:summary="@string/pref_description_lrf"
-        android:title="@string/pref_title_lrf" />
+        android:title="@string/pref_title_lrf" />-->
     <CheckBoxPreference
         android:defaultValue="false"
         android:key="disable_notifications_checkbox"
         android:title="@string/pref_title_disable_notifications" />
-    <CheckBoxPreference
+    <!--<CheckBoxPreference
         android:defaultValue="true"
         android:key="tracking_checkbox"
-        android:title="@string/pref_title_tracking" />
+        android:title="@string/pref_title_tracking" />-->
     
-         <ListPreference
+    <ListPreference
      android:defaultValue="@string/language_code"
      android:entries="@array/pref_language_list_titles"
      android:entryValues="@array/pref_language_list_values"
@@ -59,12 +59,12 @@
       android:summary="@string/pref_description_language_select"/>
     
     
-    <CheckBoxPreference 
+    <!--<CheckBoxPreference
          android:title="Use Custom Server?"
          android:defaultValue="false"
          android:key="custom_server_enabled"
-         />
-    <ListPreference
+         />-->
+    <!--<ListPreference
         android:defaultValue="@string/config_server_default"
         android:entries="@array/config_server_list_titles"
         android:entryValues="@array/config_server_list_values"
@@ -72,22 +72,22 @@
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
         android:summary="@string/pref_description_select_server"
-        android:title="@string/pref_title_select_server" />
+        android:title="@string/pref_title_select_server" />-->
     
-    <EditTextPreference 
+    <!--<EditTextPreference
          android:defaultValue="@string/config_server_default"
         android:key="custom_server_url"
         android:summary="Specify your own NICS Server."
-        android:title="Custom NICS Server URL" />
+        android:title="Custom NICS Server URL" />-->
     
     
-    <CheckBoxPreference 
+    <!--<CheckBoxPreference
      android:title="Use Custom Geo Server?"
      android:defaultValue="false"
      android:key="custom_geo_server_enabled"
-     />
+     />-->
     
-     <ListPreference
+     <!--<ListPreference
      android:defaultValue="@string/config_geo_server_default"
      android:entries="@array/config_geo_server_list_titles"
      android:entryValues="@array/config_geo_server_list_values"
@@ -95,21 +95,21 @@
      android:negativeButtonText="@null"
      android:positiveButtonText="@null"
      android:summary="@string/pref_description_select_geo_server"
-     android:title="@string/pref_title_select_geo_server" />
+     android:title="@string/pref_title_select_geo_server" />-->
     
-    <EditTextPreference 
+    <!--<EditTextPreference
         android:defaultValue="@string/config_geo_server_default"
         android:key="custom_geo_server_url"
         android:summary="Specify GeoServer for WMS/WFS layers"
-        android:title="NICS GeoServer URL" />
+        android:title="NICS GeoServer URL" />-->
     
-        <CheckBoxPreference 
+    <!--<CheckBoxPreference
      android:title="Use Custom Authentication Server?"
      android:defaultValue="false"
      android:key="custom_auth_server_enabled"
-     />
+     />-->
     
-     <ListPreference
+     <!--<ListPreference
      android:defaultValue="@string/config_auth_server_default"
      android:entries="@array/config_auth_server_list_titles"
      android:entryValues="@array/config_auth_server_list_values"
@@ -117,25 +117,25 @@
      android:negativeButtonText="@null"
      android:positiveButtonText="@null"
      android:summary="@string/pref_description_select_auth_server"
-     android:title="@string/pref_title_select_auth_server" />
+     android:title="@string/pref_title_select_auth_server" />-->
     
-    <EditTextPreference 
+    <!--<EditTextPreference
    		android:defaultValue="@string/config_auth_server_default"
         android:key="custom_auth_server_url"
         android:summary="Specify server for Open AM Authentication"
-        android:title="NICS Authentication URL" />
+        android:title="NICS Authentication URL" />-->
     
-    <CheckBoxPreference 
+    <!--<CheckBoxPreference
      android:title="@string/pref_title_custom_domain_toggle"
      android:defaultValue="false"
      android:key="custom_domain_name_enabled"
-     android:summary="@string/pref_summary_custom_domain_toggle"/>
+     android:summary="@string/pref_summary_custom_domain_toggle"/>-->
     
-    <EditTextPreference 
+    <!--<EditTextPreference
    		android:defaultValue=""
         android:key="custom_cookie_domain"
         android:summary="@string/pref_summary_nics_domain_name"
-        android:title="@string/pref_title_nics_domain_name"/>
+        android:title="@string/pref_title_nics_domain_name"/>-->
     
     <ListPreference
         android:defaultValue="0"

@@ -38,13 +38,23 @@
         android:key="header"
         android:title="@string/pref_header_sync" />
 
-    <CheckBoxPreference
+    <!--<CheckBoxPreference
         android:defaultValue="false"
         android:key="tracking_sync_over_wifi_only_checkbox"
         android:summary="@string/pref_description_sync_over_wifi_only"
-        android:title="@string/pref_title_sync_over_wifi_only" />
+        android:title="@string/pref_title_sync_over_wifi_only" />-->
     
     <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+    <ListPreference
+        android:defaultValue="60"
+        android:entries="@array/pref_sync_frequency_titles"
+        android:entryValues="@array/pref_sync_frequency_values"
+        android:key="sync_frequency"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:title="@string/pref_title_sync_frequency" />
+    <!--
+    Combined all frequency settings below into one (key=sync_frequency)
     <ListPreference
         android:defaultValue="60"
         android:entries="@array/pref_sync_frequency_titles"
@@ -77,7 +87,7 @@
         android:key="wfs_sync_frequency"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null"
-        android:title="@string/pref_title_wfs_sync_frequency" />
+        android:title="@string/pref_title_wfs_sync_frequency" />-->
     <Preference 
         android:title="@string/pref_title_clear_local_map_data"
         android:key="clear_local_map_data"/>

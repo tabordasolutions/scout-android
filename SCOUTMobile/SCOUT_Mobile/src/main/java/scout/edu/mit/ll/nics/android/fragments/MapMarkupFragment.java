@@ -43,6 +43,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONObject;
 
+import android.animation.ValueAnimator;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -81,12 +83,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -169,7 +174,14 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 	private IntentFilter mLocalMapDataClearedFilter;
 	private IntentFilter mMarkupFailedToPostFilter;
 	private ImageButton mIncidentFocusButton;
-	protected Button mPickerCompleteButton;	
+	// Button to toggle maximizing the map view
+	private ImageButton mExpandMapViewButton;
+	// Whether or not the mapview is currentl maximized
+	private boolean mExpandMapViewMaximized = false;
+	// This is the markup container whose value we are going to minimize / maximize weight = {0, 0.35}
+	private RelativeLayout mMarkupContainer;
+
+	protected Button mPickerCompleteButton;
 	private boolean markerReceiverRegistered;
 	private int mCurrentSymbolResourceId = -1;
 	private MarkerOptions mJunctionBitmapOptions;
@@ -858,7 +870,10 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			mMapClickView.setOnTouchListener(this);
 
 			mIncidentFocusButton = (ImageButton) mRootView.findViewById(R.id.markupIncidentButton);
+			mExpandMapViewButton = (ImageButton) mRootView.findViewById(R.id.markupExpandMapButton);
 			mPickerCompleteButton = (Button) mRootView.findViewById(R.id.markupPickerCompleteButton);
+
+			mMarkupContainer = (RelativeLayout) mRootView.findViewById(R.id.markupContainer);
 
 			mPickerCompleteButton.setVisibility(View.INVISIBLE);
 			
@@ -867,7 +882,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			}else{
 				mIncidentFocusButton.setVisibility(View.VISIBLE);
 			}
-			
+
 			mIncidentFocusButton.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -886,6 +901,72 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 					} else {
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mDataManager.getIncidentPositionLatitude(), mDataManager.getIncidentPositionLongitude()), 12));
 					}
+				}
+			});
+
+
+			// Sample code
+			//===================
+			/*ValueAnimator m1 = ValueAnimator.ofFloat(0.2f, 0.5f); //fromWeight, toWeight
+			m1.setDuration(400);
+			m1.setStartDelay(100); //Optional Delay
+			m1.setInterpolator(new LinearInterpolator());
+			m1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+				@Override
+				public void onAnimationUpdate(ValueAnimator animation) {
+					((LinearLayout.LayoutParams) viewToAnimate.getLayoutParams()).weight = (float) animation.getAnimatedValue();
+					viewToAnimate.requestLayout();
+				}
+
+			});
+			m1.start();*/
+			//===================
+
+			mExpandMapViewButton.setOnClickListener(new OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					// Toggle the current expanded map status
+					mExpandMapViewMaximized = !mExpandMapViewMaximized;
+
+					float from = 0.0f;
+					float to = 1.0f;
+
+					if(mExpandMapViewMaximized)
+					{
+						from = 1.0f;
+						to = 0.0f;
+					}
+
+					ValueAnimator animator = ValueAnimator.ofFloat(from,to);
+					animator.setDuration(200);
+					//animator.setStartDelay(0);
+					animator.setInterpolator(new LinearInterpolator());
+					animator.addUpdateListener(
+							new ValueAnimator.AnimatorUpdateListener()
+							{
+								@Override
+								public void onAnimationUpdate(ValueAnimator animation)
+								{
+									float t = (Float) animation.getAnimatedValue();
+
+									// Setting the weight of the mapview
+									float weight = t * 0.35f;
+									int height = mMarkupContainer.getLayoutParams().height;
+									int width = mMarkupContainer.getLayoutParams().width;
+
+									LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width,height,weight);
+									mMarkupContainer.setLayoutParams(params);
+
+									// Rotating the button (so the down arrow is pointing up)
+									float angle = (1-t) * 180f;
+									mExpandMapViewButton.setRotation(angle);
+								}
+							}
+
+					);
+					animator.start();
 				}
 			});
 		
