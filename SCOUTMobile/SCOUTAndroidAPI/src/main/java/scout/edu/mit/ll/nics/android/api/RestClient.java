@@ -157,7 +157,12 @@ public class RestClient {
 	private static boolean mFetchingChatMessages;
 	private static boolean mFetchingMarkupFeatures;
 	
-	private static AuthManager mAuthManager;   
+	private static AuthManager mAuthManager;
+
+	// Returns whether or not the private AuthManager mAuthManager is null
+	public static boolean isAuthManagerNull() {
+		return mAuthManager == null;
+	}
     
     public static void switchOrgs(int orgId) {	
 /*
