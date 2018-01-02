@@ -33,6 +33,8 @@ package scout.edu.mit.ll.nics.android.api;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -57,6 +59,7 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.HttpEntity;
 import scout.edu.mit.ll.nics.android.api.data.DamageReportData;
 import scout.edu.mit.ll.nics.android.api.data.MarkupFeature;
 import scout.edu.mit.ll.nics.android.api.data.OperationalUnit;
@@ -154,7 +157,12 @@ public class RestClient {
 	private static boolean mFetchingChatMessages;
 	private static boolean mFetchingMarkupFeatures;
 	
-	private static AuthManager mAuthManager;   
+	private static AuthManager mAuthManager;
+
+	// Returns whether or not the private AuthManager mAuthManager is null
+	public static boolean isAuthManagerNull() {
+		return mAuthManager == null;
+	}
     
     public static void switchOrgs(int orgId) {	
 /*
@@ -1279,6 +1287,11 @@ public class RestClient {
 		if(mSimpleReportResponseHandlers == null) {
 			mSimpleReportResponseHandlers = new SparseArray<SimpleReportResponseHandler>();
 		}
+
+
+		// Don't attempt to send simpleReports if AuthManager is null
+		if(mAuthManager == null || mAuthManager.getClient() == null)
+			return;
 		
 		for (SimpleReportPayload report : simpleReports) {
         	if(!report.isDraft() && mSimpleReportResponseHandlers != null && mSimpleReportResponseHandlers.indexOfKey((int)report.getId()) < 0 && !mSendingSimpleReports) {
@@ -1305,20 +1318,17 @@ public class RestClient {
 		        		params.put("description", data.getDescription());
 		        		params.put("category", data.getCategory() != null ? data.getCategory().getText() : SimpleReportCategoryType.BLANK.getText());
 		        		params.put("seqtime", String.valueOf(report.getSeqTime()));
-		        		params.put("image", new File(data.getFullpath()));     		
-        		
-                		if(mAuthManager != null && mAuthManager.getClient() != null) {
-//                			Log.e("nicsRest","incident id = " +  mDataManager.getActiveIncidentId());
-                			
-    	            		mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId() + "/SR", params, handler);
-    	        			mSendingSimpleReports = true;
-                		}
-		        		
+
+						params.put("image", new File(data.getFullpath()));
+
+						mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId() + "/SR", params, handler);
+						mSendingSimpleReports = true;
+
         			}else{	//no image
-						cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(report.toJsonString());
-		    			mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId()  + "/SR", entity, new SimpleReportNoImageResponseHandler(mContext, mDataManager, report.getId()));
-		    			mSendingSimpleReports = true;
-        			}
+							cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(report.toJsonString());
+							mAuthManager.getClient().post("reports/" + mDataManager.getActiveIncidentId() + "/SR", entity, new SimpleReportNoImageResponseHandler(mContext, mDataManager, report.getId()));
+							mSendingSimpleReports = true;
+					}
         		} catch(FileNotFoundException e) {
         			Log.e("nicsRest", "Deleting: " + report.getId() + " success: " + mDataManager.deleteSimpleReportStoreAndForward(report.getId()) + " due to invalid file.");
         			mDataManager.addPersonalHistory("Deleting simple report: " + report.getId() + " success: " + mDataManager.deleteSimpleReportStoreAndForward(report.getId()) + " due to invalid/missing image file.");

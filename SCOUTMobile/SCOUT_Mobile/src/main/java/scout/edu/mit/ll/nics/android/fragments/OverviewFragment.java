@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -47,6 +48,7 @@ import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -57,6 +59,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+
+import scout.edu.mit.ll.nics.android.LoginActivity;
 import scout.edu.mit.ll.nics.android.MainActivity;
 import scout.edu.mit.ll.nics.android.R;
 import scout.edu.mit.ll.nics.android.api.DataManager;
@@ -66,6 +70,8 @@ import scout.edu.mit.ll.nics.android.api.payload.CollabroomPayload;
 import scout.edu.mit.ll.nics.android.api.payload.IncidentPayload;
 import scout.edu.mit.ll.nics.android.utils.Intents;
 import scout.edu.mit.ll.nics.android.utils.Constants.NavigationOptions;
+
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class OverviewFragment extends Fragment {
 	
@@ -431,7 +437,17 @@ public class OverviewFragment extends Fragment {
 			mDataManager.getContext().registerReceiver(reportReceived, mWeatherReportReceivedFilter);
 			collabroomsReceiverRegistered = true;
 		}
-        
+
+		// On resuming the app, check if the Android lifecycle has destroyed a key object
+		// If so, restart the app.
+		// (This was previously causing a crash, and forcing the app to gracefully restart
+		// is better than crashing.)
+		if(RestClient.isAuthManagerNull())
+		{
+			restartApp();
+			return;
+		}
+
 		RestClient.getAllIncidents(mDataManager.getUserId());
 		
         mDataManager.sendChatMessages();
@@ -441,7 +457,15 @@ public class OverviewFragment extends Fragment {
         mDataManager.sendResourceRequests();
         mDataManager.sendSimpleReports();
     }
-    
+
+    // This function kills the current app instance and restarts the app gracefully without crashing.
+	//public static void restartApp(Context context, Intent nextIntent) {
+	public void restartApp() {
+		Intent intent = new Intent(mMainActivity, LoginActivity.class);
+		startActivity(intent);
+		mMainActivity.finish();
+	}
+
 	@Override
 	public void onPause() {
 		super.onPause();

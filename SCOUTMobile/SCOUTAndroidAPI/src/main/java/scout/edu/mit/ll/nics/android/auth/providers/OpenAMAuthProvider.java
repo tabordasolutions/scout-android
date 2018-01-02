@@ -289,7 +289,7 @@ public class OpenAMAuthProvider extends AuthProvider {
     public void getWithoutCredentials(Context context,final String url, final AsyncHttpResponseHandler responseHandler) {
     
     }
-    	
+
     public void post(final String url, final cz.msebera.android.httpclient.entity.StringEntity entity, final AsyncHttpResponseHandler responseHandler) {
 		new Thread(new Runnable() {
 
@@ -326,7 +326,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 			}
 		}).start();
     }
-    
+
     public void post(final String url, final RequestParams params, final AsyncHttpResponseHandler responseHandler) {
     	new Thread(new Runnable() {
 
@@ -347,7 +347,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 						mClient.addHeader("AMAuthCookie", mToken);
 						mClient.addHeader("iPlanetDirectoryPro", mToken);
 						mClient.addHeader("CUSTOM-uid",mDataManager.getUsername());
-						mClient.addHeader("Content-Type", "application/json");
+						mClient.addHeader("Content-Type", "multipart/form-data");
 
 						mClient.setEnableRedirects(true, true, true);
 						mClient.post(null, getAbsoluteUrl(url), null, params, "multipart/form-data", new OpenAMAuthResponseHandler(responseHandler, Looper.myLooper()));
