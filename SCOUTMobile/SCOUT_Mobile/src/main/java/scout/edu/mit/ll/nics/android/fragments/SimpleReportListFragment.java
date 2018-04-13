@@ -209,7 +209,7 @@ public class SimpleReportListFragment extends FormListFragment {
 			mIsFirstLoad = true;
 			setListShown(false);
 		}
-		
+		Log.e("USIDDEFECT","About to send all simple reports (3)");
 		mDataManager.sendSimpleReports();
 		updateData();
 	}

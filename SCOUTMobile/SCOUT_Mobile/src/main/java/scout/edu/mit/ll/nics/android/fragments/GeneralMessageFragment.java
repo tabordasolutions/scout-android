@@ -85,6 +85,7 @@ public class GeneralMessageFragment extends Fragment {
 
 	private boolean receiverRegistered = false;
 	private IntentFilter mIncidentSwitchedReceiverFilter;
+//	private IntentFilter mGeneralMessageProgressReceiverFilter;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -97,9 +98,11 @@ public class GeneralMessageFragment extends Fragment {
 		setHasOptionsMenu(true);
 		
 		mIncidentSwitchedReceiverFilter = new IntentFilter(Intents.nics_INCIDENT_SWITCHED);
+//		mGeneralMessageProgressReceiverFilter = new IntentFilter(Intents.nics_SIMPLE_REPORT_PROGRESS);
 		
 		if (!receiverRegistered) {
 			mContext.registerReceiver(incidentChangedReceiver, mIncidentSwitchedReceiverFilter);
+//			mContext.registerReceiver(incidentChangedReceiver, mGeneralMessageProgressReceiverFilter);
 			receiverRegistered = true;
 		}
 	}
@@ -244,10 +247,6 @@ public class GeneralMessageFragment extends Fragment {
 		messageData.setUser(mDataManager.getUsername());
 		messageData.setUserFull(mDataManager.getUserNickname());
 
-		//FIXME: get lat/long from form
-		//messageData.setLatitude(10);
-		//messageData.setLongitude(10);
-
 		payload = new SimpleReportPayload();
 
 		payload.setId(mReportId);
@@ -303,14 +302,17 @@ public class GeneralMessageFragment extends Fragment {
 						payload.setFormTypeId(FormType.SR.ordinal());
 //						payload.setSenderUserId(mDataManager.getUserId());
 						payload.setUserSessionId(mDataManager.getUserSessionId());
+						Log.e("USIDDEFECT","FR submission has begun, usersessionId is: " + mDataManager.getUserSessionId());
+
 						payload.setMessageData(messageData);
 //						payload.setCreatedUTC(currentTime);
 //						payload.setLastUpdatedUTC(currentTime);
 						payload.setSeqTime(currentTime);
-
+					Log.e("USIDDEFECT","about to add SR to store & forward");
 						mDataManager.addSimpleReportToStoreAndForward(payload);
+					Log.e("USIDDEFECT","about to send simple reports");
 						mDataManager.sendSimpleReports();
-	
+					Log.e("USIDDEFECT","finished sending SRs");
 						mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
 					break;
 //					} else {

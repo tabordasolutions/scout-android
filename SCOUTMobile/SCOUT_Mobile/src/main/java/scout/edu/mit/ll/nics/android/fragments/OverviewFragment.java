@@ -40,6 +40,7 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,18 +48,22 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import scout.edu.mit.ll.nics.android.LoginActivity;
 import scout.edu.mit.ll.nics.android.MainActivity;
@@ -76,7 +81,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class OverviewFragment extends Fragment {
 	
 	private View mRootView;
-	private MainActivity mMainActivity;
+	private static MainActivity mMainActivity;
 	private DataManager mDataManager;
 	
 	private ImageButton mGeneralMessageButton;
@@ -126,7 +131,7 @@ public class OverviewFragment extends Fragment {
 	private IntentFilter mMapReceivedFilter;
 	private IntentFilter mDamageReportReceivedFilter;
 	private IntentFilter mWeatherReportReceivedFilter;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -144,7 +149,6 @@ public class OverviewFragment extends Fragment {
 		
 		mDamageReportReceivedFilter = new IntentFilter(Intents.nics_NEW_DAMAGE_REPORT_RECEIVED);
 		mWeatherReportReceivedFilter = new IntentFilter(Intents.nics_NEW_WEATHER_REPORT_RECEIVED);
-
 	}
 	
 	@Override
@@ -422,17 +426,19 @@ public class OverviewFragment extends Fragment {
 	}
 	
     @Override
-	public void onResume() {
-        super.onResume();
-    
-		if(!collabroomsReceiverRegistered) {
+	public void onResume()
+	{
+		super.onResume();
+
+		if (!collabroomsReceiverRegistered)
+		{
 			mDataManager.getContext().registerReceiver(CollabroomPollingReceiver, mCollabroomsBeganPolling);
 			mDataManager.getContext().registerReceiver(CollabroomReceiver, mCollabroomsSuccessReceiverFilter);
 			mDataManager.getContext().registerReceiver(CollabroomReceiver, mCollabroomsFailReceiverFilter);
 			mDataManager.getContext().registerReceiver(simpleReportReceived, mSimpleReportReceivedFilter);
 			mDataManager.getContext().registerReceiver(chatReceived, mChatReceivedFilter);
 			mDataManager.getContext().registerReceiver(mapReceived, mMapReceivedFilter);
-			
+
 			mDataManager.getContext().registerReceiver(reportReceived, mDamageReportReceivedFilter);
 			mDataManager.getContext().registerReceiver(reportReceived, mWeatherReportReceivedFilter);
 			collabroomsReceiverRegistered = true;
@@ -442,28 +448,27 @@ public class OverviewFragment extends Fragment {
 		// If so, restart the app.
 		// (This was previously causing a crash, and forcing the app to gracefully restart
 		// is better than crashing.)
-		if(RestClient.isAuthManagerNull())
+		if (RestClient.isAuthManagerNull())
 		{
 			restartApp();
 			return;
 		}
 
 		RestClient.getAllIncidents(mDataManager.getUserId());
-		
-        mDataManager.sendChatMessages();
-        mDataManager.sendFieldReports();
-        mDataManager.sendDamageReports();
-        mDataManager.sendMarkupFeatures();
-        mDataManager.sendResourceRequests();
-        mDataManager.sendSimpleReports();
-    }
+
+		mDataManager.sendChatMessages();
+		mDataManager.sendFieldReports();
+		mDataManager.sendDamageReports();
+		mDataManager.sendMarkupFeatures();
+		mDataManager.sendResourceRequests();
+	}
 
     // This function kills the current app instance and restarts the app gracefully without crashing.
-	//public static void restartApp(Context context, Intent nextIntent) {
 	public void restartApp() {
 		Intent intent = new Intent(mMainActivity, LoginActivity.class);
 		startActivity(intent);
-		mMainActivity.finish();
+		//mMainActivity.finish();
+		android.os.Process.killProcess(android.os.Process.myPid());
 	}
 
 	@Override
