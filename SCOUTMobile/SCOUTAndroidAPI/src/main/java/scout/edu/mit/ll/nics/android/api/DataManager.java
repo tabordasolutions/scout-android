@@ -149,7 +149,7 @@ public class DataManager {
 	private boolean newMapAvailable = false;
 
 	// Set to true to point to app to STAGING instead of PRODUCTION
-	private final boolean STAGING = true;
+	private final boolean STAGING = false;
 
 	private CustomCommand invalidSessionIDCommand;
 	private CustomCommand invalidSRSessionIDCommand;
@@ -1876,7 +1876,7 @@ public class DataManager {
 	{
 		invalidSessionIDCommand = command;
 	}
-	
+
 	private ArrayList<Long> invalidUSIDsHandled = null;
 
 	// Returns true if invalidUSIDsHandled contains usid
