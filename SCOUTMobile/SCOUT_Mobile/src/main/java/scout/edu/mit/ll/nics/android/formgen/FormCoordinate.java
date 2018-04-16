@@ -83,9 +83,10 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 	private EditText mLatitudeInput;
 	private EditText mLongitudeInput;
 	private EditText mOtherInput;
-	
-	private ImageButton mLRFButton;
-	private Button mMapButton;
+
+	//Luis removed me due to problematic functionality
+	//private ImageButton mLRFButton;
+	//private Button mMapButton;
 	private ImageButton mMyLocationButton;
 	
 	private TextView mFormCoordinateTitle;
@@ -105,15 +106,15 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 		mLongitudeInput = (EditText) mLayout.findViewById(R.id.formCoordinateLongitudeInput);
 		mOtherInput = (EditText) mLayout.findViewById(R.id.formCoordinateOtherInput);
 		
-		mLRFButton = (ImageButton) mLayout.findViewById(R.id.formCoordinateLRF);
-		mMapButton = (Button) mLayout.findViewById(R.id.formCoordinateMap);
+		//mLRFButton = (ImageButton) mLayout.findViewById(R.id.formCoordinateLRF);
+		//mMapButton = (Button) mLayout.findViewById(R.id.formCoordinateMap);
 		mMyLocationButton = (ImageButton) mLayout.findViewById(R.id.formCoordinateMyLocation);
 		
-		mLRFButton.setOnClickListener(lrfClickListener);
-		mMapButton.setOnClickListener(mapClickListener);
+		//mLRFButton.setOnClickListener(lrfClickListener);
+		//mMapButton.setOnClickListener(mapClickListener);
 		mMyLocationButton.setOnClickListener(myLocationClickListener);
 		
-		mBluetoothLRF = BluetoothLRF.getInstance(mContext, this);
+		//mBluetoothLRF = BluetoothLRF.getInstance(mContext, this);
 		/*if (mDataManager.isLRFEnabled())
 		{
 			mLRFButton.setVisibility(View.VISIBLE);
@@ -137,8 +138,8 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 		}
 		else
 		{*/
-			mBluetoothLRF.closeBT();
-			mLRFButton.setVisibility(View.GONE);
+			//mBluetoothLRF.closeBT();
+			//mLRFButton.setVisibility(View.GONE);
 		//}
 	}
 	
@@ -296,21 +297,21 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 		
 		if(editable) {
 			mMyLocationButton.setVisibility(View.VISIBLE);
-			mMapButton.setVisibility(View.VISIBLE);
-			mLRFButton.setVisibility(View.VISIBLE);
+			//mMapButton.setVisibility(View.VISIBLE);
+			//mLRFButton.setVisibility(View.VISIBLE);
 			mLatitudeInput.setTextColor(Color.WHITE);
 			mLongitudeInput.setTextColor(Color.WHITE);
 			mOtherInput.setTextColor(Color.WHITE);
 		} else {
-			if (btReceiverRegistered) {
+			/*if (btReceiverRegistered) {
 				mBluetoothLRF.cancelConnect();
 				mContext.unregisterReceiver(btSRReceiver);
 				btReceiverRegistered = false;
-			}
+			}*/
 			
 			mMyLocationButton.setVisibility(View.GONE);
-			mMapButton.setVisibility(View.GONE);
-			mLRFButton.setVisibility(View.GONE);
+			//mMapButton.setVisibility(View.GONE);
+			//mLRFButton.setVisibility(View.GONE);
 			mLatitudeInput.setTextColor(Color.GRAY);
 			mLongitudeInput.setTextColor(Color.GRAY);
 			mOtherInput.setTextColor(Color.GRAY);
@@ -355,12 +356,14 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 				// TODO: rewrite
 		}
 	};
-	
+	//Luis disabled all of this, LRF is not supported
+	/*
 	private BroadcastReceiver btSRReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, final Intent intent) {
 			try {
+
 				if(mLRFDialog != null && mLRFDialog.isShowing()) {
 					mLRFDialog.dismiss();
 				}
@@ -418,8 +421,10 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 				e.printStackTrace();
 			}
 		}
-	};
-	
+	};*/
+
+	//Luis disabled this, map implementation was problematic
+	/*
 	private OnClickListener mapClickListener = new OnClickListener() {
 		
 		@Override
@@ -443,8 +448,10 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 				main.openMapLocationPicker();
 			}
 		}
-	};	
-	
+	};*/
+
+	//Luis disabled this
+	/*
 	private OnClickListener lrfClickListener = new OnClickListener() {
 
 		@Override
@@ -477,6 +484,7 @@ public class FormCoordinate extends FormWidget implements OnLRFDataListener {
 			}
 		}
 	};
+	*/
 
 	@Override
 	public void onLRFData(LRF_HV data) {

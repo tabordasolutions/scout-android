@@ -57,6 +57,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -182,10 +183,35 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	protected boolean mPreventNavigation = false;
 	
 	private TextView mBreadcrumbTextView;
+	private String mCurBreadcrumbText;
 	private boolean mReportOpenedFromMap;
 	private String[] mOrgArray;
 	
 	public static MenuItem LowDataModeIcon;
+
+
+	static private Handler invalidSessionIDHandler;
+	// If set to true, we have triggered an invalid session id warning
+	static boolean invalidSessionID = false;
+
+
+	// If set to true, the dialog is currently visible, so don't overlay another
+	static boolean invalidSessionIDDialogVisible = false;
+	// If set to true, invalid session id warning was triggered from a SR upload
+	static boolean invalidSessionIDFromSR = false;
+	// If set to true, we are currently attempting to re-authenticate, don't show another dialog
+	static boolean invalidSessionIDReauthenticating = false;
+
+
+	// Contains the actual code that is executed upon invalid session ID
+	static Runnable invalidSessionIDRunnable;
+	// Counts how many times the runnable has been invoked
+	// This allows us to only run the network validation X times
+	static int invalidSessionIDCounter = 0;
+	// How often to check for invalid session ID (in msec)
+	static final int invalidSessionIDDelay = 1000;
+
+
 	
 	private String[] navOptionsAsArray() {
 	    NavigationOptions[] states = NavigationOptions.values();
@@ -285,6 +311,40 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				showOrgSelector();
 			}
 		}
+
+		if(invalidSessionIDHandler == null)
+		{
+			invalidSessionIDHandler = new Handler();
+			invalidSessionIDRunnable = new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					invalidSessionIDCounter++;
+					// Only check against the server every 5 times
+					// This is meant to reduce the amount of network requests
+					if(!invalidSessionID && invalidSessionIDCounter >= 5)
+					{
+						invalidSessionIDCounter = 0;
+						RestClient.validateSessionID();
+					}
+
+
+					if(invalidSessionID && !invalidSessionIDDialogVisible && !invalidSessionIDReauthenticating)
+					{
+						invalidSessionIDDialogVisible = true;
+						MainActivity.this.showInvalidSessionIDDialog(invalidSessionIDFromSR);
+						// This dialog will either re-login or exit, but don't show another unless it's triggered again
+						invalidSessionID = false;
+						invalidSessionIDFromSR = false;
+					}
+					else
+					{
+						invalidSessionIDHandler.postDelayed(this, invalidSessionIDDelay);
+					}
+				}
+			};
+		}
 	}
 	
 	private void showOrgSelector() {
@@ -367,60 +427,70 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		} else {
 			clearViewTitle();
 		}
+
+		DataManager.CustomCommand invalidSessionIDCommand;
+
+		invalidSessionIDCommand = new DataManager.CustomCommand()
+		{
+			@Override
+			public void performAction()
+			{
+				Log.v("USIDDEFECT","session id command action invoked");
+				MainActivity.invalidSessionID = true;
+			}
+		};
+
+		mDataManager.setInvalidSessionsIDCommand(invalidSessionIDCommand);
+
+
+		DataManager.CustomCommand invalidSRSessionIDCommand;
+
+		invalidSRSessionIDCommand = new DataManager.CustomCommand()
+		{
+			@Override
+			public void performAction()
+			{
+				Log.v("USIDDEFECT","SR session id command action invoked");
+				MainActivity.invalidSessionIDFromSR = true;
+				MainActivity.invalidSessionID = true;
+			}
+
+		};
+
+		mDataManager.setInvalidSRSessionsIDCommand(invalidSRSessionIDCommand);
+
+
+		invalidSessionIDHandler.postDelayed(invalidSessionIDRunnable,invalidSessionIDDelay);
 	}
 
 	// Restores the view title using current fragments to deduce title
 	public void restoreViewTitle()
 	{
-		Fragment currentFragment =  mFragmentManager.findFragmentById(R.id.container);
-		Fragment currentFragment2 = mFragmentManager.findFragmentById(R.id.container2);
-		setViewTitle(currentFragment,currentFragment2);
+		mBreadcrumbTextView.setText(mCurBreadcrumbText);
 	}
 
-	// Updates the title textView depending on what room we are in
-	public void setViewTitle(Fragment currentFragment, Fragment currentFragment2)
+	public void setViewTitle(String title)
 	{
 		if(mBreadcrumbTextView != null) {
-
 			CollabroomPayload collabRoom = mDataManager.getSelectedCollabRoom();
 
 			// IF we haven't selected a room
 			if(collabRoom.getName().equals(getString(R.string.no_selection))){
-				setBreadcrumbText("No Room Selected");
+				mCurBreadcrumbText = "No Room Selected";
 			}
 			else {
-				if(currentFragment == mSimpleReportFragment)
-				{
-					// have to choose between chat and field report
-					if(currentFragment2 == mChatFragment)
-						mBreadcrumbTextView.setText(R.string.fragment_title_chat);
-					else if(currentFragment2 == mSimpleReportListFragment)
-						mBreadcrumbTextView.setText(R.string.fragment_title_field_report);
-					else
-						mBreadcrumbTextView.setText(R.string.fragment_title_simple_report);
-				}
-				else if(currentFragment == mFieldReportFragment)
-					mBreadcrumbTextView.setText(R.string.fragment_title_field_report);
-				else if(currentFragment == mDamageReportFragment)
-					mBreadcrumbTextView.setText(R.string.fragment_title_damage_report);
-				else if(currentFragment == mWeatherReportFragment)
-					mBreadcrumbTextView.setText(R.string.fragment_title_weather_report);
-				else if(currentFragment == mMapMarkupFragment)
-					mBreadcrumbTextView.setText(R.string.fragment_title_map);
-				else if(currentFragment == mChatFragment)
-					mBreadcrumbTextView.setText(R.string.fragment_title_chat);
-				else if(currentFragment == mSimpleReportListFragment)
-					mBreadcrumbTextView.setText(R.string.fragment_title_field_report);
-				else
-					mBreadcrumbTextView.setText(collabRoom.getName());
+				mCurBreadcrumbText = title;
 			}
 
-			mBreadcrumbTextView.setVisibility(View.VISIBLE);
+			mBreadcrumbTextView.setText(mCurBreadcrumbText);
+			if(!mCurBreadcrumbText.isEmpty())
+				mBreadcrumbTextView.setVisibility(View.VISIBLE);
 		}
 	}
 
 	public void clearViewTitle()
 	{
+		mCurBreadcrumbText = "";
 		setBreadcrumbText("");
 		mBreadcrumbTextView.setVisibility(View.GONE);
 	}
@@ -1041,6 +1111,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			mDataManager.requestWeatherReportRepeating(mDataManager.getIncidentDataRate(), false);
 			
 			boolean showIncidentName = false;
+
+			String viewTitle = null;
 			
 			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "New view is: " +  navDropdownOptions[position]);
 			
@@ -1050,6 +1122,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						mOverviewFragment = new OverviewFragment();
 					}
 					fragmentOverview = mOverviewFragment;
+					viewTitle = "";
 					break;
 				case GENERALMESSAGE:
 					if(currentFragment != null && currentFragment2 != null ){
@@ -1061,7 +1134,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						mSimpleReportListFragment = new SimpleReportListFragment();
 					}
 					fragment2 = mSimpleReportListFragment;
-					
+					viewTitle = getString(R.string.fragment_title_field_report);
+
 					//if using tablet view and map is closed
 					//set detail view on left side
 					if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet){
@@ -1107,6 +1181,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						mFieldReportListFragment = new FieldReportListFragment();
 					}
 					fragment2 = mFieldReportListFragment;
+					viewTitle = getString(R.string.fragment_title_field_report);
 					
 					//if using tablet view and map is closed
 					//set detail view on left side
@@ -1153,6 +1228,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						mDamageReportListFragment = new DamageReportListFragment();
 					}
 					fragment2 = mDamageReportListFragment;
+					viewTitle = getString(R.string.fragment_title_damage_report);
 					
 					//if using tablet view and map is closed
 					//set detail view on left side
@@ -1198,6 +1274,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						mWeatherReportListFragment = new WeatherReportListFragment();
 					}
 					fragment2 = mWeatherReportListFragment;
+					viewTitle = getString(R.string.fragment_title_weather_report);
 					
 					//if using tablet view and map is closed
 					//set detail view on left side
@@ -1237,6 +1314,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						mMapMarkupFragment = new MapMarkupFragment();
 					}
 					fragment = mMapMarkupFragment;
+					viewTitle = getString(R.string.fragment_title_map);
 
 					if(mDataManager.getTabletLayoutOn()){
 						mMapMarkupOpenTablet = !mMapMarkupOpenTablet;
@@ -1265,6 +1343,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					}
 					mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), true);
 					fragment2 = mChatFragment;
+					viewTitle = getString(R.string.fragment_title_chat);
 					
 					if(mDataManager.getTabletLayoutOn()){
 						if(currentFragment != null && currentFragment != mMapMarkupFragment){
@@ -1421,8 +1500,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				if (position == NavigationOptions.OVERVIEW.getValue()) {
 					clearViewTitle();
 				} else {
-
-					setViewTitle(fragment,fragment2);
+					if(viewTitle != null)
+						setViewTitle(viewTitle);
 
 					if(showIncidentName)
 					{
@@ -1865,6 +1944,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		
 		mViewMapLocationPicker = true;
 	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		if(invalidSessionIDHandler != null)
+			invalidSessionIDHandler.removeCallbacks(invalidSessionIDRunnable);
+	}
 	
 	@Override
 	protected void onDestroy() {
@@ -1915,6 +2002,83 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	
 	public void setBreadcrumbText(CharSequence charSequence) {
 		mBreadcrumbTextView.setText(charSequence);
+	}
+
+
+	public void showInvalidSessionIDDialog(boolean FRMessage) {
+
+		Context context = this;
+		Log.v("USIDDEFECT","showInvalidSessionIDDialog invoked");
+		//Showing a failure dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		String title = mContext.getString(R.string.invalid_session_title);
+
+		String message = mContext.getString(R.string.invalid_session_body);
+		if(FRMessage)
+			message = mContext.getString(R.string.invalid_session_body_FR);
+
+		builder.setTitle(title);
+		builder.setMessage(message);
+		// Relogin button
+		builder.setPositiveButton(mContext.getString(R.string.invalid_session_relogin),
+				new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int id)
+					{
+						dialog.dismiss();
+
+						invalidSessionIDReauthenticating = true;
+						// Create the command to perform after logging in
+						DataManager.CustomCommand cmd = new DataManager.CustomCommand()
+						{
+							@Override
+							public void performAction()
+							{
+								// Need to call this AFTER we have successfully logged in.
+								RestClient.setSendingSimpleReports(false);
+								MainActivity.invalidSessionIDReauthenticating = false;
+							}
+						};
+						mDataManager.requestRelogin(cmd);
+						invalidSessionIDHandler.postDelayed(invalidSessionIDRunnable, invalidSessionIDDelay);
+						invalidSessionIDDialogVisible = false;
+
+					}
+				});
+		// Close app button
+		builder.setNegativeButton(mContext.getString(R.string.invalid_session_okay),
+				new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int id)
+					{
+						dialog.dismiss();
+						// Must fully close the application, just calling finish() is insufficient as MainActivity won't be
+						// properly instantiated next time. The following call does work, however.
+						android.os.Process.killProcess(android.os.Process.myPid());
+					}
+				});
+
+		final AlertDialog alertdialog = builder.create();
+
+		alertdialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_PANEL);
+
+		// Changing the dialog text button text sizes
+		alertdialog.setOnShowListener(new DialogInterface.OnShowListener()
+		{
+			@Override
+			public void onShow(DialogInterface dialog)
+			{
+				Button btnPositive = alertdialog.getButton(Dialog.BUTTON_POSITIVE);
+				btnPositive.setTextSize(13);
+				Button btnNegative = alertdialog.getButton(Dialog.BUTTON_NEGATIVE);
+				btnNegative.setTextSize(13);
+			}
+
+		});
+
+		alertdialog.setCancelable(false);
+
+		alertdialog.show();
 	}
 	
 }

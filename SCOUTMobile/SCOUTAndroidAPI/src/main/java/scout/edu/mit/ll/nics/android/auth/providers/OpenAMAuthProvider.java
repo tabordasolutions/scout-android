@@ -27,6 +27,9 @@
  |~^~|OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\*/
 package scout.edu.mit.ll.nics.android.auth.providers;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
@@ -111,13 +114,22 @@ public class OpenAMAuthProvider extends AuthProvider {
 		mClient.addHeader("X-OpenAM-Password", password);
 		mClient.addHeader("Content-Type", "application/json");
 
+		Log.e("USIDDEFECTrq","requestAuthToken URL: " + mDataManager.getAuthServerURL() + "json/authenticate");
+		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " X-OpenAM-Username: " + username);
+		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " X-OpenAM-Password: " + password);
+		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " X-OpenAM-Content-Type: " + "application/json");
+
+
+
 		mClient.post(mDataManager.getAuthServerURL() + "json/authenticate", new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
                 String content = (responseBody != null) ? new String(responseBody) : "error";
+				Log.e("USIDDEFECTrq","requestAuthToken Response: " + content);
 
-                OpenAMAuthenticationData authData = mBuilder.create().fromJson(content, OpenAMAuthenticationData.class);
+
+				OpenAMAuthenticationData authData = mBuilder.create().fromJson(content, OpenAMAuthenticationData.class);
 
                 if(authData.getErrorMessage() == null) {
 
@@ -297,24 +309,36 @@ public class OpenAMAuthProvider extends AuthProvider {
 			public void run() {
 				Looper.prepare();
 		    	try {
+
+
+
+
 					if(mIsAuthenticating) {
-			    		if(mLatch == null || mLatch.getCount() == 0) {
-			    			mLatch = new CountDownLatch(1);
-			    		}
+						if(mLatch == null || mLatch.getCount() == 0) {
+							mLatch = new CountDownLatch(1);
+
+						}
 						mLatch.await();
 					}
 					
-					if(debugIgnoreOpenAmAuth){mTokenIsValid = true;};
-					
+					if(debugIgnoreOpenAmAuth){
+						mTokenIsValid = true;
+					}
+
+
 					if(mTokenIsValid) {
+
+
 						mClient.addHeader("AMAuthCookie", mToken);
-						mClient.addHeader("iPlanetDirectoryPro", mToken);
+						String cookie = "iPlanetDirectoryPro=" + mToken + ";AMAuthCookie=" + mToken;
+						mClient.addHeader("Cookie",cookie);
+						//mClient.addHeader("iPlanetDirectoryPro", mToken);
 						mClient.addHeader("CUSTOM-uid",mDataManager.getUsername());
 						mClient.addHeader("Content-Type", "application/json");
 
 						mClient.setEnableRedirects(true, true, true);
 
-						mClient.post(null, getAbsoluteUrl(url) , (cz.msebera.android.httpclient.HttpEntity) entity, "application/json", new OpenAMAuthResponseHandler(responseHandler, Looper.myLooper()));
+						mClient.post(null, getAbsoluteUrl(url) , entity, "application/json", new OpenAMAuthResponseHandler(responseHandler, Looper.myLooper()));
 
 					}
 		    	

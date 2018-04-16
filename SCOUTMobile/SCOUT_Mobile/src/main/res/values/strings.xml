@@ -45,6 +45,21 @@
 	<string name="button_cancel">Cancel</string>
 	<string name="exit_report_draft_dialog_title">Cancel Report</string>
 	<string name="exit_report_draft_dialog_msg">Your report progress will be lost if you leave the report.</string>
+	<string name="invalid_session_title">Warning</string>
+	<string name="invalid_session_body_FR">"You have logged into SCOUT on a different device
+You have been logged out of this session
+Please click Re-Login to complete the Field Report submission
+Your other session will be logged out if you Re-login on this device
+OR
+Press Okay to close the application"</string>
+	<string name="invalid_session_body">"You have logged into SCOUT on a different device
+You have been logged out of this session
+Please click Re-Login to continue using SCOUT
+Your other session will be logged out if you Re-login on this device
+OR
+Press Okay to close the application"</string>
+	<string name="invalid_session_okay">Okay</string>
+	<string name="invalid_session_relogin">Re-Login</string>
 	<string name="exit_report_draft_dialog_save">Save Draft and Close</string>
 	<string name="exit_report_draft_dialog_ok">Don\'t Save and Close</string>
 	<string name="exit_report_draft_dialog_cancel">Continue Editing</string>

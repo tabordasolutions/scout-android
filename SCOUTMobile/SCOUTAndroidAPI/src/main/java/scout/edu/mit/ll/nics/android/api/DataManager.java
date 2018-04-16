@@ -147,8 +147,17 @@ public class DataManager {
 	private boolean newReportAvailable = false;
 	private boolean newchatAvailable = false;
 	private boolean newMapAvailable = false;
+
+	// Set to true to point to app to STAGING instead of PRODUCTION
+	private final boolean STAGING = false;
+
+	private CustomCommand invalidSessionIDCommand;
+	private CustomCommand invalidSRSessionIDCommand;
 	
 	private ArrayList<TrackingLayerPayload> TrackingLayers;
+
+	//The response code the server sends if the session is invalid
+	public static final int invalidSessionResponseCode = 401;
 	
 	private DataManager() {
 		mAlarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
@@ -208,12 +217,21 @@ public class DataManager {
 		return mInstance;
 	}
 
-	public void requestLogin(String username, String password, boolean getActiveAssignment) {
-		RestClient.login(mContext, username, password, false);
+	private String current_session_username;
+	private String current_session_password;
+
+	public void requestLogin(String username, String password, CustomCommand command) {
+		RestClient.login(mContext, username, password, command);
+		current_session_username = username;
+		current_session_password = password;
+	}
+
+	public void requestRelogin(CustomCommand command) {
+		requestLogin(current_session_username,current_session_password,command);
 	}
 
 	public void requestLogout() {
-		RestClient.logout(getUsername(), false, false);
+		RestClient.logout(getUsername(), false, null);
 		if(mLocationHandler != null) {
 			mLocationHandler.deactivate();
 			mLocationHandler = null;
@@ -880,6 +898,7 @@ public class DataManager {
 								requestActiveAssignment();
 							
 								// Send any pending send items when checking for assignment ~ every minute
+								Log.e("USIDDEFECT","About to send all simple reports (1)");
 								sendSimpleReports();
 								sendFieldReports();
 								sendResourceRequests();
@@ -928,6 +947,7 @@ public class DataManager {
 				if(isOnline) {
 					sendChatMessages();
 					sendDamageReports();
+					Log.e("USIDDEFECT","About to send all simple reports (2)");
 					sendSimpleReports();
 					sendFieldReports();
 					sendWeatherReports();
@@ -1486,6 +1506,10 @@ public class DataManager {
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mGlobalPreferences.getString("server_list", getContext().getResources().getString(R.string.config_server_default));
+		if(STAGING)
+		{
+			return getContext().getResources().getString(R.string.config_server_staging);
+		}
 		return getContext().getResources().getString(R.string.config_server_default);
 	}
 	
@@ -1500,6 +1524,10 @@ public class DataManager {
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mSharedPreferences.getPreferenceString(Constants.IPLANET_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default));
+		if(STAGING)
+		{
+			return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_staging);
+		}
 		return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default);
 	}
 	
@@ -1513,6 +1541,11 @@ public class DataManager {
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mSharedPreferences.getPreferenceString(Constants.AMAUTH_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_amauth_cookie_domain_default));
+		if(STAGING)
+		{
+			return getContext().getResources().getString(R.string.config_amauth_cookie_domain_staging);
+
+		}
 		return getContext().getResources().getString(R.string.config_amauth_cookie_domain_default);
 	}
 	
@@ -1597,6 +1630,10 @@ public class DataManager {
 		//	return mGlobalPreferences.getString("custom_geo_server_url", getContext().getResources().getString(R.string.config_geo_server_default));
 		//}
 		//return mGlobalPreferences.getString("geo_server_list", getContext().getResources().getString(R.string.config_geo_server_default));
+		if(STAGING)
+		{
+			return getContext().getResources().getString(R.string.config_geo_server_staging);
+		}
 		return getContext().getResources().getString(R.string.config_geo_server_default);
 	}
 	
@@ -1606,8 +1643,11 @@ public class DataManager {
 		//	return mGlobalPreferences.getString("custom_auth_server_url", getContext().getResources().getString(R.string.config_auth_server_default));
 		//}
 		//return mGlobalPreferences.getString("auth_server_list", getContext().getResources().getString(R.string.config_auth_server_default));
+		if(STAGING)
+		{
+			return getContext().getResources().getString(R.string.config_auth_server_staging);
+		}
 		return getContext().getResources().getString(R.string.config_auth_server_default);
-		
 	}
 	
 	public String getAuthToken() {
@@ -1827,6 +1867,78 @@ public class DataManager {
 				TrackingLayers.set(i, updatedTrackingLayer);
 				return true;
 			}
+		}
+		return false;
+	}
+
+
+	public void setInvalidSessionsIDCommand(CustomCommand command)
+	{
+		invalidSessionIDCommand = command;
+	}
+
+	private ArrayList<Long> invalidUSIDsHandled = null;
+
+	// Returns true if invalidUSIDsHandled contains usid
+	// If not, adds the usid to the array and returns false
+	private boolean invalidUSIDAlreadyHandled(long usid)
+	{
+		if(invalidUSIDsHandled == null)
+			invalidUSIDsHandled = new ArrayList<Long>();
+
+		Long usidObj = usid;
+
+		for(Long o : invalidUSIDsHandled)
+		{
+			if(o.equals(usidObj))
+				return true;
+		}
+
+		invalidUSIDsHandled.add(usidObj);
+		return false;
+	}
+
+	// usid : which usid prompted this invalid call
+	public void performInvalidSessionIDCommand(long usid)
+	{
+		if(invalidUSIDAlreadyHandled(usid))
+			return;
+		if(invalidSessionIDCommand != null)
+			invalidSessionIDCommand.performAction();
+	}
+
+	public void setInvalidSRSessionsIDCommand(CustomCommand command)
+	{
+		invalidSRSessionIDCommand = command;
+	}
+
+	// usid : which usid prompted this invalid call
+	public void performInvalidSRSessionIDCommand(long usid)
+	{
+		if(invalidUSIDAlreadyHandled(usid))
+			return;
+		if(invalidSRSessionIDCommand != null)
+			invalidSRSessionIDCommand.performAction();
+	}
+
+
+	// This command class allows us to execute specific code if a certain condition arises.
+	// For example, invalidSessionIDCommand is set to notify the MainActivity if a network request response indicates our session is no longer active
+	public static class CustomCommand
+	{
+		public void performAction()
+		{
+			// Should be overridden on instantiation
+		}
+	}
+
+	// Checks if the statuscode means the session is invalid (this is from SRs)
+	public boolean sessionIsInvalid(int statusCode, long usid)
+	{
+		if(statusCode == DataManager.invalidSessionResponseCode)
+		{
+			performInvalidSRSessionIDCommand(usid);
+			return true;
 		}
 		return false;
 	}

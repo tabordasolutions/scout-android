@@ -45,13 +45,19 @@ import org.apache.http.entity.StringEntity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpClient;
@@ -225,8 +231,10 @@ public class RestClient {
     	
     }
     
-    private static void attemptLogin(final boolean getActiveAssignment) {
+    private static void attemptLogin(final DataManager.CustomCommand command) {
     	try {
+			//This method used to have the parameter getActiveAssignment
+			// but it was never used.
 			mDataManager = DataManager.getInstance(mContext);
     		final String username = mDataManager.getUsername();
     		
@@ -248,6 +256,7 @@ public class RestClient {
 
 			cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(p.toJsonString());
 
+
 			mAuthManager.getClient().post("login", entity, new AsyncHttpResponseHandler() {
 	
 				@Override
@@ -257,13 +266,15 @@ public class RestClient {
 					//if you don't properly logout then the api doesn't handle the usersession properly and sends back "error" next time you try to log in.
 					//Until the APi sends back the response that the user is already logged in. I am currently catching the error and logging out, then logging back in.
 					if(content.equals("error")){
-						logout(username, true, getActiveAssignment);
+						logout(username, true,command);
 						return;
 					}
 					
 					
 			        mDataManager.setLoggedIn(true);
 					Log.i("nicsRest", "Successfully logged in as: " + username + " status code: " + statusCode );
+
+					Log.i("nicsRest","Received response: " + content);
 					
 					mAuthHeader = headers;
 					
@@ -281,6 +292,11 @@ public class RestClient {
 					getAllIncidents(payload.getUserId());
 					getUserData(payload.getUserId());
 					mDataManager.requestOrgCapabilitiesUpdate();
+
+					if(command != null)
+					{
+						command.performAction();
+					}
 					
 //					if(getActiveAssignment) {
 //						getActiveAssignment(username, payload.getUserId());
@@ -306,10 +322,11 @@ public class RestClient {
 						HttpResponseException exception = (HttpResponseException)error;
 						
 						if(exception.getStatusCode() == 412) {
+							//USIDDEFECT: this code was already in place before the fix, it may no longer be needed
 							broadcast = false;
 							LoginMessage message = mBuilder.create().fromJson(content, LoginMessage.class);
 							Log.w("nicsRest", message.getMessage());
-							logout(username, true, getActiveAssignment);
+							logout(username, true, command);
 						} else if(exception.getStatusCode() == 401) {
 					        intent.putExtra("message", "Invalid username or password");
 						} else {
@@ -359,7 +376,7 @@ public class RestClient {
     	}
     }
     
-	public static void login(final Context context, final String username, final String password, final boolean getActiveAssignment) {
+	public static void login(final Context context, final String username, final String password, DataManager.CustomCommand command) {
 		mContext = context;
 		
 		mAuthManager = AuthManager.getInstance(username, password);
@@ -368,10 +385,10 @@ public class RestClient {
 //		mAuthManager.registerAuthType(new BasicAuthProvider());			//enable for basic
 //		also check AuthManager getClient() for the correct auth type
 		
-		attemptLogin(false);
+		attemptLogin(command);
 	}
 
-	public static void logout(final String username, final boolean retryLogin, final boolean getActiveAssignment) {
+	public static void logout(final String username, final boolean retryLogin, final DataManager.CustomCommand command) {
 		if(mAuthManager != null) {
 		
 			//	mAuthManager.getClient().post("login?username=" + username, new RequestParams(), new AsyncHttpResponseHandler() {
@@ -405,7 +422,7 @@ public class RestClient {
 					mDataManager.stopPollingAlarms();
 					
 					if(retryLogin) {
-						attemptLogin(getActiveAssignment);
+						attemptLogin(command);
 					} else {
 						mDataManager.addPersonalHistory("User " + username + " logged out successfully. ");
 						mDataManager.setLoggedIn(false);
@@ -418,6 +435,64 @@ public class RestClient {
 				}
 			});
 		}
+	}
+
+	// Checks whether our current usersessionID is still valid on the server
+	// Invokes DataManager's invalidSessionIDCommand if a session was not found
+	// Returns true if it is valid
+	// Returns false if it is invalid
+	public static void validateSessionID()
+	{
+		String url = "users/1/verifyActiveSession/" + mDataManager.getUserSessionId();
+
+		AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
+
+			long userSessionID = mDataManager.getUserSessionId();
+
+			@Override
+			public void onSuccess(int statusCode, Header[] headers, byte[] responseBody)
+			{
+
+				String content = (responseBody != null) ? new String(responseBody) : "error";
+				Log.e("nicsRest", "Validate Session ID Status: "+ statusCode + ", Response: " + content);
+
+				JSONObject response;
+				try
+				{
+					response = new JSONObject(content);
+
+
+					boolean sessionActive = response.getBoolean("activeSession");
+
+					// Inform Main Activity that the session is no longer active
+					if(!sessionActive)
+					{
+						Log.e("USIDDEFECT","Informing MainActivity");
+						mDataManager.performInvalidSessionIDCommand(userSessionID);
+					}
+
+				}
+				catch(JSONException e)
+				{
+					Log.e("nicsRest","Error: unable to read server response. Unable to validate the user session.");
+					e.printStackTrace();
+					mDataManager.performInvalidSessionIDCommand(userSessionID);
+				}
+			}
+
+			@Override
+			public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error)
+			{
+				Log.e("nicsRest", "Failed to validate user session ID");
+
+				String content = (responseBody != null) ? new String(responseBody) : "error";
+
+				Log.e("nicsRest", "Validate Session ID Status: "+ statusCode + ", Response: " + content);
+				mDataManager.performInvalidSessionIDCommand(userSessionID);
+			}
+		};
+
+		mAuthManager.getClient().get(url,responseHandler);
 	}
 
 	public static void deleteMarkup(final String featureId) {
@@ -1296,12 +1371,14 @@ public class RestClient {
 		for (SimpleReportPayload report : simpleReports) {
         	if(!report.isDraft() && mSimpleReportResponseHandlers != null && mSimpleReportResponseHandlers.indexOfKey((int)report.getId()) < 0 && !mSendingSimpleReports) {
         		Log.w("nics_POST", "Adding simple report " + report.getId() + " to send queue.");
+				// Updating User Session ID
+				report.setUserSessionId(mDataManager.getUserSessionId());
         		SimpleReportData data = report.getMessageData();
         		
         		try {
         			if(data.getFullpath() != null && data.getFullpath() != ""){
-        				
-    					SimpleReportResponseHandler handler =  new SimpleReportResponseHandler(mContext, mDataManager, report.getId());
+
+						SimpleReportResponseHandler handler =  new SimpleReportResponseHandler(mContext, mDataManager, report.getId(),report.getUserSessionId());
                 		mSimpleReportResponseHandlers.put((int)report.getId(), handler);
 
 		        		RequestParams params = new RequestParams();
@@ -1320,13 +1397,14 @@ public class RestClient {
 		        		params.put("seqtime", String.valueOf(report.getSeqTime()));
 
 						params.put("image", new File(data.getFullpath()));
-
 						mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId() + "/SR", params, handler);
 						mSendingSimpleReports = true;
 
         			}else{	//no image
 							cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(report.toJsonString());
-							mAuthManager.getClient().post("reports/" + mDataManager.getActiveIncidentId() + "/SR", entity, new SimpleReportNoImageResponseHandler(mContext, mDataManager, report.getId()));
+							SimpleReportNoImageResponseHandler responseHandler;
+							responseHandler = new SimpleReportNoImageResponseHandler(mContext, mDataManager, report.getId(),report.getUserSessionId());
+							mAuthManager.getClient().post("reports/" + mDataManager.getActiveIncidentId() + "/SR", entity, responseHandler);
 							mSendingSimpleReports = true;
 					}
         		} catch(FileNotFoundException e) {
@@ -1340,6 +1418,8 @@ public class RestClient {
         	}
 		}
 	}
+
+
 		
 	public static void removeSimpleReportHandler(long reportId) {
 		Log.w("nics_POST", "Removing simple report " + reportId + " from send queue.");

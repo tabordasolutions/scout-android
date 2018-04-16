@@ -67,6 +67,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import scout.edu.mit.ll.nics.android.api.DataManager;
+import scout.edu.mit.ll.nics.android.api.RestClient;
 import scout.edu.mit.ll.nics.android.dialogs.SplashScreenDialog;
 import scout.edu.mit.ll.nics.android.utils.Constants;
 import scout.edu.mit.ll.nics.android.utils.EncryptedPreferences;
@@ -353,7 +354,18 @@ public class LoginActivity extends ActionBarActivity implements OnCheckedChangeL
 				showProgress(true);
 								
 				mDataManager.clearCollabRoomList();
-				mDataManager.requestLogin(mEmail, mPassword, false);
+
+				// Creating a custom command to post simple reports after logging in.
+				DataManager.CustomCommand cmd = new DataManager.CustomCommand()
+				{
+					@Override
+					public void performAction()
+					{
+						// Need to call this AFTER we have successfully logged in.
+						RestClient.setSendingSimpleReports(false);
+					}
+				};
+				mDataManager.requestLogin(mEmail, mPassword, cmd);
 				 
 				if(getCurrentFocus() != null) {
 					InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);

@@ -52,12 +52,15 @@ public class SimpleReportResponseHandler extends AsyncHttpResponseHandler {
 	private long mReportId;
 	
 	private boolean mFailed;
+
+	private long mUserSessionId;
 	
-	public SimpleReportResponseHandler(Context context, DataManager dataManager, long reportId) {
+	public SimpleReportResponseHandler(Context context, DataManager dataManager, long reportId, long userSessionId) {
 		mContext = context;
 		mReportId = reportId;
 		mDataManager = dataManager;
-		mFailed = false;	
+		mFailed = false;
+		mUserSessionId = userSessionId;
 	}
 
 	@Override
@@ -80,8 +83,23 @@ public class SimpleReportResponseHandler extends AsyncHttpResponseHandler {
 		super.onProgress(bytesWritten, totalSize);
 	}
 
+
+
 	@Override
 	public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+		Log.e("USIDDEFECT", "Simple Report No Image got response code: " + statusCode);
+
+		if(mDataManager.sessionIsInvalid(statusCode,mUserSessionId))
+		{
+			RestClient.removeSimpleReportHandler(mReportId);
+			return;
+		}
+
+		Log.e("nicsRest", "Success to post Simple Report w/ Image information");
+		Log.e("nicsRest","USIDDEFECT, onSuccess statusCode: " + statusCode);
+		Log.e("nicsRest","USIDDEFECT, onSuccess headers: " + headers);
+		Log.e("nicsRest","USIDDEFECT, onSuccess responseBody: " + (responseBody != null ? new String(responseBody) : "null"));
+
 		Log.e("nicsRest", "Success to post Simple Report information");
 		Log.e("nicsRest", "Deleting: " + mReportId + " success: " + mDataManager.deleteSimpleReportStoreAndForward(mReportId));
 		
@@ -101,8 +119,9 @@ public class SimpleReportResponseHandler extends AsyncHttpResponseHandler {
 
 	@Override
 	public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-		Log.e("nicsRest", "Failed to post Simple Report information: " + error.getMessage());
-		
+		Log.e("nicsRest", "Failed to post Simple Report information: Status Code: " + statusCode + " Message: " + error.getMessage());
+		Log.e("nicsRest","USIDDEFECT, onFailure responseBody: " + (responseBody != null ? new String(responseBody) : "null"));
+
 		Intent intent = new Intent();
 	    intent.setAction(Intents.nics_SIMPLE_REPORT_PROGRESS);
 	    
@@ -113,6 +132,13 @@ public class SimpleReportResponseHandler extends AsyncHttpResponseHandler {
 		
         mContext.sendBroadcast (intent);
 		RestClient.removeSimpleReportHandler(mReportId);
+
+		if(mDataManager.sessionIsInvalid(statusCode,mUserSessionId))
+		{
+			return;
+		}
+
 		RestClient.setSendingSimpleReports(false);
+
 	}
 }

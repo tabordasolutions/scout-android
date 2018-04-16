@@ -292,4 +292,7 @@
 	<string name="about_google_display_name">(es translate)</string>
 	<string name="about_legal_section_icons_display_name">Legal Notice - Icons(es translate)</string>
 	<string name="about_icons_display_name">(es translate)</string>
+    <string name="invalid_session_relogin">Re-Login</string>
+	<string name="invalid_session_okay">Okay</string>
+	<string name="invalid_session_title">Advertencia</string>
 </resources>

@@ -32,14 +32,21 @@ package scout.edu.mit.ll.nics.android.api.handlers;
 
 import org.apache.http.Header;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import scout.edu.mit.ll.nics.android.api.DataManager;
+import scout.edu.mit.ll.nics.android.api.R;
 import scout.edu.mit.ll.nics.android.api.RestClient;
 import scout.edu.mit.ll.nics.android.api.data.ReportSendStatus;
 import scout.edu.mit.ll.nics.android.api.messages.SimpleReportMessage;
@@ -50,17 +57,31 @@ public class SimpleReportNoImageResponseHandler extends AsyncHttpResponseHandler
 	private DataManager mDataManager;
 	private Context mContext;
 	private long mReportId;
-	
-	public SimpleReportNoImageResponseHandler(Context context, DataManager dataManager, long reportId) {
+
+	private long mUserSessionId;
+
+	public SimpleReportNoImageResponseHandler(Context context, DataManager dataManager, long reportId, long userSessionId) {
 		mContext = context;
 		mReportId = reportId;
 		mDataManager = dataManager;
+		mUserSessionId = userSessionId;
 	}
 	
 	@Override
 	public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
+
+		Log.e("USIDDEFECT", "Simple Report No Image got response code: " + statusCode);
+
+		if(mDataManager.sessionIsInvalid(statusCode,mUserSessionId))
+		{
+			return;
+		}
+
 		Log.e("nicsRest", "Success to post Simple Report No Image information");
-		
+		Log.e("nicsRest","USIDDEFECT, onSuccess statusCode: " + statusCode);
+		Log.e("nicsRest","USIDDEFECT, onSuccess headers: " + headers);
+		Log.e("nicsRest","USIDDEFECT, onSuccess responseBody: " + (responseBody != null ? new String(responseBody) : "null"));
+
 		String content = (responseBody != null) ? new String(responseBody) : "";
 		SimpleReportMessage message = new Gson().fromJson(content, SimpleReportMessage.class);
 		for(SimpleReportPayload payload : message.getReports()) {
@@ -76,7 +97,6 @@ public class SimpleReportNoImageResponseHandler extends AsyncHttpResponseHandler
 			intent.putExtra("progress", (double)100);
 			
 	        mContext.sendBroadcast (intent);
-			
 			mDataManager.addSimpleReportToStoreAndForward(payload);
 		}
 		
@@ -86,9 +106,18 @@ public class SimpleReportNoImageResponseHandler extends AsyncHttpResponseHandler
 	
 	@Override
 	public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+
 		Log.e("nicsRest", "Failed to post Simple Report No Image information: " + error.getMessage());
+		Log.e("nicsRest","Simple Report Error Information:" + error.toString());
+		Log.e("nicsRest","USIDDEFECT, onFailure status code: " + statusCode);
+		Log.e("nicsRest","USIDDEFECT, onFailure headers: " + headers);
+		Log.e("nicsRest","USIDDEFECT, onFailure responseBody: " + (responseBody != null ? new String(responseBody) : "null"));
+
+		if(mDataManager.sessionIsInvalid(statusCode,mUserSessionId))
+		{
+			return;
+		}
 
 		RestClient.setSendingSimpleReports(false);
 	}
-
 }

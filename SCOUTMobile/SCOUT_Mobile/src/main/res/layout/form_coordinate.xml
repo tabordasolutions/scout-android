@@ -82,7 +82,7 @@
 
 
 
-    <ImageButton
+    <!--<ImageButton
             android:id="@+id/formCoordinateLRF"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="38dp"
@@ -109,7 +109,7 @@
             android:minHeight="32dip"
             android:minWidth="32dip"
             android:text="M"
-            android:textSize="15sp" />
+            android:textSize="15sp" />-->
         
         <ImageButton
             android:id="@+id/formCoordinateMyLocation"
