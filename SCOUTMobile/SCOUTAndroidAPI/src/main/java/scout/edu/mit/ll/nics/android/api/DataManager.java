@@ -153,7 +153,7 @@ public class DataManager {
 
 	private CustomCommand invalidSessionIDCommand;
 	private CustomCommand invalidSRSessionIDCommand;
-	
+
 	private ArrayList<TrackingLayerPayload> TrackingLayers;
 
 	//The response code the server sends if the session is invalid

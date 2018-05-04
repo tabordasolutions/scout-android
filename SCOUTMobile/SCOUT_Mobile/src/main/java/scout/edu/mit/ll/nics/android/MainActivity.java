@@ -330,6 +330,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					}
 
 
+					// Enable this to monitor status every time this runs (every 1 second)
+					//Log.e("USIDDEFECT","ISID: " + invalidSessionID + ", dialogVisible: " + invalidSessionIDDialogVisible + ", reauthing: " + invalidSessionIDReauthenticating);
+
+
 					if(invalidSessionID && !invalidSessionIDDialogVisible && !invalidSessionIDReauthenticating)
 					{
 						invalidSessionIDDialogVisible = true;

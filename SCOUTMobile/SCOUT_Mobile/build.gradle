@@ -44,4 +44,6 @@ dependencies {
     compile group: 'org.apache.httpcomponents' , name: 'httpclient-android' , version: '4.3.5.1'
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.android.support:multidex:1.0.1'
+    // Disabled TestFairy integration
+    //compile 'testfairy:testfairy-android-sdk:1.+@aar'
 }
