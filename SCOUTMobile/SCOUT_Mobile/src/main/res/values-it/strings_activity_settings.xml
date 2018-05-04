@@ -122,6 +122,6 @@
     <string name="pref_title_vibrate">Vibrate</string>
     
     <string name="log_in_and_join_collabroom_to_enable_risk_assessment">Please log-in and join a Collabroom to enable risk assessment.</string>
-    <string name="join_collabroom_to_enable_risk_assessment">L\'altra sessione verrà disconnessa se si effettua nuovamente l\'accesso su questo dispositivo\\n OPPURE\\n Premere OK per chiudere l\'applicazione</string>
+    <string name="join_collabroom_to_enable_risk_assessment">Please join a Collabroom to enable risk assessment.</string>
 
 </resources>

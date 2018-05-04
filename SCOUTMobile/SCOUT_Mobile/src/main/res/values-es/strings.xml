@@ -210,7 +210,7 @@
 	<string name="pref_ringtone_silent">Silent</string>
 	<string name="pref_title_vibrate">Vibrate</string>
 	<string name="log_in_and_join_collabroom_to_enable_risk_assessment">Please log-in and join a Collabroom to enable risk assessment.</string>
-	<string name="join_collabroom_to_enable_risk_assessment">Advertencia</string>
+	<string name="join_collabroom_to_enable_risk_assessment">Please join a Collabroom to enable risk assessment.</string>
 	<string name="connected_device">%s Connected.</string>
 	<string name="connected_device_desc">Successfully connected to LRF.</string>
 	<string name="disconnected_device">%s Disconnected</string>
