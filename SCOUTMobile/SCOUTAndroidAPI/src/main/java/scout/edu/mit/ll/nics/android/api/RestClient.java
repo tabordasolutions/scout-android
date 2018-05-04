@@ -282,6 +282,8 @@ public class RestClient {
 					LoginPayload payload = message.getLoginPayload().get(0);
 					
 					mDataManager.setLoginData(payload);
+
+					Log.e("LOGINTEST","Just logged in: received USID: " + mDataManager.getUserSessionId());
 					
 			        Intent intent = new Intent();
 			        intent.setAction(Intents.nics_SUCCESSFUL_LOGIN);
@@ -491,6 +493,9 @@ public class RestClient {
 				mDataManager.performInvalidSessionIDCommand(userSessionID);
 			}
 		};
+
+		Log.e("nicsRest","About to check USID: " + mDataManager.getUserSessionId());
+
 
 		mAuthManager.getClient().get(url,responseHandler);
 	}

@@ -73,6 +73,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 //import com.loopj.android.http.AsyncHttpResponseHandler;
 
 import scout.edu.mit.ll.nics.android.MainActivity;
@@ -294,64 +295,75 @@ public class MarkupLayer {
 					SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US);
 					format.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-//					RestClient.getWFSData(mLayerPayload, 500, format.format(new Date(mLastFeatureTimestamp)), new AsyncHttpResponseHandler() {
-//						@SuppressWarnings("unchecked")
-//
-//						@Override
-//						public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-//							String content = (responseBody != null) ? new String(responseBody) : "error";
-//
-//							if (mLayerPayload.shouldExpectJson()) {
-//								try {
-//									FeatureCollection collection = mBuilder.create().fromJson(content, FeatureCollection.class);
-//									if (collection != null) {
-//										clearFromMap();
-//										mParseFeaturesTask = new ParseFeaturesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, collection.getFeatures());
-//									}
-//								} catch (Exception e) {
-//									e.printStackTrace();
-//								}
-//							} else {
-//
-//								XmlParser parser = new XmlParser();
-//								InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
-//								;
-//
-//								try {
-//									FeatureCollection collection = new FeatureCollection();
-//									collection.setFeatures(parser.parse(stream));
-//									collection.setType("TRACKING TYPE");
-//
-//									if (collection.getFeatures() != null) {
-//										clearFromMap();
-//										mParseFeaturesTask = new ParseFeaturesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, collection.getFeatures());
-//									}
-//
-//								} catch (XmlPullParserException e) {
-//									e.printStackTrace();
-//								} catch (IOException e) {
-//									e.printStackTrace();
-//								} finally {
-//									if (stream != null) {
-//										try {
-//											stream.close();
-//										} catch (IOException e) {
-//											// TODO Auto-generated catch block
-//											e.printStackTrace();
-//										}
-//									}
-//								}
-//							}
-//						}
-//
-//						@Override
-//						public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-//							String content = (responseBody != null) ? new String(responseBody) : "error";
-//							Log.e("nicsRest", content);
-//
-//							mLayerPayload.setAuthtoken(null);    //force a new token on next pull
-//						}
-//					});
+// Luis's note: This section between the "//==.*==" was disabled in the codebase I inherited
+// This led to AVLs not being rendered on Android
+// Enabling this code subsequently enabled AVL rendering,
+// Because this code was disabled sometime between the previous Google Play Store build and the last Android code changes by the previous dev team
+// I have no way of knowing why the code was disabled. (Perhaps it was related to performance issues.)
+//====================================================================================
+
+					RestClient.getWFSData(mLayerPayload, 500, format.format(new Date(mLastFeatureTimestamp)), new AsyncHttpResponseHandler() {
+						//@SuppressWarnings("unchecked")
+
+						@Override
+						public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody)
+						{
+							String content = (responseBody != null) ? new String(responseBody) : "error";
+
+							if (mLayerPayload.shouldExpectJson()) {
+								try {
+									FeatureCollection collection = mBuilder.create().fromJson(content, FeatureCollection.class);
+									if (collection != null) {
+										clearFromMap();
+										mParseFeaturesTask = new ParseFeaturesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, collection.getFeatures());
+									}
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+							} else {
+
+								XmlParser parser = new XmlParser();
+								InputStream stream = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+
+
+								try {
+									FeatureCollection collection = new FeatureCollection();
+									collection.setFeatures(parser.parse(stream));
+									collection.setType("TRACKING TYPE");
+
+									if (collection.getFeatures() != null) {
+										clearFromMap();
+										mParseFeaturesTask = new ParseFeaturesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, collection.getFeatures());
+									}
+
+								} catch (XmlPullParserException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+								} finally {
+									if (stream != null) {
+										try {
+											stream.close();
+										} catch (IOException e) {
+											// TODO Auto-generated catch block
+											e.printStackTrace();
+										}
+									}
+								}
+							}
+						}
+
+
+						@Override
+						public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error)
+						{
+							String content = (responseBody != null) ? new String(responseBody) : "error";
+							Log.e("nicsRest", content);
+
+							mLayerPayload.setAuthtoken(null);    //force a new token on next pull
+						}
+					});
+//====================================================================================
 				}
 				//Release the lock
 				wakeLock.release();
