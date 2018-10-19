@@ -149,7 +149,7 @@ public class DataManager {
 	private boolean newMapAvailable = false;
 
 	// Set to true to point to app to STAGING instead of PRODUCTION
-	private final boolean STAGING = false;
+	private final boolean STAGING = true;
 
 	private CustomCommand invalidSessionIDCommand;
 	private CustomCommand invalidSRSessionIDCommand;

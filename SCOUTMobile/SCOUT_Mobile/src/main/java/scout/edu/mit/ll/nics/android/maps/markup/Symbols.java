@@ -237,7 +237,7 @@ public class Symbols {
         weatherTemp.put("skc.png", R.drawable.skc);
         weatherTemp.put("sn.png", R.drawable.sn);
         weatherTemp.put("tsra.png", R.drawable.tsra);
-        
+
         WEATHER = weatherTemp;
 
 		TreeBidiMap<String, Integer> allTemp = new TreeBidiMap<String, Integer>();

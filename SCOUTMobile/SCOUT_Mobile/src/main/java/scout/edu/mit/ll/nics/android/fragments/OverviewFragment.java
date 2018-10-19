@@ -631,24 +631,25 @@ public class OverviewFragment extends Fragment {
 
 			mDialogBuilder.setTitle(R.string.select_report_type);
 
-			mDialogBuilder.setMessage(R.string.feature_coming_soon);
-			mDialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+			// These lines enable a "coming soon" dialog
+			//mDialogBuilder.setMessage(R.string.feature_coming_soon);
+			/*mDialogBuilder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}
-			});
+			});*/
 
 			//These lines enable the reports dialog menu
-		    /*for(int i = 0; i < activeReports.size(); i++) {
+		    for(int i = 0; i < activeReports.size(); i++) {
 		    	activeReports.set(i, activeReports.get(i).replace(mDataManager.getActiveIncidentName() + "-", ""));
 		    }
 
 		    if(activeReports.size() == 0)
 		    {
 		    	activeReports.add(getString(R.string.reports_not_available_for_your_organization));
-		    }*/
+		    }
 
 			mDialogBuilder.setItems(activeReports.toArray(new String[activeReports.size()]), reportSelected);
 			mReportPopupMenu = mDialogBuilder.create();

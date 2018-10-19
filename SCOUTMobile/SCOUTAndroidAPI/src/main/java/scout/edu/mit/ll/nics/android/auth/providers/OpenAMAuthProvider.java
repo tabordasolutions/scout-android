@@ -110,22 +110,27 @@ public class OpenAMAuthProvider extends AuthProvider {
 	
 	public void requestAuthToken(final String username, final String password) {
 
+		mClient.removeAllHeaders();
 		mClient.addHeader("X-OpenAM-Username", username);
 		mClient.addHeader("X-OpenAM-Password", password);
 		mClient.addHeader("Content-Type", "application/json");
 
+		Log.e("USIDDEFECTrq","Requesting Auth Token from OpenAM:");
 		Log.e("USIDDEFECTrq","requestAuthToken URL: " + mDataManager.getAuthServerURL() + "json/authenticate");
 		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " X-OpenAM-Username: " + username);
 		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " X-OpenAM-Password: " + password);
-		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " X-OpenAM-Content-Type: " + "application/json");
-
+		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " Content-Type: " + "application/json");
 
 
 		mClient.post(mDataManager.getAuthServerURL() + "json/authenticate", new AsyncHttpResponseHandler() {
 
             @Override
             public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-                String content = (responseBody != null) ? new String(responseBody) : "error";
+				// Removing the username / password headers.
+				mClient.removeHeader("X-OpenAM-Username");
+				mClient.removeHeader("X-OpenAM-Password");
+
+				String content = (responseBody != null) ? new String(responseBody) : "error";
 				Log.e("USIDDEFECTrq","requestAuthToken Response: " + content);
 
 
@@ -151,6 +156,10 @@ public class OpenAMAuthProvider extends AuthProvider {
 
             @Override
             public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+				// Removing the username / password headers.
+				mClient.removeHeader("X-OpenAM-Username");
+				mClient.removeHeader("X-OpenAM-Password");
+
                 String content = (responseBody != null) ? new String(responseBody) : "error";
                 clearAuthCookies();
 
@@ -328,7 +337,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 
 					if(mTokenIsValid) {
 
-
+						mClient.removeAllHeaders();
 						mClient.addHeader("AMAuthCookie", mToken);
 						String cookie = "iPlanetDirectoryPro=" + mToken + ";AMAuthCookie=" + mToken;
 						mClient.addHeader("Cookie",cookie);
@@ -337,6 +346,9 @@ public class OpenAMAuthProvider extends AuthProvider {
 						mClient.addHeader("Content-Type", "application/json");
 
 						mClient.setEnableRedirects(true, true, true);
+
+						Log.e("test","Authentication token: " + mToken);
+
 
 						mClient.post(null, getAbsoluteUrl(url) , entity, "application/json", new OpenAMAuthResponseHandler(responseHandler, Looper.myLooper()));
 

@@ -562,7 +562,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 				mCoordinateManager.setCoordinates(0, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
 
 			} else {
-				showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_symbol)), getString(R.string.markup_confirm_completion, getString(R.string.markup_symbol_lowercase)), "");
+				showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_symbol)), String.format(getString(R.string.markup_confirm_completion, getString(R.string.markup_symbol_lowercase))), "");
 			}
 			break;
 

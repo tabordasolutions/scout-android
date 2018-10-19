@@ -273,7 +273,7 @@
 	<string name="markup_trapezoid_lowercase">trapezoid</string>
 	<string name="markup_circle_lowercase">circle</string>
 	<string name="markup_finalize">Finalize %s Markup?</string>
-	<string name="markup_confirm_completion">Click OK to complete the %0$s. Click Cancel to continue editing the %0$s.</string>
+	<string name="markup_confirm_completion">Click OK to complete the %1$s. Click Cancel to continue editing the %1$s.</string>
 	<string name="markup_confrim_delete">Delete the selected shape?</string>
 	<string name="markup_shape_incomplete">Shape Incomplete</string>
 	<string name="markup_confirm_fields">Please fill in all of the lat/long fields to continue.</string>

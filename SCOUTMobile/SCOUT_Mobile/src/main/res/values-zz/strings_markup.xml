@@ -75,7 +75,7 @@
     <string name="markup_circle_lowercase">çîrçlè</string>
     
     <string name="markup_finalize">Fïñâlìzë %s Mãrkùp?</string>
-    <string name="markup_confirm_completion">Çlíçk ÓK tô çõＭplêtë thè %0$s. Çlîçk Çàñçél tö çøñtïñûê ëþìtíñg thè %0$s.</string>
+    <string name="markup_confirm_completion">Çlíçk ÓK tô çõＭplêtë thè %1$s. Çlîçk Çàñçél tö çøñtïñûê ëþìtíñg thè %1$s.</string>
     <string name="markup_confrim_delete">Ðélêtë thè sélêçtëþ ßhãpè?</string>
     <string name="markup_shape_incomplete">Shápé ÎñçôＭplêtë</string>
     <string name="markup_confirm_fields">Plêäsë fìll íñ åll öf thè làt/løñg fîélþs tò çóñtïñûê.</string>

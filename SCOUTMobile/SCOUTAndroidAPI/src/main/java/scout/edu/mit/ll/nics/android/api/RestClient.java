@@ -245,16 +245,22 @@ public class RestClient {
 
 			mSimpleReportResponseHandlers = new SparseArray<SimpleReportResponseHandler>();
 			mDamageReportResponseHandlers = new SparseArray<DamageReportResponseHandler>();
-			
-	    	LoginPayload p = new LoginPayload(username);
 
-	    	p.setWorkspaceId(mDataManager.getWorkspaceId());
 
+			JSONObject obj = new JSONObject();
+			obj.put("username",username);
+			obj.put("userId",0);
+			obj.put("userSessionId",0);
+			obj.put("workspaceId",0);
+
+
+			//LoginPayload p = new LoginPayload(username);
+	    	//p.setWorkspaceId(mDataManager.getWorkspaceId());
 //	    	p.setWorkspaceId(0);
 //	    	p.setUserId(null);
 //	    	p.setUserSessionId(null);
-
-			cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(p.toJsonString());
+			Log.e("test","JSON Data sent in login request: " + obj);
+			cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(obj.toString());
 
 
 			mAuthManager.getClient().post("login", entity, new AsyncHttpResponseHandler() {
@@ -376,6 +382,17 @@ public class RestClient {
     	    intent.putExtra("message", "Failed to connect to server: " + e.getLocalizedMessage() + " - Please check your network connection.");
     	    mContext.sendBroadcast (intent);
     	}
+    	catch(JSONException e)
+		{
+			Log.e("nicsRest", e.getLocalizedMessage());
+
+			Intent intent = new Intent();
+			intent.setAction(Intents.nics_FAILED_LOGIN);
+
+			intent.putExtra("offlineMode", true);
+			intent.putExtra("message", "Failed to connect to server: " + e.getLocalizedMessage() + " - Something went wrong.");
+			mContext.sendBroadcast (intent);
+		}
     }
     
 	public static void login(final Context context, final String username, final String password, DataManager.CustomCommand command) {

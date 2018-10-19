@@ -34,7 +34,7 @@
     -->
 <manifest package="scout.edu.mit.ll.nics.android"
           android:versionCode="4"
-          android:versionName="6.6" xmlns:android="http://schemas.android.com/apk/res/android">
+          android:versionName="6.7_staging" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="21" />
 

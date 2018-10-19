@@ -76,7 +76,7 @@
     <string name="markup_circle_lowercase">-+-+-+</string>
     
     <string name="markup_finalize">-+-+-+ %s -+-+-+?</string>
-    <string name="markup_confirm_completion">-+-+-+ -+-+-+ -+-+-+ -+-+-+ -+-+-+ %0$s. -+-+-+ -+-+-+ -+-+-+ -+-+-+ -+-+-+ -+-+-+ %0$s.</string>
+    <string name="markup_confirm_completion">-+-+-+ -+-+-+ -+-+-+ -+-+-+ -+-+-+ %1$s. -+-+-+ -+-+-+ -+-+-+ -+-+-+ -+-+-+ -+-+-+ %1$s.</string>
     <string name="markup_confrim_delete">-+-+-+ -+-+-+ -+-+-+ -+-+-+?</string>
     <string name="markup_shape_incomplete">-+-+-+ -+-+-+</string>
     <string name="markup_confirm_fields">-+-+-+ -+-+-+ -+-+-+-+-+-+ -+-+-+ -+-+-+ -+-+-+ -+-+-+.</string>
