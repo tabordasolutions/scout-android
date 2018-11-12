@@ -66,34 +66,24 @@ import com.loopj.android.http.RequestParams;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.HttpEntity;
-import scout.edu.mit.ll.nics.android.api.data.DamageReportData;
 import scout.edu.mit.ll.nics.android.api.data.MarkupFeature;
 import scout.edu.mit.ll.nics.android.api.data.OperationalUnit;
 import scout.edu.mit.ll.nics.android.api.data.OrgCapabilities;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportCategoryType;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportData;
 import scout.edu.mit.ll.nics.android.api.handlers.ChatResponseHandler;
-import scout.edu.mit.ll.nics.android.api.handlers.DamageReportNoImageResponseHandler;
-import scout.edu.mit.ll.nics.android.api.handlers.DamageReportResponseHandler;
-import scout.edu.mit.ll.nics.android.api.handlers.FieldReportResponseHandler;
 import scout.edu.mit.ll.nics.android.api.handlers.SimpleReportNoImageResponseHandler;
-import scout.edu.mit.ll.nics.android.api.handlers.WeatherReportResponseHandler;
 import scout.edu.mit.ll.nics.android.api.handlers.MDTResponseHandler;
 import scout.edu.mit.ll.nics.android.api.handlers.MarkupResponseHandler;
-import scout.edu.mit.ll.nics.android.api.handlers.ResourceRequestResponseHandler;
 import scout.edu.mit.ll.nics.android.api.handlers.SimpleReportResponseHandler;
 import scout.edu.mit.ll.nics.android.api.messages.AssignmentMessage;
 import scout.edu.mit.ll.nics.android.api.messages.ChatMessage;
 import scout.edu.mit.ll.nics.android.api.messages.CollaborationRoomMessage;
-import scout.edu.mit.ll.nics.android.api.messages.DamageReportMessage;
-import scout.edu.mit.ll.nics.android.api.messages.FieldReportMessage;
 import scout.edu.mit.ll.nics.android.api.messages.TrackingLayerMessage;
-import scout.edu.mit.ll.nics.android.api.messages.WeatherReportMessage;
 import scout.edu.mit.ll.nics.android.api.messages.IncidentMessage;
 import scout.edu.mit.ll.nics.android.api.messages.LoginMessage;
 import scout.edu.mit.ll.nics.android.api.messages.MarkupMessage;
 import scout.edu.mit.ll.nics.android.api.messages.OrganizationMessage;
-import scout.edu.mit.ll.nics.android.api.messages.ResourceRequestMessage;
 import scout.edu.mit.ll.nics.android.api.messages.SimpleReportMessage;
 import scout.edu.mit.ll.nics.android.api.messages.UserMessage;
 import scout.edu.mit.ll.nics.android.api.payload.AssignmentPayload;
@@ -106,17 +96,9 @@ import scout.edu.mit.ll.nics.android.api.payload.MobileDeviceTrackingPayload;
 import scout.edu.mit.ll.nics.android.api.payload.TrackingLayerPayload;
 import scout.edu.mit.ll.nics.android.api.payload.TrackingTokenPayload;
 import scout.edu.mit.ll.nics.android.api.payload.WeatherPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.DamageReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.FieldReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.ResourceRequestPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.WeatherReportPayload;
 import scout.edu.mit.ll.nics.android.api.tasks.ParseChatMessagesTask;
-import scout.edu.mit.ll.nics.android.api.tasks.ParseDamageReportsTask;
-import scout.edu.mit.ll.nics.android.api.tasks.ParseFieldReportsTask;
-import scout.edu.mit.ll.nics.android.api.tasks.ParseWeatherReportsTask;
 import scout.edu.mit.ll.nics.android.api.tasks.ParseMarkupFeaturesTask;
-import scout.edu.mit.ll.nics.android.api.tasks.ParseResourceRequestsTask;
 import scout.edu.mit.ll.nics.android.api.tasks.ParseSimpleReportsTask;
 import scout.edu.mit.ll.nics.android.auth.AuthManager;
 import scout.edu.mit.ll.nics.android.auth.providers.OpenAMAuthProvider;
@@ -134,15 +116,10 @@ public class RestClient {
     
     private static AsyncTask<ArrayList<ChatPayload>, Object, Integer> mParseChatMessagesTask;
     private static AsyncTask<ArrayList<SimpleReportPayload>, Object, Integer> mParseSimpleReportsTask;
-    private static AsyncTask<ArrayList<FieldReportPayload>, Object, Integer> mParseFieldReportsTask;
-    private static AsyncTask<ArrayList<DamageReportPayload>, Object, Integer> mParseDamageReportsTask;
-    private static AsyncTask<ArrayList<ResourceRequestPayload>, Object, Integer> mParseResourceRequestTask;
-    private static AsyncTask<ArrayList<WeatherReportPayload>, Object, Integer> mParseWeatherReportsTask;
     private static AsyncTask<MarkupPayload, Object, Integer> mParseMarkupFeaturesTask;
     
     private static SparseArray<SimpleReportResponseHandler> mSimpleReportResponseHandlers;
-    private static SparseArray<DamageReportResponseHandler> mDamageReportResponseHandlers;
-    
+
     private static boolean firstRun = true;
 
 	private static String mDeviceId;
@@ -204,18 +181,24 @@ public class RestClient {
     
     //Test function to test JSON Parsing
     public static void getHardCodedOrgCapabilities(){// {'name':'FR-Form','capId':10}, {'name':'RES-Form','capId':14},  , {'name':'SVR-Form','capId':14}
-    	String content ="{'message':'ok','count':5,'capabilities':[{'name':'Chat','capId':14}, {'name':'MapMarkup','capId':14}, {'name':'WR-Form','capId':10}, {'name':'DR-Form','capId':10}],'orgCapability':null,'capabilitiesName':null}";
+    	String content ="{'message':'ok','count':5,'capabilities':[{'name':'Chat','capId':14}, {'name':'MapMarkup','capId':14}, {'name':'WR-Form','capId':10}, {'name':'DR-Form','capId':10}, {'name':'ROC-Form','capId':10}],'orgCapability':null,'capabilitiesName':null}";
     	OrgCapabilities OrgCap = new OrgCapabilities();
     	OrgCap.setCapabilitiesFromJSON(content);
     	mDataManager.setOrgCapabilites(OrgCap);
     }
     
-    public static void getOrgCapabilities(long orgId){
+    /*public static void getOrgCapabilities(long orgId){
+		//FIXME: This endpoint doesn't seem to be implemented on the backend server
+		Log.e("tag","hullo sent org capabilities request for workSpaceId: ");
+		Log.e("tag","hullo orgCapabilities URL: " + "\"orgs/" + mDataManager.getWorkspaceId() +"/capabilities?orgId=" + orgId + "\"");
 
-    	mAuthManager.getClient().get("orgs/" + mDataManager.getWorkspaceId() +"/capabilities?orgId=" + orgId , new AsyncHttpResponseHandler() {
+
+		mAuthManager.getClient().get("orgs/" + mDataManager.getWorkspaceId() +"/capabilities?orgId=" + orgId , new AsyncHttpResponseHandler() {
 			@Override
 			public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
 				String content = (responseBody != null) ? new String(responseBody) : "error";
+
+				Log.e("tag","hullo got OrgCapabilities : " + content);
 				
 				OrgCapabilities OrgCap = new OrgCapabilities();
 				OrgCap.setCapabilitiesFromJSON(content);
@@ -224,12 +207,13 @@ public class RestClient {
 
 			@Override
 			public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+				Log.e("tag","hullo get orgCapabilities failed." + statusCode);
+
 				String content = (responseBody != null) ? new String(responseBody) : "error";
     			Log.e(Constants.nics_DEBUG_ANDROID_TAG, "Fail to get Org Capabilities." + content);
 			}
     	});
-    	
-    }
+    }*/
     
     private static void attemptLogin(final DataManager.CustomCommand command) {
     	try {
@@ -244,8 +228,6 @@ public class RestClient {
 			}
 
 			mSimpleReportResponseHandlers = new SparseArray<SimpleReportResponseHandler>();
-			mDamageReportResponseHandlers = new SparseArray<DamageReportResponseHandler>();
-
 
 			JSONObject obj = new JSONObject();
 			obj.put("username",username);
@@ -432,10 +414,7 @@ public class RestClient {
 					mSendingSimpleReports = false;
 					
 					clearParseChatMessagesTask();
-					clearParseFieldReportTask();
-					clearParseDamageReportTask();
 					clearParseMarkupFeaturesTask();
-					clearParseResourceRequestTask();
 					clearParseSimpleReportTask();
 					
 					mDataManager.stopPollingAlarms();
@@ -811,11 +790,7 @@ public class RestClient {
 			        }
 					
 			        getSimpleReports(-1, -1, incidentId);
-					getFieldReports(-1, -1, incidentId);
-					getDamageReports(-1, -1, incidentId);
-					getResourceRequests(-1, -1, incidentId);
-					getWeatherReports(-1, -1, incidentId);
-					
+
 //					if(collabRoomName.contains("-")) {
 //						getChatHistory(incident.getIncidentName(), collabRoomName.split("-")[1]);
 //						getMarkupHistory(collabRoomId);
@@ -917,166 +892,6 @@ public class RestClient {
 				@Override
 				public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
 					mFetchingSimpleReports = false;
-				}
-			});
-		}
-	}
-	
-	public static void getFieldReports(int offset, int limit, final long incidentId) {
-		if(!mFetchingFieldReports && mParseFieldReportsTask == null && incidentId != -1) {
-			String url = "reports/" + mDataManager.getActiveIncidentId() + "/FR?sortOrder=desc&fromDate=" + (mDataManager.getLastFieldReportTimestamp() + 1);
-			
-			if(incidentId != -1) {
-				url += "&incidentId=" + incidentId;
-			}
-			
-			mFetchingFieldReports = true;
-			
-			mAuthManager.getClient().get(url, new AsyncHttpResponseHandler() {
-
-				@Override
-				public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-					String content = (responseBody != null) ? new String(responseBody) : "error";
-					
-					FieldReportMessage message = mBuilder.create().fromJson(content, FieldReportMessage.class);
-					
-					if(message != null) {
-						ArrayList<FieldReportPayload> frPayloads = message.getReports();
-
-						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-							mParseFieldReportsTask = new ParseFieldReportsTask(mContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, frPayloads);
-						} else {
-							mParseFieldReportsTask = new ParseFieldReportsTask(mContext).execute(frPayloads);
-						}
-						Log.i("nicsRest", "Successfully received field report information.");
-					}
-					mFetchingFieldReports = false;
-				}
-
-				@Override
-				public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-					mFetchingFieldReports = false;
-				}
-			});
-		}
-	}
-	
-	public static void getDamageReports(int offset, int limit, final long incidentId) {
-		if(!mFetchingDamageReports && mParseDamageReportsTask == null && incidentId != -1) {
-			String url = "reports/" + mDataManager.getActiveIncidentId() + "/DMGRPT?sortOrder=desc&fromDate=" + (mDataManager.getLastDamageReportTimestamp() + 1);
-			
-			if(incidentId != -1) {
-				url += "&incidentId=" + incidentId;
-			}
-			
-			mFetchingDamageReports = true;
-			
-			mAuthManager.getClient().get(url, new AsyncHttpResponseHandler() {
-				
-				@Override
-				public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-					String content = (responseBody != null) ? new String(responseBody) : "error";
-					
-					DamageReportMessage message = mBuilder.create().fromJson(content, DamageReportMessage.class);
-					
-					if(message != null) {
-						ArrayList<DamageReportPayload> drPayloads = message.getReports();
-
-						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-							mParseDamageReportsTask = new ParseDamageReportsTask(mContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, drPayloads);
-						} else {
-							mParseDamageReportsTask = new ParseDamageReportsTask(mContext).execute(drPayloads);
-						}
-						Log.i("nicsRest", "Successfully received damage report information.");
-					}
-					mFetchingDamageReports = false;
-				}
-
-				@Override
-				public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-					mFetchingDamageReports = false;
-				}
-			});
-		}
-	}	
-	
-	public static void getResourceRequests(int offset, int limit, final long incidentId) {
-		if(!mFetchingResourceRequests && mParseResourceRequestTask == null && incidentId != -1) {
-			String url = "reports/" + mDataManager.getActiveIncidentId() + "/RESREQ?sortOrder=desc&fromDate=" + (mDataManager.getLastResourceRequestTimestamp() + 1);
-			
-			if(incidentId != -1) {
-				url += "&incidentId=" + incidentId;
-			}
-			
-			mFetchingResourceRequests = true;
-			
-			mAuthManager.getClient().get(url , new AsyncHttpResponseHandler() {
-
-				@Override
-				public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-					String content = (responseBody != null) ? new String(responseBody) : "error";
-					
-					ResourceRequestMessage message = mBuilder.create().fromJson(content, ResourceRequestMessage.class);
-					
-					if(message != null) {
-						ArrayList<ResourceRequestPayload> resourceRequestPayloads = message.getReports();
-
-						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-							mParseResourceRequestTask = new ParseResourceRequestsTask(mContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, resourceRequestPayloads);
-						} else {
-							mParseResourceRequestTask = new ParseResourceRequestsTask(mContext).execute(resourceRequestPayloads);
-						}
-						Log.i("nicsRest", "Successfully received resource request information.");
-					}
-					mFetchingResourceRequests = false;
-				}
-
-				@Override
-				public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-					String content = (responseBody != null) ? new String(responseBody) : "error";
-
-					mFetchingResourceRequests = false;
-					Log.i("nicsRest", "Failed to received resource request information for: " + content);
-				}
-			});
-		}
-	}
-	
-	public static void getWeatherReports(int offset, int limit, final long incidentId) {
-		if(!mFetchingWeatherReports && mParseWeatherReportsTask == null && incidentId != -1) {
-			String url = "reports/" + mDataManager.getActiveIncidentId() + "/WR?sortOrder=desc&fromDate=" + (mDataManager.getLastWeatherReportTimestamp() + 1);
-			
-			if(incidentId != -1) {
-				url += "&incidentId=" + incidentId;
-			}
-			
-			mFetchingWeatherReports = true;
-			
-			mAuthManager.getClient().get(url , new AsyncHttpResponseHandler() {
-				
-				@Override
-				public void onSuccess(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody) {
-					String content = (responseBody != null) ? new String(responseBody) : "error";
-					WeatherReportMessage message = mBuilder.create().fromJson(content, WeatherReportMessage.class);
-					
-					if(message != null) {
-						ArrayList<WeatherReportPayload> wrPayloads = message.getReports();
-
-						if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-							mParseWeatherReportsTask = new ParseWeatherReportsTask(mContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, wrPayloads);
-						} else {
-							mParseWeatherReportsTask = new ParseWeatherReportsTask(mContext).execute(wrPayloads);
-						}
-						Log.i("nicsRest", "Successfully received weather report information.");
-					}
-					mFetchingWeatherReports = false;
-				}
-				
-				@Override
-				public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
-					String content = (responseBody != null) ? new String(responseBody) : "error";
-					mFetchingWeatherReports = false;
-					Log.i("nicsRest", "Failed to received weather report information for: " + content);
 				}
 			});
 		}
@@ -1324,34 +1139,6 @@ public class RestClient {
 		}
 	}
 
-	public static void clearParseFieldReportTask() {
-		if(mParseFieldReportsTask != null) {
-			mParseFieldReportsTask.cancel(true);
-			mParseFieldReportsTask = null;
-		}
-	}
-	
-	public static void clearParseDamageReportTask() {
-		if(mParseDamageReportsTask != null) {
-			mParseDamageReportsTask.cancel(true);
-			mParseDamageReportsTask = null;
-		}
-	}
-	
-	public static void clearParseResourceRequestTask() {
-		if(mParseResourceRequestTask != null) {
-			mParseResourceRequestTask.cancel(true);
-			mParseResourceRequestTask = null;
-		}
-	}
-	
-	public static void clearParseWeatherReportTask() {
-		if(mParseWeatherReportsTask != null) {
-			mParseWeatherReportsTask.cancel(true);
-			mParseWeatherReportsTask = null;
-		}
-	}
-	
 	public static void clearParseMarkupFeaturesTask() {
 		if(mParseMarkupFeaturesTask != null) {
 			mParseMarkupFeaturesTask.cancel(true);
@@ -1447,117 +1234,7 @@ public class RestClient {
 		Log.w("nics_POST", "Removing simple report " + reportId + " from send queue.");
 		mSimpleReportResponseHandlers.remove((int)reportId);
 	}
-	
-	public static void removeDamageReportHandler(long reportId) {
-		Log.w("nics_POST", "Removing damage report " + reportId + " from send queue.");
-		mDamageReportResponseHandlers.remove((int)reportId);
-	}
-		
-	public static void postFieldReports() {
-		if(!mSendingFieldReports) {
-			ArrayList<FieldReportPayload> fieldReports = mDataManager.getAllFieldReportStoreAndForwardReadyToSend();
-			
-			for (FieldReportPayload report : fieldReports) {
-				try {
-		        	if(!report.isDraft()) {
-						cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(report.toJsonString());
-		    			mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId() + "/FR", entity, new FieldReportResponseHandler(mContext, mDataManager, report.getId()));
-		    			mSendingFieldReports = true;
-		        	}
-				} catch(UnsupportedEncodingException e) {
-					
-				}
-			}
-		}
-	}
-	
-	public static void postDamageReports() {
-		ArrayList<DamageReportPayload> damageReports = mDataManager.getAllDamageReportStoreAndForwardReadyToSend();
-		
-		if(mDamageReportResponseHandlers == null) {
-			mDamageReportResponseHandlers = new SparseArray<DamageReportResponseHandler>();
-		}
-		
-		for (DamageReportPayload report : damageReports) {
-        	if(!report.isDraft() && mDamageReportResponseHandlers != null && mDamageReportResponseHandlers.indexOfKey((int)report.getId()) < 0 && !mSendingDamageReports) {
-        		Log.w("nics_POST", "Adding damage report " + report.getId() + " to send queue.");
-        		DamageReportData data = report.getMessageData();
-        		
-        		try {
-        		
-	        		if(data.getFullpath() != null && data.getFullpath() != ""){
-		        		
-		        		RequestParams params = new RequestParams();
-		        		params.put("msg", data.toJsonString());
-		        		params.put("deviceId", mDeviceId);
-		        		params.put("incidentId", String.valueOf(report.getIncidentId()));
-		//        		params.put("userId", String.valueOf(report.getSenderUserId()));
-		        		params.put("usersessionid", String.valueOf(report.getUserSessionId()));
-		        		params.put("seqtime", String.valueOf(report.getSeqTime()));
-	        			params.put("image", new File(data.getFullpath()));
-	        			
-	        			DamageReportResponseHandler handler =  new DamageReportResponseHandler(mContext, mDataManager, report.getId());
-	            		mDamageReportResponseHandlers.put((int)report.getId(), handler);
-	            		
-	            		mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId() + "/DMGRPT", params, handler);
-	        		}else{	//no image
-						cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(report.toJsonString());
-		    			mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId()  + "/DMGRPT", entity, new DamageReportNoImageResponseHandler(mContext, mDataManager, report.getId()));
-		    			mSendingDamageReports = true;
-	        		}
-            		
-            		
-        		} catch(FileNotFoundException e) {
-        			Log.e("nicsRest", "Deleting: " + report.getId() + " success: " + mDataManager.deleteDamageReportStoreAndForward(report.getId()) + " due to invalid file.");
-        			mSendingDamageReports = false;
-        		} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-					mSendingDamageReports = false;
-        		}
-        		
-    			mSendingDamageReports = true;
-        	}
-		}
-	}
-	
-	public static void postResourceRequests() {
-		if(!mSendingResourceRequests) {
-			ArrayList<ResourceRequestPayload> resourceRequests = mDataManager.getAllResourceRequestStoreAndForwardReadyToSend();
-			
-			for (ResourceRequestPayload request : resourceRequests) {
-				try {
-		        	if(!request.isDraft()) {
-						cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(request.toJsonString());
-		    			
-		    			mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId() + "/RESREQ", entity, new ResourceRequestResponseHandler(mContext, mDataManager, request.getId()));
-		    			mSendingResourceRequests = true;
-		        	}
-				} catch(UnsupportedEncodingException e) {
-					
-				}
-			}
-		}
-	}
-	
-	public static void postWeatherReports() {
-		if(!mSendingWeatherReports) {
-			ArrayList<WeatherReportPayload> weatherReports = mDataManager.getAllWeatherReportStoreAndForwardReadyToSend();
-			
-			for (WeatherReportPayload report : weatherReports) {
-				try {
-		        	if(!report.isDraft()) {
-						cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(report.toJsonString());
-		    			String test = report.toJsonString();
-		    			mAuthManager.getClient().post("reports/"  + mDataManager.getActiveIncidentId()  + "/WR", entity, new WeatherReportResponseHandler(mContext, mDataManager, report.getId()));
-		    			mSendingWeatherReports = true;
-		        	}
-				} catch(UnsupportedEncodingException e) {
-					
-				}
-			}
-		}
-	}
-	
+
 	public static void postChatMessages() {
 		if(!mSendingChatMessages) {
 			ArrayList<ChatPayload> chatMessages = mDataManager.getAllChatStoreAndForward();
@@ -1631,45 +1308,31 @@ public class RestClient {
 		mClient.get("http://www.google.com/mobile/legalnotices/", responseHandler);
 	}
 	
-	public static String getDeviceId() {
+	public static String getDeviceId()
+	{
 		return mDeviceId;
 	}
 
-	public static void setSendingSimpleReports(boolean isSending) {
+	public static void setSendingSimpleReports(boolean isSending)
+	{
 		mSendingSimpleReports = isSending;
 		if(mDataManager.isOnline()) {
 			postSimpleReports();
 		}
 	}
-	
-	public static void setSendingFieldReports(boolean isSending) {
-		mSendingFieldReports = isSending;
-	}
 
-	public static void setSendingDamageReports(boolean isSending) {
-		mSendingDamageReports = isSending;
-		if(mDataManager.isOnline()) {
-			postDamageReports();
-		}
-	}
-	
-	public static void setSendingResourceRequests(boolean isSending) {
-		mSendingResourceRequests = isSending;
-	}
-	
-	public static void setSendingWeatherReports(boolean isSending) {
-		mSendingWeatherReports = isSending;
-	}
-	
-	public static void setSendingChatMessages(boolean isSending) {
+	public static void setSendingChatMessages(boolean isSending)
+	{
 		mSendingChatMessages = isSending;
 	}
 	
-	public static void setSendingMarkupFeatures(boolean isSending) {
+	public static void setSendingMarkupFeatures(boolean isSending)
+	{
 		mSendingMarkupFeatures = isSending;
 	}
 
-	public static void setDataManager(DataManager mInstance) {
+	public static void setDataManager(DataManager mInstance)
+	{
 		mDataManager = mInstance;
 	}
 }

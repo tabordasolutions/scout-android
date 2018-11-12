@@ -39,10 +39,11 @@ public class OrgCapabilities {
 	private boolean DamageReportForm;
 	private boolean ResourceRequestForm;
 	private boolean WeatherReportForm;
+	private boolean ReportOnConditionForm;
 	private boolean SettingsTab;
 	private boolean MapMarkup;
 	private boolean Chat;
-	
+
 	
 	public void setCapabilitiesFromJSON(String content) {
 
@@ -53,34 +54,54 @@ public class OrgCapabilities {
 		SettingsTab = false;
 		MapMarkup = false;
 		Chat = false;
+		ReportOnConditionForm = false;
 
-		try {
+		try
+		{
 			JSONObject JsonContent = new JSONObject(content);
 			JSONArray capabilities = JsonContent.getJSONArray("capabilities");
 			
 			for(int i = 0; i < capabilities.length(); i++)
 			{
 				JSONObject currentCapabilitiy = new JSONObject(capabilities.getString(i));
-			   String name = currentCapabilitiy.getString("name");
-			   
-			   if(name.equals("FR-Form")){
+				String name = currentCapabilitiy.getString("name");
+
+			   if(name.equals("FR-Form"))
+			   {
 			       FieldReportForm = true;
-			   }else if(name.equals("DR-Form")){
+			   }
+			   else if(name.equals("DR-Form"))
+			   {
 			         DamageReportForm = true; 
-			   }else if(name.equals("RES-Form")){
+			   }
+			   else if(name.equals("RES-Form"))
+			   {
 			       	ResourceRequestForm = true; 
-			   }else if(name.equals("WR-Form")){
+			   }
+			   else if(name.equals("WR-Form"))
+			   {
 				   WeatherReportForm = true; 
-			   }else if(name.equals("SettingsTab")){
-			        ResourceRequestForm = true; 
-			   }else if(name.equals("MapMarkup")){
+			   }
+			   else if(name.equals("ROC-Form"))
+			   {
+				   ReportOnConditionForm = true;
+			   }
+			   else if(name.equals("SettingsTab"))
+			   {
+			   		ResourceRequestForm = true;
+			   }
+			   else if(name.equals("MapMarkup"))
+			   {
 				   	MapMarkup = true; 
-			   }else if(name.equals("Chat")){
+			   }
+			   else if(name.equals("Chat"))
+			   {
 			      Chat = true; 
 			   }
-		   } 
-		} catch (JSONException e) {
-			
+		   }
+		}
+		catch (JSONException e)
+		{
 			Log.e(Constants.nics_DEBUG_ANDROID_TAG, "Failed to convert orgs JSON." + content);
 			e.printStackTrace();
 		}
@@ -98,6 +119,7 @@ public class OrgCapabilities {
 	public boolean getWeatherReportForm(){
 		return WeatherReportForm;
 	}
+	public boolean getROCForm() { return ReportOnConditionForm; }
 	public boolean getSettingsTab(){
 		return SettingsTab;
 	}

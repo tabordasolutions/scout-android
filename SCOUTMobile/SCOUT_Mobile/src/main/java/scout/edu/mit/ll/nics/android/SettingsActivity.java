@@ -728,10 +728,7 @@ public class SettingsActivity extends PreferenceActivity {
 		
 		mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), true);
 		mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), true);
-		mDataManager.requestDamageReportRepeating(mDataManager.getIncidentDataRate(), true);
-		mDataManager.requestFieldReportRepeating(mDataManager.getIncidentDataRate(), true);
 		mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), true);
-		mDataManager.requestResourceRequestRepeating(mDataManager.getIncidentDataRate(), true);
 		super.onDestroy();
 	}
 

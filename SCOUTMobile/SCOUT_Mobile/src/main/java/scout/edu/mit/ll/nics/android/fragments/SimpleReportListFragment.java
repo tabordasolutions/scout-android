@@ -50,6 +50,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemLongClickListener;
+
 import scout.edu.mit.ll.nics.android.MainActivity;
 import scout.edu.mit.ll.nics.android.R;
 import scout.edu.mit.ll.nics.android.adapters.SimpleReportListAdapter;
@@ -63,7 +64,8 @@ import scout.edu.mit.ll.nics.android.utils.Intents;
 import scout.edu.mit.ll.nics.android.utils.Constants.NavigationOptions;
 import scout.edu.mit.ll.nics.android.api.tasks.MarkAllReportsAsReadTask;
 
-public class SimpleReportListFragment extends FormListFragment {
+public class SimpleReportListFragment extends FormListFragment
+{
 	private Context mContext;
 	private EncryptedPreferences settings;
 	private SimpleReportListAdapter mSimpleReportListAdapter;
@@ -76,31 +78,33 @@ public class SimpleReportListFragment extends FormListFragment {
 	private long mLastIncidentId = 0;
 	protected boolean mIsFirstLoad = true;
 	protected MarkAllReportsAsReadTask MarkMessagesAsReadTask = null;
-	
+
 	private int index;
 	private int top;
 	private int longPressSelectionPosition;
-	
+
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
-		
+
 		mContext = getActivity();
-		settings = new EncryptedPreferences( mContext.getSharedPreferences(Constants.PREFERENCES_NAME, Constants.PREFERENCES_MODE));
-		
+		settings = new EncryptedPreferences(mContext.getSharedPreferences(Constants.PREFERENCES_NAME, Constants.PREFERENCES_MODE));
+
 		mSimpleReportReceiverFilter = new IntentFilter(Intents.nics_NEW_SIMPLE_REPORT_RECEIVED);
 		mSimpleReportProgressReceiverFilter = new IntentFilter(Intents.nics_SIMPLE_REPORT_PROGRESS);
 		mIncidentSwitchedReceiverFilter = new IntentFilter(Intents.nics_INCIDENT_SWITCHED);
 		mMarkAllAsReadReceiverFilter = new IntentFilter(Intents.nics_MARKING_ALL_REPORTS_READ_FINISHED);
 		mSentReportsClearedFilter = new IntentFilter(Intents.nics_SENT_SIMPLE_REPORTS_CLEARED);
-		
-		if (!simpleReportReceiverRegistered) {
+
+		if (!simpleReportReceiverRegistered)
+		{
 			mContext.registerReceiver(simpleReportReceiver, mSimpleReportReceiverFilter);
 			mContext.registerReceiver(simpleReportProgressReceiver, mSimpleReportProgressReceiverFilter);
 			mContext.registerReceiver(incidentChangedReceiver, mIncidentSwitchedReceiverFilter);
 			mContext.registerReceiver(markAllAsReadReceiver, mMarkAllAsReadReceiverFilter);
 			mContext.registerReceiver(sentReportsClearedReceiver, mSentReportsClearedFilter);
-			
+
 			simpleReportReceiverRegistered = true;
 		}
 
@@ -108,89 +112,100 @@ public class SimpleReportListFragment extends FormListFragment {
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+	{
 		super.onCreateOptionsMenu(menu, inflater);
 
 		inflater.inflate(R.menu.simplereport, menu);
 	}
 
 	@Override
-	public void onViewCreated(View view, Bundle savedInstanceState) {
+	public void onViewCreated(View view, Bundle savedInstanceState)
+	{
 		view.setPadding(10, 0, 10, 0);
 
 		this.setEmptyText(mContext.getString(R.string.no_simple_reports_exist));
 		super.onViewCreated(view, savedInstanceState);
-		
-		   getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
 
-			      @Override
-			      public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		getListView().setOnItemLongClickListener(new OnItemLongClickListener()
+		{
 
-			    	longPressSelectionPosition = position;
-		    	  	AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder((MainActivity) getActivity());
-		    	  
-					mDialogBuilder.setMessage(null);
-				    mDialogBuilder.setPositiveButton(null, null);
-				    
-				    String[] choices = {getString(R.string.go_to_report_on_map)};
-				    
-					mDialogBuilder.setItems(choices,dialogSelected);
-					
-					mDialogBuilder.create();
-					mDialogBuilder.show();
-			    	  
-			        return true;
-			      }
-			    });
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id)
+			{
+
+				longPressSelectionPosition = position;
+				AlertDialog.Builder mDialogBuilder = new AlertDialog.Builder((MainActivity) getActivity());
+
+				mDialogBuilder.setMessage(null);
+				mDialogBuilder.setPositiveButton(null, null);
+
+				String[] choices = {getString(R.string.go_to_report_on_map)};
+
+				mDialogBuilder.setItems(choices, dialogSelected);
+
+				mDialogBuilder.create();
+				mDialogBuilder.show();
+
+				return true;
+			}
+		});
 	}
 
-	DialogInterface.OnClickListener dialogSelected = new DialogInterface.OnClickListener() {
+	DialogInterface.OnClickListener dialogSelected = new DialogInterface.OnClickListener()
+	{
 
 		@Override
-		public void onClick(DialogInterface dialog, int which) {
+		public void onClick(DialogInterface dialog, int which)
+		{
 
 			MainActivity mMainActivity = (MainActivity) getActivity();
 			SimpleReportPayload item = mSimpleReportListAdapter.getItem(longPressSelectionPosition);
 			String cameraPos = item.getMessageData().getLatitude() + "," + item.getMessageData().getLongitude() + "," + 13 + "," + 0 + "," + 0;
 			EncryptedPreferences settings = new EncryptedPreferences(mContext.getSharedPreferences(Constants.nics_MAP_MARKUP_STATE, 0));
 			settings.savePreferenceString(Constants.nics_MAP_PREVIOUS_CAMERA, cameraPos);
-			
+
 			mMainActivity.onNavigationItemSelected(NavigationOptions.MAPCOLLABORATION.getValue(), -1);
 		}
 	};
-	
+
 	@Override
-	public void onListItemClick(ListView listView, View view, int position, long id) {
+	public void onListItemClick(ListView listView, View view, int position, long id)
+	{
 		super.onListItemClick(listView, view, position, id);
 
 		SimpleReportPayload item = mSimpleReportListAdapter.getItem(position);
 		item.parse();
 		Log.d("Long id: ", String.valueOf(id));
-		
-		if(item.isNew()){
+
+		if (item.isNew())
+		{
 			item.setNew(false);
 			mDataManager.deleteSimpleReportFromHistory(item.getId());
 			mDataManager.addSimpleReportToHistory(item);
-			
-			ImageView blueDot = (ImageView)view.findViewById(R.id.srBlueDotImage);
+
+			ImageView blueDot = (ImageView) view.findViewById(R.id.srBlueDotImage);
 			blueDot.setVisibility(View.INVISIBLE);
 		}
-		
+
 		((MainActivity) mContext).openSimpleReport(item, item.isDraft());
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume()
+	{
 		super.onResume();
 		mDataManager.setNewGeneralMessageAvailable(false);
-		
-		if(mSimpleReportListAdapter == null) {
+
+		if (mSimpleReportListAdapter == null)
+		{
 			mSimpleReportListAdapter = new SimpleReportListAdapter(mContext, R.layout.listitem_simplereport, R.id.simpleReportTitle, new ArrayList<SimpleReportPayload>());
 			mIsFirstLoad = true;
 			getListView().setAdapter(mSimpleReportListAdapter);
 		}
-		
-		if (!simpleReportReceiverRegistered) {
+
+		if (!simpleReportReceiverRegistered)
+		{
 			mContext.registerReceiver(simpleReportReceiver, mSimpleReportReceiverFilter);
 			mContext.registerReceiver(simpleReportProgressReceiver, mSimpleReportProgressReceiverFilter);
 			mContext.registerReceiver(incidentChangedReceiver, mIncidentSwitchedReceiverFilter);
@@ -198,27 +213,30 @@ public class SimpleReportListFragment extends FormListFragment {
 			mContext.registerReceiver(sentReportsClearedReceiver, mSentReportsClearedFilter);
 			simpleReportReceiverRegistered = true;
 		}
-		
-		index  = settings.getPreferenceLong("sr_scrollIdx", "-1").intValue();
-		top  = settings.getPreferenceLong("sr_scrollTop", "-1").intValue();
-		
+
+		index = settings.getPreferenceLong("sr_scrollIdx", "-1").intValue();
+		top = settings.getPreferenceLong("sr_scrollTop", "-1").intValue();
+
 		settings.removePreference("sr_scrollIdx");
 		settings.removePreference("sr_scrollTop");
-		
-		if(mLastIncidentId != mDataManager.getActiveIncidentId()) {
+
+		if (mLastIncidentId != mDataManager.getActiveIncidentId())
+		{
 			mIsFirstLoad = true;
 			setListShown(false);
 		}
-		Log.e("USIDDEFECT","About to send all simple reports (3)");
+		Log.e("USIDDEFECT", "About to send all simple reports (3)");
 		mDataManager.sendSimpleReports();
 		updateData();
 	}
 
 	@Override
-	public void onDestroyView() {
+	public void onDestroyView()
+	{
 		super.onDestroyView();
 
-		if (simpleReportReceiverRegistered) {
+		if (simpleReportReceiverRegistered)
+		{
 			mContext.unregisterReceiver(simpleReportReceiver);
 			mContext.unregisterReceiver(simpleReportProgressReceiver);
 			mContext.unregisterReceiver(incidentChangedReceiver);
@@ -227,24 +245,28 @@ public class SimpleReportListFragment extends FormListFragment {
 			simpleReportReceiverRegistered = false;
 		}
 	}
-	
+
 	@Override
-	public void onPause() {
+	public void onPause()
+	{
 		super.onPause();
-		
+
 		int index = getListView().getFirstVisiblePosition();
 		View v = getListView().getChildAt(0);
 		int top = (v == null) ? 0 : v.getTop();
 
-		settings.savePreferenceLong("sr_scrollIdx", (long)index);
-		settings.savePreferenceLong("sr_scrollTop", (long)top);
+		settings.savePreferenceLong("sr_scrollIdx", (long) index);
+		settings.savePreferenceLong("sr_scrollTop", (long) top);
 	}
 
-	private BroadcastReceiver simpleReportReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver simpleReportReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
-			try {
+		public void onReceive(Context context, Intent intent)
+		{
+			try
+			{
 				Bundle bundle = intent.getExtras();
 				SimpleReportPayload payload = mBuilder.create().fromJson(bundle.getString("payload"), SimpleReportPayload.class);
 				payload.setSendStatus(ReportSendStatus.lookUp(bundle.getInt("sendStatus", 0)));
@@ -252,144 +274,172 @@ public class SimpleReportListFragment extends FormListFragment {
 
 				SimpleReportData data = payload.getMessageData();
 				mSimpleReportListAdapter.add(payload);
-				
+
 				mSimpleReportListAdapter.sort(reportComparator);
 				mSimpleReportListAdapter.notifyDataSetChanged();
 				mDataManager.setNewGeneralMessageAvailable(false);
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}
 	};
 
-	private BroadcastReceiver simpleReportProgressReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver simpleReportProgressReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
-			try {
+		public void onReceive(Context context, Intent intent)
+		{
+			try
+			{
 				Bundle bundle = intent.getExtras();
 				long reportId = bundle.getLong("reportId");
 				double progress = bundle.getDouble("progress");
 				boolean failed = bundle.getBoolean("failed");
 
-				for (SimpleReportPayload payload : mSimpleReportListAdapter.getItems()) {
-					if (payload.getId() == reportId) {
+				for (SimpleReportPayload payload : mSimpleReportListAdapter.getItems())
+				{
+					if (payload.getId() == reportId)
+					{
 						payload.setProgress((int) Math.round(progress));
 						payload.setFailedToSend(failed);
 					}
 				}
 
-				if(mSimpleReportListAdapter != null) {
+				if (mSimpleReportListAdapter != null)
+				{
 					mSimpleReportListAdapter.notifyDataSetChanged();
 				}
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}
 	};
 
-	
-	private BroadcastReceiver incidentChangedReceiver = new BroadcastReceiver() {
+
+	private BroadcastReceiver incidentChangedReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(Context context, Intent intent)
+		{
 			updateData();
 		}
 	};
-	
-	protected void updateData() {
+
+	protected void updateData()
+	{
 		long currentIncidentId;
 
 		currentIncidentId = mDataManager.getActiveIncidentId();
 		mDataManager.requestSimpleReports();
-		
+
 		mSimpleReportListAdapter.clear();
-		
+
 		mSimpleReportListAdapter.addAll(mDataManager.getSimpleReportHistoryForIncident(currentIncidentId));
 		mSimpleReportListAdapter.addAll(mDataManager.getAllSimpleReportStoreAndForwardReadyToSend(currentIncidentId));
 		mSimpleReportListAdapter.addAll(mDataManager.getAllSimpleReportStoreAndForwardHasSent(currentIncidentId));
 		mSimpleReportListAdapter.sort(reportComparator);
-		
-		if(mIsFirstLoad) {
+
+		if (mIsFirstLoad)
+		{
 			setListAdapter(mSimpleReportListAdapter);
 			mLastIncidentId = currentIncidentId;
 			mIsFirstLoad = false;
 			setListShown(true);
 		}
-		
-		mSimpleReportListAdapter.notifyDataSetChanged();		
-		if(index != -1 && top != -1) {
-			getListView().post(new Runnable() {
-				
+
+		mSimpleReportListAdapter.notifyDataSetChanged();
+		if (index != -1 && top != -1)
+		{
+			getListView().post(new Runnable()
+			{
+
 				@Override
-				public void run() {
-					try{
+				public void run()
+				{
+					try
+					{
 						getListView().setSelectionFromTop(index, top);
 						index = -1;
 						top = -1;
-					}catch(IllegalStateException e){
-						Log.e("SimpleReportListFrag",e.toString());
+					} catch (IllegalStateException e)
+					{
+						Log.e("SimpleReportListFrag", e.toString());
 						e.printStackTrace();
 					}
 				}
 			});
 		}
 	}
-	
+
 	public void MarkAllMessagesAsRead()
-	{		
-		if(MarkMessagesAsReadTask == null){
+	{
+		if (MarkMessagesAsReadTask == null)
+		{
 			MarkMessagesAsReadTask = new MarkAllReportsAsReadTask(mContext);
 			MarkMessagesAsReadTask.execute(FormType.SR);
 		}
 	}
-	
-	private BroadcastReceiver markAllAsReadReceiver = new BroadcastReceiver() {
+
+	private BroadcastReceiver markAllAsReadReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(Context context, Intent intent)
+		{
 			MarkMessagesAsReadTask = null;
-			updateData();	
+			updateData();
 		}
 	};
-	
-	
-	private BroadcastReceiver sentReportsClearedReceiver = new BroadcastReceiver() {
+
+
+	private BroadcastReceiver sentReportsClearedReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(Context context, Intent intent)
+		{
 			long reportId = intent.getExtras().getLong("reportId");
-			for(int i = 0; i < mSimpleReportListAdapter.getCount() ; i++){
+			for (int i = 0; i < mSimpleReportListAdapter.getCount(); i++)
+			{
 				SimpleReportPayload payload = mSimpleReportListAdapter.getItem(i);
-				if(payload.getFormId() == reportId && payload.isNew() == false){
+				if (payload.getFormId() == reportId && payload.isNew() == false)
+				{
 					mSimpleReportListAdapter.remove(payload);
 					mSimpleReportListAdapter.notifyDataSetChanged();
 					return;
 				}
-			}	
+			}
 		}
 	};
-	
-	private Comparator<? super SimpleReportPayload> reportComparator = new Comparator<SimpleReportPayload>() {
+
+	private Comparator<? super SimpleReportPayload> reportComparator = new Comparator<SimpleReportPayload>()
+	{
 
 		@Override
-		public int compare(SimpleReportPayload lhs, SimpleReportPayload rhs) {
+		public int compare(SimpleReportPayload lhs, SimpleReportPayload rhs)
+		{
 			return (Long.valueOf(rhs.getSeqTime()).compareTo(Long.valueOf(lhs.getSeqTime())));
 		}
 	};
 
 	@Override
-	protected boolean itemIsDraft(int position) {
+	protected boolean itemIsDraft(int position)
+	{
 		SimpleReportPayload item = mSimpleReportListAdapter.getItem(position);
 		return item.isDraft();
 	}
 
 	@Override
-	protected boolean handleItemDeletion(int position) {
+	protected boolean handleItemDeletion(int position)
+	{
 		SimpleReportPayload item = mSimpleReportListAdapter.getItem(position);
 		mSimpleReportListAdapter.remove(item);
 		mSimpleReportListAdapter.notifyDataSetChanged();
-		
+
 		return mDataManager.deleteSimpleReportStoreAndForward(item.getId());
 	}
 }

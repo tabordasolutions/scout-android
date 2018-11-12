@@ -253,7 +253,7 @@ public class GeneralMessageFragment extends Fragment {
 		payload.setDraft(isDraft);
 		payload.setIncidentId(mDataManager.getActiveIncidentId());
 		payload.setIncidentName(mDataManager.getActiveIncidentName());
-		payload.setFormTypeId(FormType.DR.ordinal());
+//		payload.setFormTypeId(FormType.DR.ordinal());
 //					payload.setSenderUserId(mDataManager.getUserId());
 		payload.setUserSessionId(mDataManager.getUserSessionId());
 		payload.setMessageData(messageData);

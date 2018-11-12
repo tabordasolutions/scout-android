@@ -135,7 +135,8 @@ public class Constants {
 		DAMAGESURVEY(11),
 		CATANREQUEST(12),
 		UXOREPORT(13),
-		UXOFILTER(14);
+		UXOFILTER(14),
+		ROCFORM(15);
 		
 		private final int value;
 		

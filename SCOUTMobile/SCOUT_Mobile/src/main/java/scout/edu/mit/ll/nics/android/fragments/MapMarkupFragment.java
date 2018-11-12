@@ -133,7 +133,6 @@ import scout.edu.mit.ll.nics.android.maps.markup.MarkupSymbol;
 import scout.edu.mit.ll.nics.android.maps.markup.MarkupText;
 import scout.edu.mit.ll.nics.android.maps.markup.MarkupType;
 import scout.edu.mit.ll.nics.android.maps.markup.Symbols;
-import scout.edu.mit.ll.nics.android.maps.markup.layers.DamageReportLayer;
 import scout.edu.mit.ll.nics.android.maps.markup.layers.MarkupLayer;
 import scout.edu.mit.ll.nics.android.maps.markup.layers.SimpleReportLayer;
 import scout.edu.mit.ll.nics.android.maps.markup.tileprovider.MarkupFeatureTileProvider;
@@ -145,7 +144,8 @@ import scout.edu.mit.ll.nics.android.utils.Intents;
 import scout.edu.mit.ll.nics.android.utils.LocationHandler;
 import scout.edu.mit.ll.nics.android.utils.MarkupCoordinateManager;
 
-public class MapMarkupFragment extends Fragment implements OnMapClickListener, OnMapLongClickListener, OnMarkerClickListener, OnLocationChangedListener, OnTouchListener {
+public class MapMarkupFragment extends Fragment implements OnMapClickListener, OnMapLongClickListener, OnMarkerClickListener, OnLocationChangedListener, OnTouchListener
+{
 	protected Activity mContext;
 	private MarkupCoordinateManager mCoordinateManager;
 	private SupportMapFragment mMapFragment;
@@ -192,7 +192,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 	private ListView mShapesListView;
 	private ArrayAdapter<MarkupFeature> mShapesAdapter;
-	private int[] mColor = new int[] { 255, 255, 255, 255 };
+	private int[] mColor = new int[]{255, 255, 255, 255};
 	private boolean mIgnoreUpdate;
 
 	private boolean mFirstLoad = true;
@@ -212,9 +212,10 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 	private MarkerOptions markerOptionsTabletReport = null;
 	private Marker markerTabletReport = null;
-	
+
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		mContext = getActivity();
 
@@ -234,11 +235,13 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 		mMarkupLayers = new HashMap<String, MarkupLayer>();
 
-		if (savedInstanceState != null) {
+		if (savedInstanceState != null)
+		{
 			mMapType = savedInstanceState.getInt("mapType", GoogleMap.MAP_TYPE_NORMAL);
-		} else {
+		} else
+		{
 //			SharedPreferences settings = this.mContext.getSharedPreferences(Constants.nics_MAP_MARKUP_STATE, 0);
-			EncryptedPreferences settings = new EncryptedPreferences( this.mContext.getSharedPreferences(Constants.nics_MAP_MARKUP_STATE, 0));
+			EncryptedPreferences settings = new EncryptedPreferences(this.mContext.getSharedPreferences(Constants.nics_MAP_MARKUP_STATE, 0));
 			mMapType = settings.getPreferenceLong("mapType", Integer.toString(GoogleMap.MAP_TYPE_NORMAL)).intValue();
 		}
 
@@ -247,52 +250,64 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		mIncidentSwitchedFilter = new IntentFilter(Intents.nics_INCIDENT_SWITCHED);
 		mLocalMapDataClearedFilter = new IntentFilter(Intents.nics_LOCAL_MAP_FEATURES_CLEARED);
 		mMarkupFailedToPostFilter = new IntentFilter(Intents.nics_FAILED_TO_POST_MARKUP);
-		
-		if (!markerReceiverRegistered) {
+
+		if (!markerReceiverRegistered)
+		{
 			Log.d("MarkupFragment", "receivers registered onCreate");
 			mContext.registerReceiver(markupReceiver, mMarkupReceiverFilter);
-			mContext.registerReceiver(collabRoomSwitchedReceiver,mCollabRoomSwitchedFilter);
-			mContext.registerReceiver(incidentSwitchedReceiver,mIncidentSwitchedFilter);
-			mContext.registerReceiver(localMapDataClearedReceiver,mLocalMapDataClearedFilter);
-			mContext.registerReceiver(mapFeatureFailedToPostReceiver,mMarkupFailedToPostFilter);
+			mContext.registerReceiver(collabRoomSwitchedReceiver, mCollabRoomSwitchedFilter);
+			mContext.registerReceiver(incidentSwitchedReceiver, mIncidentSwitchedFilter);
+			mContext.registerReceiver(localMapDataClearedReceiver, mLocalMapDataClearedFilter);
+			mContext.registerReceiver(mapFeatureFailedToPostReceiver, mMarkupFailedToPostFilter);
 			markerReceiverRegistered = true;
 		}
 		addingMarkupEnabled = mDataManager.getSelectedCollabRoom().doIHaveMarkupPermission(mDataManager.getUserId());
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
 		super.onCreateView(inflater, container, savedInstanceState);
-		
+
 		mMapFragment = (SupportMapFragment) mFragmentManager.findFragmentById(R.id.markupMapFragment);
 
-		if (mMapFragment == null) {
+		if (mMapFragment == null)
+		{
 			int id = -1;
-			if (savedInstanceState != null) {
+			if (savedInstanceState != null)
+			{
 				id = savedInstanceState.getInt("mapId", -1);
 				mMapType = savedInstanceState.getInt("mapType", GoogleMap.MAP_TYPE_NORMAL);
 			}
 
-			if (id == -1) {
-				if(mDataManager.getTabletLayoutOn()){
+			if (id == -1)
+			{
+				if (mDataManager.getTabletLayoutOn())
+				{
 					mRootView = inflater.inflate(R.layout.fragment_mapmarkup_tablet, container, false);
-				}else{
+				} else
+				{
 					mRootView = inflater.inflate(R.layout.fragment_mapmarkup, container, false);
 				}
-			} else {
+			} else
+			{
 				mMapFragment = (SupportMapFragment) mFragmentManager.findFragmentById(id);
 
-				if (mMapFragment != null) {
+				if (mMapFragment != null)
+				{
 					mMap = mMapFragment.getMap();
-					if (mMap != null && mMapType != -1) {
+					if (mMap != null && mMapType != -1)
+					{
 						mMap.setMapType(mMapType);
-						if(wmsTileOverlay != null) {
+						if (wmsTileOverlay != null)
+						{
 							wmsTileOverlay.remove();
 							wmsTileOverlay = null;
 							wmsTileProvider = null;
 						}
-						
-						if(mMapType == GoogleMap.MAP_TYPE_NONE) {
+
+						if (mMapType == GoogleMap.MAP_TYPE_NONE)
+						{
 							wmsTileProvider = new MarkupWMSTileProvider(256, 256);
 							TileOverlayOptions wmsOverlayOptions = new TileOverlayOptions();
 							wmsOverlayOptions.tileProvider(wmsTileProvider);
@@ -311,13 +326,15 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+	{
 		super.onCreateOptionsMenu(menu, inflater);
 
 		inflater.inflate(R.menu.mapmarkup, menu);
 		mMenu = menu;
 
-		if (mMap != null) {
+		if (mMap != null)
+		{
 			MenuItem trafficMenuItem = mMenu.findItem(R.id.trafficMapOption);
 			trafficMenuItem.setChecked(mMap.isTrafficEnabled());
 
@@ -325,107 +342,128 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			indoorMenuItem.setChecked(mMap.isIndoorEnabled());
 
 			MenuItem mapItem = null;
-			switch (mMap.getMapType()) {
-			case GoogleMap.MAP_TYPE_NORMAL:
-				mapItem = mMenu.findItem(R.id.normalMapOption);
-				break;
-			case GoogleMap.MAP_TYPE_SATELLITE:
-				mapItem = mMenu.findItem(R.id.satelliteMapOption);
-				break;
-			case GoogleMap.MAP_TYPE_HYBRID:
-				mapItem = mMenu.findItem(R.id.hybridMapOption);
-				break;
-			case GoogleMap.MAP_TYPE_TERRAIN:
-				mapItem = mMenu.findItem(R.id.terrainMapOption);
-				break;
-			case GoogleMap.MAP_TYPE_NONE:
-				mapItem = mMenu.findItem(R.id.offlineMapOption);
-				break;
-			default:
-				mapItem = mMenu.findItem(R.id.normalMapOption);
+			switch (mMap.getMapType())
+			{
+				case GoogleMap.MAP_TYPE_NORMAL:
+					mapItem = mMenu.findItem(R.id.normalMapOption);
+					break;
+				case GoogleMap.MAP_TYPE_SATELLITE:
+					mapItem = mMenu.findItem(R.id.satelliteMapOption);
+					break;
+				case GoogleMap.MAP_TYPE_HYBRID:
+					mapItem = mMenu.findItem(R.id.hybridMapOption);
+					break;
+				case GoogleMap.MAP_TYPE_TERRAIN:
+					mapItem = mMenu.findItem(R.id.terrainMapOption);
+					break;
+				case GoogleMap.MAP_TYPE_NONE:
+					mapItem = mMenu.findItem(R.id.offlineMapOption);
+					break;
+				default:
+					mapItem = mMenu.findItem(R.id.normalMapOption);
 			}
 
-			if (mapItem != null) {
+			if (mapItem != null)
+			{
 				mapItem.setChecked(true);
 			}
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addMarkupFromServer() {
+	private void addMarkupFromServer()
+	{
 
-		if (mCurrentShape == null && mCoordinateManager.getCurrentShapeType() == -1 && !mIgnoreUpdate && mRenderMarkupFeaturesTask == null) {
-			try {
+		if (mCurrentShape == null && mCoordinateManager.getCurrentShapeType() == -1 && !mIgnoreUpdate && mRenderMarkupFeaturesTask == null)
+		{
+			try
+			{
 				// mShapesListView.setVisibility(View.GONE);
 				// mShapesListProgress.setVisibility(View.VISIBLE);
 
-				if (mRenderMarkupFeaturesTask == null) {
+				if (mRenderMarkupFeaturesTask == null)
+				{
 					mRenderMarkupFeaturesTask = new RenderMarkupFeaturesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mFeatures);
 				}
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				Log.e(Constants.nics_DEBUG_ANDROID_TAG, e.toString());
 			}
 		}
 	}
 
-	public Bitmap generateRotatedBitmap(String symbolPath) {
+	public Bitmap generateRotatedBitmap(String symbolPath)
+	{
 		Integer bitmapId = Symbols.ALL.get(symbolPath);
-		if (bitmapId == null) {
+		if (bitmapId == null)
+		{
 			bitmapId = R.drawable.symbol;
 		}
 
 		return generateRotatedBitmap(bitmapId, 0);
 	}
 
-	public Bitmap generateRotatedBitmap(int resourceId, float rotationDegrees) {
+	public Bitmap generateRotatedBitmap(int resourceId, float rotationDegrees)
+	{
 		Bitmap bitmap = null;
 		Options opts = new BitmapFactory.Options();
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		{
 			opts.inMutable = true;
 			bitmap = BitmapFactory.decodeResource(getResources(), resourceId, opts);
-		} else {
+		} else
+		{
 			bitmap = BitmapFactory.decodeResource(getResources(), resourceId, opts).copy(Config.ARGB_8888, true);
 		}
 
-		if (!this.isDetached()) {
+		if (!this.isDetached())
+		{
 			bitmap = BitmapFactory.decodeResource(getResources(), resourceId, opts);
 
-			try {
+			try
+			{
 				Matrix rotator = new Matrix();
 				rotator.postRotate(rotationDegrees, bitmap.getWidth() / 2.0f, bitmap.getHeight() / 2.0f);
 
 				bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), rotator, true);
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}
 		return bitmap;
 	}
 
-	public Bitmap generateTintedBitmap(int resourceId, int[] colorArray) {
+	public Bitmap generateTintedBitmap(int resourceId, int[] colorArray)
+	{
 
 		Bitmap bitmap = null;
 		Options opts = new BitmapFactory.Options();
 		opts.inSampleSize = 2;
 
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+		{
 			opts.inMutable = true;
 			bitmap = BitmapFactory.decodeResource(getResources(), resourceId, opts);
-		} else {
+		} else
+		{
 			bitmap = BitmapFactory.decodeResource(getResources(), resourceId, opts).copy(Config.ARGB_8888, true);
 		}
 
-		if (bitmap != null) {
+		if (bitmap != null)
+		{
 			Canvas test = new Canvas(bitmap);
 
 			Paint paint = new Paint();
 
 			int color = Color.argb(255, colorArray[1], colorArray[2], colorArray[3]);
 
-			if (color != -1) {
+			if (color != -1)
+			{
 				paint.setColorFilter(new PorterDuffColorFilter(color, Mode.SRC_IN));
-			} else {
+			} else
+			{
 				paint.setColorFilter(new PorterDuffColorFilter(Color.WHITE, Mode.SRC_IN));
 			}
 			test.drawBitmap(bitmap, 0, 0, paint);
@@ -435,40 +473,46 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume()
+	{
 		super.onResume();
 		mDataManager.setNewMapAvailable(false);
 		mContext.registerReceiver(markupReceiver, mMarkupReceiverFilter);
 		setUpMapIfNeeded();
 
-		if (!markerReceiverRegistered) {
+		if (!markerReceiverRegistered)
+		{
 			Log.d("MarkupFragment", "receivers registered onResume");
 			mContext.registerReceiver(markupReceiver, mMarkupReceiverFilter);
-			mContext.registerReceiver(collabRoomSwitchedReceiver,mCollabRoomSwitchedFilter);
-			mContext.registerReceiver(incidentSwitchedReceiver,mIncidentSwitchedFilter);
-			mContext.registerReceiver(localMapDataClearedReceiver,mLocalMapDataClearedFilter);
-			mContext.registerReceiver(mapFeatureFailedToPostReceiver,mMarkupFailedToPostFilter);
+			mContext.registerReceiver(collabRoomSwitchedReceiver, mCollabRoomSwitchedFilter);
+			mContext.registerReceiver(incidentSwitchedReceiver, mIncidentSwitchedFilter);
+			mContext.registerReceiver(localMapDataClearedReceiver, mLocalMapDataClearedFilter);
+			mContext.registerReceiver(mapFeatureFailedToPostReceiver, mMarkupFailedToPostFilter);
 			markerReceiverRegistered = true;
 		}
-		
+
 		mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), true);
 	}
 
 	@Override
-	public void onPause() {
+	public void onPause()
+	{
 		super.onPause();
 
-		if (handler != null) {
+		if (handler != null)
+		{
 			handler.setUpdateRate(mDataManager.getMDTDataRate());
 		}
 
-		if (mRenderMarkupFeaturesTask != null) {
+		if (mRenderMarkupFeaturesTask != null)
+		{
 			mRenderMarkupFeaturesTask.cancel(true);
 			mRenderMarkupFeaturesTask = null;
 		}
 
-		
-		if (markerReceiverRegistered) {
+
+		if (markerReceiverRegistered)
+		{
 			Log.d("MarkupFragment", "receivers unregistereed onPause");
 			mContext.unregisterReceiver(markupReceiver);
 			mContext.unregisterReceiver(collabRoomSwitchedReceiver);
@@ -479,11 +523,14 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			markerReceiverRegistered = false;
 		}
 
-		for (MarkupFireLine fireline : mFirelineFeatures) {
-			try {
+		for (MarkupFireLine fireline : mFirelineFeatures)
+		{
+			try
+			{
 				fireline.removeFromMap();
 				fireline.getFeature().setRendered(false);
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 			}
 		}
 
@@ -491,12 +538,15 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 		tileOverlay.clearTileCache();
 
-		try {
-			for (MarkupBaseShape shape : mMarkupShapes.values()) {
+		try
+		{
+			for (MarkupBaseShape shape : mMarkupShapes.values())
+			{
 				shape.removeFromMap();
 				shape.getFeature().setRendered(false);
 			}
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
 		}
 		mMarkupShapes.clear();
 
@@ -504,7 +554,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 		saveMapState();
 
-		for (MarkupLayer layer : mMarkupLayers.values()) {
+		for (MarkupLayer layer : mMarkupLayers.values())
+		{
 			layer.clearFromMap();
 			layer.unregister();
 		}
@@ -512,23 +563,28 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public void onSaveInstanceState(Bundle outState)
+	{
 		super.onSaveInstanceState(outState);
 
 		// Save the ID of the existing MapFragment so it can properly be
 		// restored when app resumes
-		if (mMapFragment != null) {
+		if (mMapFragment != null)
+		{
 			outState.putInt("mapId", mMapFragment.getId());
 		}
 
-		if (mMap != null) {
+		if (mMap != null)
+		{
 			outState.putInt("mapType", mMap.getMapType());
 		}
 	}
 
 	@Override
-	public boolean onMarkerClick(Marker arg0) {
-		if (mCoordinateManager.getCurrentShapeType() != -1) {
+	public boolean onMarkerClick(Marker arg0)
+	{
+		if (mCoordinateManager.getCurrentShapeType() != -1)
+		{
 			onMapClick(mLastPressLocation);
 			return true;
 		}
@@ -536,197 +592,227 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 	}
 
 	@Override
-	public void onMapLongClick(LatLng arg0) {
+	public void onMapLongClick(LatLng arg0)
+	{
 
 	}
 
 	@Override
-	public void onMapClick(LatLng coordinate) {
+	public void onMapClick(LatLng coordinate)
+	{
 		String newId = UUID.randomUUID().toString();
-		switch (mCoordinateManager.getCurrentShapeType()) {
+		switch (mCoordinateManager.getCurrentShapeType())
+		{
 
-		case R.id.MarkupButtonSymbol:
-			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding symbol point @ " + coordinate.toString());
-			if (mCurrentShape == null) {
-				Bitmap symbolBitmap = generateRotatedBitmap(mCurrentSymbolResourceId, 0);
-				String symbolPath = Symbols.ALL.getKey(mCurrentSymbolResourceId);
-				MarkupSymbol symbol = new MarkupSymbol(mDataManager, mMap, "Marker", coordinate, symbolBitmap, symbolPath, new int[] { 255, 255, 255, 255 });
-				symbol.setMarker(mMap.addMarker(symbol.getOptions()));
-				symbol.setType(MarkupType.marker);
-				
-				mCurrentShape = symbol;
-				mCurrentShapeId = newId;
-				mMarkupShapes.put(newId, symbol);
-				mUndoStack.push(mCurrentShape);
+			case R.id.MarkupButtonSymbol:
+				Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding symbol point @ " + coordinate.toString());
+				if (mCurrentShape == null)
+				{
+					Bitmap symbolBitmap = generateRotatedBitmap(mCurrentSymbolResourceId, 0);
+					String symbolPath = Symbols.ALL.getKey(mCurrentSymbolResourceId);
+					MarkupSymbol symbol = new MarkupSymbol(mDataManager, mMap, "Marker", coordinate, symbolBitmap, symbolPath, new int[]{255, 255, 255, 255});
+					symbol.setMarker(mMap.addMarker(symbol.getOptions()));
+					symbol.setType(MarkupType.marker);
 
-				mCoordinateManager.setCoordinates(0, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
+					mCurrentShape = symbol;
+					mCurrentShapeId = newId;
+					mMarkupShapes.put(newId, symbol);
+					mUndoStack.push(mCurrentShape);
 
-			} else {
-				showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_symbol)), String.format(getString(R.string.markup_confirm_completion, getString(R.string.markup_symbol_lowercase))), "");
-			}
-			break;
+					mCoordinateManager.setCoordinates(0, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
 
-		case R.id.MarkupButtonLine:
-			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding line point @ " + coordinate.toString());
+				} else
+				{
+					showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_symbol)), String.format(getString(R.string.markup_confirm_completion, getString(R.string.markup_symbol_lowercase))), "");
+				}
+				break;
 
-			mJunctionBitmapOptions.position(coordinate);
+			case R.id.MarkupButtonLine:
+				Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding line point @ " + coordinate.toString());
 
-			if (mCurrentShape != null) {
-				if (mCurrentShape.getPoints().size() < 2) {
-					mCurrentShape.addPoint(coordinate);
+				mJunctionBitmapOptions.position(coordinate);
+
+				if (mCurrentShape != null)
+				{
+					if (mCurrentShape.getPoints().size() < 2)
+					{
+						mCurrentShape.addPoint(coordinate);
+						mCoordinateManager.setCoordinates(mCurrentShape.getPoints().size() - 1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
+						mCurrentShape.addMarker(mMap.addMarker(mJunctionBitmapOptions));
+					} else
+					{
+						showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_segment)), getString(R.string.markup_confirm_completion, getString(R.string.markup_segment_lowercase)), "");
+					}
+				} else
+				{
+					MarkupSegment segment = new MarkupSegment(mDataManager, "", coordinate, mColor);
+					segment.setPolyline(mMap.addPolyline(segment.getOptions()));
+					segment.addMarker(mMap.addMarker(mJunctionBitmapOptions));
+					segment.setType(MarkupType.sketch);
+					mCurrentShape = segment;
+					mCurrentShapeId = newId;
+					mMarkupShapes.put(newId, segment);
+					mUndoStack.push(mCurrentShape);
 					mCoordinateManager.setCoordinates(mCurrentShape.getPoints().size() - 1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
-					mCurrentShape.addMarker(mMap.addMarker(mJunctionBitmapOptions));
-				} else {
-					showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_segment)), getString(R.string.markup_confirm_completion, getString(R.string.markup_segment_lowercase)), "");
 				}
-			} else {
-				MarkupSegment segment = new MarkupSegment(mDataManager, "", coordinate, mColor);
-				segment.setPolyline(mMap.addPolyline(segment.getOptions()));
-				segment.addMarker(mMap.addMarker(mJunctionBitmapOptions));
-				segment.setType(MarkupType.sketch);
-				mCurrentShape = segment;
-				mCurrentShapeId = newId;
-				mMarkupShapes.put(newId, segment);
-				mUndoStack.push(mCurrentShape);
-				mCoordinateManager.setCoordinates(mCurrentShape.getPoints().size() - 1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
-			}
-			break;
+				break;
 
-		case R.id.MarkupButtonRectangle:
-			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding rectangle point @ " + coordinate.toString());
+			case R.id.MarkupButtonRectangle:
+				Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding rectangle point @ " + coordinate.toString());
 
-			mJunctionBitmapOptions.position(coordinate);
-			if (mCurrentShape != null) {
-				if (mCurrentShape.getPoints().size() < 2) {
-					LatLng origin = mCurrentShape.getPoints().get(0);
+				mJunctionBitmapOptions.position(coordinate);
+				if (mCurrentShape != null)
+				{
+					if (mCurrentShape.getPoints().size() < 2)
+					{
+						LatLng origin = mCurrentShape.getPoints().get(0);
 
-					mCurrentShape.addPoint(new LatLng(origin.latitude, coordinate.longitude));
-					mCurrentShape.addPoint(coordinate);
-					mCurrentShape.addPoint(new LatLng(coordinate.latitude, origin.longitude));
+						mCurrentShape.addPoint(new LatLng(origin.latitude, coordinate.longitude));
+						mCurrentShape.addPoint(coordinate);
+						mCurrentShape.addPoint(new LatLng(coordinate.latitude, origin.longitude));
 
-					mCoordinateManager.setCoordinates(1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
-					mCurrentShape.addMarker(mMap.addMarker(mJunctionBitmapOptions));
-				} else {
-					showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_rectangle)), getString(R.string.markup_confirm_completion, getString(R.string.markup_rectangle_lowercase)), "");
+						mCoordinateManager.setCoordinates(1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
+						mCurrentShape.addMarker(mMap.addMarker(mJunctionBitmapOptions));
+					} else
+					{
+						showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_rectangle)), getString(R.string.markup_confirm_completion, getString(R.string.markup_rectangle_lowercase)), "");
+					}
+				} else
+				{
+					MarkupRectangle rectangle = new MarkupRectangle(mDataManager, "", coordinate, mColor);
+					rectangle.setPolygon(mMap.addPolygon(rectangle.getOptions()));
+					rectangle.addMarker(mMap.addMarker(mJunctionBitmapOptions));
+					rectangle.setType(MarkupType.square);
+
+					mCurrentShape = rectangle;
+					mCurrentShapeId = newId;
+					mMarkupShapes.put(newId, rectangle);
+					mUndoStack.push(mCurrentShape);
+					mCoordinateManager.setCoordinates(0, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
 				}
-			} else {
-				MarkupRectangle rectangle = new MarkupRectangle(mDataManager, "", coordinate, mColor);
-				rectangle.setPolygon(mMap.addPolygon(rectangle.getOptions()));
-				rectangle.addMarker(mMap.addMarker(mJunctionBitmapOptions));
-				rectangle.setType(MarkupType.square);
-				
-				mCurrentShape = rectangle;
-				mCurrentShapeId = newId;
-				mMarkupShapes.put(newId, rectangle);
-				mUndoStack.push(mCurrentShape);
-				mCoordinateManager.setCoordinates(0, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
-			}
-			break;
+				break;
 
-		case R.id.MarkupButtonTrapezoid:
-			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding trapezoid point @ " + coordinate.toString());
+			case R.id.MarkupButtonTrapezoid:
+				Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding trapezoid point @ " + coordinate.toString());
 
-			mJunctionBitmapOptions.position(coordinate);
+				mJunctionBitmapOptions.position(coordinate);
 
-			if (mCurrentShape != null) {
-				if (mCurrentShape.getPoints().size() < 4) {
-					mCurrentShape.addPoint(coordinate);
+				if (mCurrentShape != null)
+				{
+					if (mCurrentShape.getPoints().size() < 4)
+					{
+						mCurrentShape.addPoint(coordinate);
+						mCoordinateManager.setCoordinates(mCurrentShape.getPoints().size() - 1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
+						mCurrentShape.addMarker(mMap.addMarker(mJunctionBitmapOptions));
+					} else
+					{
+						showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_trapezoid)), getString(R.string.markup_confirm_completion, getString(R.string.markup_trapezoid_lowercase)), "");
+					}
+				} else
+				{
+					MarkupRectangle trap = new MarkupRectangle(mDataManager, "", coordinate, mColor);
+					trap.setType(MarkupType.polygon);
+					trap.setPolygon(mMap.addPolygon(trap.getOptions()));
+					trap.addMarker(mMap.addMarker(mJunctionBitmapOptions));
+
+					mCurrentShape = trap;
+					mCurrentShapeId = newId;
+					mMarkupShapes.put(newId, trap);
+					mUndoStack.push(mCurrentShape);
+
 					mCoordinateManager.setCoordinates(mCurrentShape.getPoints().size() - 1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
-					mCurrentShape.addMarker(mMap.addMarker(mJunctionBitmapOptions));
-				} else {
-					showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_trapezoid)), getString(R.string.markup_confirm_completion, getString(R.string.markup_trapezoid_lowercase)), "");
 				}
-			} else {
-				MarkupRectangle trap = new MarkupRectangle(mDataManager, "", coordinate, mColor);
-				trap.setType(MarkupType.polygon);
-				trap.setPolygon(mMap.addPolygon(trap.getOptions()));
-				trap.addMarker(mMap.addMarker(mJunctionBitmapOptions));
+				break;
 
-				mCurrentShape = trap;
-				mCurrentShapeId = newId;
-				mMarkupShapes.put(newId, trap);
-				mUndoStack.push(mCurrentShape);
+			case R.id.MarkupButtonCircle:
+				Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding circle point @ " + coordinate.toString());
+				mJunctionBitmapOptions.position(coordinate);
 
-				mCoordinateManager.setCoordinates(mCurrentShape.getPoints().size() - 1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
-			}
-			break;
+				if (mCurrentShape != null)
+				{
+					if (mCurrentShape.getPoints().size() < 2)
+					{
+						MarkupCircle circle = (MarkupCircle) mCurrentShape;
+						mCurrentShape.addPoint(coordinate);
+						LatLng startCoord = mCurrentShape.getPoints().remove(0);
 
-		case R.id.MarkupButtonCircle:
-			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Adding circle point @ " + coordinate.toString());
-			mJunctionBitmapOptions.position(coordinate);
+						float[] results = new float[3];
+						Location.distanceBetween(startCoord.latitude, startCoord.longitude, coordinate.latitude, coordinate.longitude, results);
 
-			if (mCurrentShape != null) {
-				if (mCurrentShape.getPoints().size() < 2) {
-					MarkupCircle circle = (MarkupCircle) mCurrentShape;
-					mCurrentShape.addPoint(coordinate);
-					LatLng startCoord = mCurrentShape.getPoints().remove(0);
-
-					float[] results = new float[3];
-					Location.distanceBetween(startCoord.latitude, startCoord.longitude, coordinate.latitude, coordinate.longitude, results);
-
-					circle.setRadius(results[0]);
-					mCoordinateManager.setRadius(results[0]);
+						circle.setRadius(results[0]);
+						mCoordinateManager.setRadius(results[0]);
+						circle.addMarker(mMap.addMarker(mJunctionBitmapOptions));
+						circle.setCircle(mMap.addCircle((CircleOptions) mCurrentShape.getOptions()));
+						circle.setType(MarkupType.circle);
+					} else
+					{
+						showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_circle)), getString(R.string.markup_confirm_completion, getString(R.string.markup_circle_lowercase)), "");
+					}
+				} else
+				{
+					MarkupCircle circle = new MarkupCircle(mDataManager, "", coordinate, 0, mColor);
 					circle.addMarker(mMap.addMarker(mJunctionBitmapOptions));
-					circle.setCircle(mMap.addCircle((CircleOptions) mCurrentShape.getOptions()));
-					circle.setType(MarkupType.circle);
-				} else {
-					showConfirmDialog(getString(R.string.markup_finalize, getString(R.string.markup_circle)), getString(R.string.markup_confirm_completion, getString(R.string.markup_circle_lowercase)), "");
-				}
-			} else {
-				MarkupCircle circle = new MarkupCircle(mDataManager, "", coordinate, 0, mColor);
-				circle.addMarker(mMap.addMarker(mJunctionBitmapOptions));
 
-				mCurrentShape = circle;
-				mCurrentShapeId = newId;
-				mMarkupShapes.put(newId, circle);
-				mUndoStack.push(mCurrentShape);
-				mCoordinateManager.setCoordinates(mCurrentShape.getPoints().size() - 1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
-			}
-			break;
-
-		default:
-			
-			if(mDataManager.getTabletLayoutOn()){
-				if(markerOptionsTabletReport == null){
-					markerOptionsTabletReport = new MarkerOptions();
-					markerOptionsTabletReport.position(new LatLng(coordinate.latitude, coordinate.longitude));
-					markerOptionsTabletReport.draggable(true);
-					
-					markerTabletReport = mMap.addMarker(markerOptionsTabletReport);
-					markerTabletReport.setPosition(new LatLng(coordinate.latitude, coordinate.longitude));
-					
-				}else{
-					markerOptionsTabletReport.position(new LatLng(coordinate.latitude, coordinate.longitude));
-					markerTabletReport.setPosition(new LatLng(coordinate.latitude, coordinate.longitude));
+					mCurrentShape = circle;
+					mCurrentShapeId = newId;
+					mMarkupShapes.put(newId, circle);
+					mUndoStack.push(mCurrentShape);
+					mCoordinateManager.setCoordinates(mCurrentShape.getPoints().size() - 1, String.valueOf(coordinate.latitude), String.valueOf(coordinate.longitude));
 				}
-			}
-			
-			break;
+				break;
+
+			default:
+
+				if (mDataManager.getTabletLayoutOn())
+				{
+					if (markerOptionsTabletReport == null)
+					{
+						markerOptionsTabletReport = new MarkerOptions();
+						markerOptionsTabletReport.position(new LatLng(coordinate.latitude, coordinate.longitude));
+						markerOptionsTabletReport.draggable(true);
+
+						markerTabletReport = mMap.addMarker(markerOptionsTabletReport);
+						markerTabletReport.setPosition(new LatLng(coordinate.latitude, coordinate.longitude));
+
+					} else
+					{
+						markerOptionsTabletReport.position(new LatLng(coordinate.latitude, coordinate.longitude));
+						markerTabletReport.setPosition(new LatLng(coordinate.latitude, coordinate.longitude));
+					}
+				}
+
+				break;
 		}
 
 		Collections.sort(mFeatures, markupComparator);
 		mShapesAdapter.notifyDataSetChanged();
 
-		if (!mIgnoreUpdate && mCoordinateManager.getCurrentShapeType() == -1) {
+		if (!mIgnoreUpdate && mCoordinateManager.getCurrentShapeType() == -1)
+		{
 			mShapesListView.setVisibility(View.VISIBLE);
 			mShapesListProgress.setVisibility(View.GONE);
 		}
 	}
 
-	public LatLng getReportMarkerCoordinates(){
-		if(markerTabletReport != null){
+	public LatLng getReportMarkerCoordinates()
+	{
+		if (markerTabletReport != null)
+		{
 			return markerTabletReport.getPosition();
-		}else{
-			return new LatLng(0,0);
+		} else
+		{
+			return new LatLng(0, 0);
 		}
 	}
-	
+
 	@Override
-	public void onLocationChanged(Location arg0) {
+	public void onLocationChanged(Location arg0)
+	{
 		Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Cur Location: " + arg0.toString());
 	}
 
-	private void setUpMapIfNeeded() {
+	private void setUpMapIfNeeded()
+	{
 
 		mShapesListView = (ListView) mRootView.findViewById(R.id.markupShapesListView);
 		mShapesListView.setVisibility(View.GONE);
@@ -734,20 +820,25 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		mShapesListProgress = (ProgressBar) mRootView.findViewById(R.id.markupShapesProgress);
 		mShapesListProgress.setVisibility(View.VISIBLE);
 
-		if (mMapFragment == null || mMap == null) {
+		if (mMapFragment == null || mMap == null)
+		{
 			mMapFragment = (SupportMapFragment) mFragmentManager.findFragmentById(R.id.markupMapFragment);
 			mMap = mMapFragment.getMap();
 
-			if (mMap != null) {
-				if (mMapType != -1) {
+			if (mMap != null)
+			{
+				if (mMapType != -1)
+				{
 					mMap.setMapType(mMapType);
-					if(wmsTileOverlay != null) {
+					if (wmsTileOverlay != null)
+					{
 						wmsTileOverlay.remove();
 						wmsTileOverlay = null;
 						wmsTileProvider = null;
 					}
-					
-					if(mMapType == GoogleMap.MAP_TYPE_NONE) {
+
+					if (mMapType == GoogleMap.MAP_TYPE_NONE)
+					{
 						wmsTileProvider = new MarkupWMSTileProvider(256, 256);
 						TileOverlayOptions wmsOverlayOptions = new TileOverlayOptions();
 						wmsOverlayOptions.tileProvider(wmsTileProvider);
@@ -758,7 +849,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 				mMap.setOnMapClickListener(this);
 				mMap.setOnMarkerClickListener(this);
 
-				if (mDataManager.isMDTEnabled()) {
+				if (mDataManager.isMDTEnabled())
+				{
 					handler = mDataManager.getLocationSource();
 					handler.setUpdateRate(0);
 					mMap.setLocationSource(handler);
@@ -767,7 +859,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 				mDataManager.forceLocationUpdate();
 				mIgnoreUpdate = false;
 			}
-		} else {
+		} else
+		{
 
 			addMarkupFromServer();
 		}
@@ -784,36 +877,38 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		mShapesListView.setAdapter(mShapesAdapter);
 
 
-
-		if (mMap != null) {
-			if (mInfoWindowAdapter != null) {
+		if (mMap != null)
+		{
+			if (mInfoWindowAdapter != null)
+			{
 				mMap.setInfoWindowAdapter(mInfoWindowAdapter);
-				mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+				mMap.setOnInfoWindowClickListener(new OnInfoWindowClickListener()
+				{
 
 					@Override
-					public void onInfoWindowClick(Marker marker) {
-						try {
+					public void onInfoWindowClick(Marker marker)
+					{
+						try
+						{
 							JSONObject data = new JSONObject(marker.getTitle());
 							String type = data.getString("type");
-							if (type != null) {
+							if (type != null)
+							{
 								MainActivity main = (MainActivity) mContext;
-								if( type.equals("sr")) {
+								if (type.equals("sr"))
+								{
 									main.mViewSimpleReport = true;
 									main.mOpenedSimpleReportId = data.getLong("reportId");
 									main.mOpenedSimpleReportPayload = data.getString("payload");
-									
+
 									//all three navigation calls from map to report are not working on phone ui right now.
 									//locks up in MainActivity around line 1958 : mFragmentManager.executePendingTransactions();
-									
+
 //									main.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -1);
-								} else if(type.equals("dmgrpt")) {
-									main.mViewDamageReport = true;
-									main.mOpenedDamageReportId = data.getLong("reportId");
-									main.mOpenedDamageReportPayload = data.getString("payload");
-//									main.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -1);
 								}
 							}
-						} catch (Exception e) {
+						} catch (Exception e)
+						{
 							e.printStackTrace();
 						}
 					}
@@ -844,20 +939,26 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			// }
 			// });
 
-			mShapesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			mShapesListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+			{
 
 				@Override
-				public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+				public void onItemClick(AdapterView<?> parent, final View view, int position, long id)
+				{
 					MarkupFeature feature = (MarkupFeature) parent.getItemAtPosition(position);
 
 					MarkupBaseShape shape = mMarkupShapes.get(feature.getFeatureId());
 
-					if (shape != null) {
-						if (shape.getType().equals(MarkupType.marker) || shape.getType().equals(MarkupType.label)) {
+					if (shape != null)
+					{
+						if (shape.getType().equals(MarkupType.marker) || shape.getType().equals(MarkupType.label))
+						{
 							mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(shape.getPoints().get(0), 13));
-						} else {
+						} else
+						{
 							LatLngBounds.Builder t = LatLngBounds.builder();
-							for (LatLng point : shape.getPoints()) {
+							for (LatLng point : shape.getPoints())
+							{
 								t.include(point);
 							}
 							mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(t.build(), 200));
@@ -876,29 +977,39 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			mMarkupContainer = (RelativeLayout) mRootView.findViewById(R.id.markupContainer);
 
 			mPickerCompleteButton.setVisibility(View.INVISIBLE);
-			
-			if(mDataManager.getSelectedCollabRoom().getName().equals(getString(R.string.no_selection))){
+
+			if (mDataManager.getSelectedCollabRoom().getName().equals(getString(R.string.no_selection)))
+			{
 				mIncidentFocusButton.setVisibility(View.INVISIBLE);
-			}else{
+			} else
+			{
 				mIncidentFocusButton.setVisibility(View.VISIBLE);
 			}
 
-			mIncidentFocusButton.setOnClickListener(new OnClickListener() {
+			mIncidentFocusButton.setOnClickListener(new OnClickListener()
+			{
 
 				@Override
-				public void onClick(View v) {
-					if (extentBuilder != null) {
-						try {
+				public void onClick(View v)
+				{
+					if (extentBuilder != null)
+					{
+						try
+						{
 							LatLngBounds bounds = extentBuilder.build();
 							mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
-						} catch (Exception e) {
-							if(mDataManager.getIncidentPositionLatitude() == 0 && mDataManager.getIncidentPositionLongitude() == 0){
-								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mDataManager.getMDTLatitude(),mDataManager.getMDTLongitude()),12));
-							}else{
+						} catch (Exception e)
+						{
+							if (mDataManager.getIncidentPositionLatitude() == 0 && mDataManager.getIncidentPositionLongitude() == 0)
+							{
+								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mDataManager.getMDTLatitude(), mDataManager.getMDTLongitude()), 12));
+							} else
+							{
 								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mDataManager.getIncidentPositionLatitude(), mDataManager.getIncidentPositionLongitude()), 12));
 							}
 						}
-					} else {
+					} else
+					{
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mDataManager.getIncidentPositionLatitude(), mDataManager.getIncidentPositionLongitude()), 12));
 					}
 				}
@@ -933,13 +1044,13 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 					float from = 0.0f;
 					float to = 1.0f;
 
-					if(mExpandMapViewMaximized)
+					if (mExpandMapViewMaximized)
 					{
 						from = 1.0f;
 						to = 0.0f;
 					}
 
-					ValueAnimator animator = ValueAnimator.ofFloat(from,to);
+					ValueAnimator animator = ValueAnimator.ofFloat(from, to);
 					animator.setDuration(200);
 					//animator.setStartDelay(0);
 					animator.setInterpolator(new LinearInterpolator());
@@ -956,11 +1067,11 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 									int height = mMarkupContainer.getLayoutParams().height;
 									int width = mMarkupContainer.getLayoutParams().width;
 
-									LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width,height,weight);
+									LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height, weight);
 									mMarkupContainer.setLayoutParams(params);
 
 									// Rotating the button (so the down arrow is pointing up)
-									float angle = (1-t) * 180f;
+									float angle = (1 - t) * 180f;
 									mExpandMapViewButton.setRotation(angle);
 								}
 							}
@@ -969,20 +1080,25 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 					animator.start();
 				}
 			});
-		
-			try {
+
+			try
+			{
 				mJunctionBitmapOptions = new MarkerOptions();
 				mJunctionBitmapOptions.anchor(0.5f, 0.5f);
 				mJunctionBitmapOptions.icon(BitmapDescriptorFactory.fromBitmap(generateRotatedBitmap(R.drawable.dot, 0)));
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 
 			}
 
 			restoreMapState();
-		} else {
-			if (addingMarkupEnabled) {
+		} else
+		{
+			if (addingMarkupEnabled)
+			{
 				mCoordinateManager.setButtonsVisibility(View.VISIBLE);
-			} else {
+			} else
+			{
 				mCoordinateManager.setButtonsVisibility(View.GONE);
 			}
 		}
@@ -990,49 +1106,55 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		mIgnoreUpdate = false;
 	}
 
-	private void restoreMapState() {
-		EncryptedPreferences settings = new EncryptedPreferences(this.mContext.getSharedPreferences(Constants.nics_MAP_MARKUP_STATE, 0));	
+	private void restoreMapState()
+	{
+		EncryptedPreferences settings = new EncryptedPreferences(this.mContext.getSharedPreferences(Constants.nics_MAP_MARKUP_STATE, 0));
 		changeMapType(settings.getPreferenceLong(Constants.nics_MAP_TYPE, Integer.toString(GoogleMap.MAP_TYPE_NORMAL)).intValue());
 
 		boolean isTrafficEnabled = settings.getPreferenceBoolean(Constants.nics_MAP_TRAFFIC_ENABLED, String.valueOf(mMap.isTrafficEnabled()));
-		boolean isIndoorEnabled = settings.getPreferenceBoolean(Constants.nics_MAP_INDOOR_ENABLED,String.valueOf( mMap.isIndoorEnabled()));
+		boolean isIndoorEnabled = settings.getPreferenceBoolean(Constants.nics_MAP_INDOOR_ENABLED, String.valueOf(mMap.isIndoorEnabled()));
 
 		mMap.setTrafficEnabled(isTrafficEnabled);
 		mMap.setIndoorEnabled(isIndoorEnabled);
 
-		if (mMenu != null) {
+		if (mMenu != null)
+		{
 			MenuItem trafficMenuItem = mMenu.findItem(R.id.trafficMapOption);
-			if (trafficMenuItem != null) {
+			if (trafficMenuItem != null)
+			{
 				trafficMenuItem.setChecked(isTrafficEnabled);
 			}
 
 			MenuItem indoorMenuItem = mMenu.findItem(R.id.indoorMapOption);
-			if (indoorMenuItem != null) {
+			if (indoorMenuItem != null)
+			{
 				indoorMenuItem.setChecked(isIndoorEnabled);
 			}
 
 			MenuItem mapItem = null;
-			switch (mMap.getMapType()) {
-			case GoogleMap.MAP_TYPE_NORMAL:
-				mapItem = mMenu.findItem(R.id.normalMapOption);
-				break;
-			case GoogleMap.MAP_TYPE_SATELLITE:
-				mapItem = mMenu.findItem(R.id.satelliteMapOption);
-				break;
-			case GoogleMap.MAP_TYPE_HYBRID:
-				mapItem = mMenu.findItem(R.id.hybridMapOption);
-				break;
-			case GoogleMap.MAP_TYPE_TERRAIN:
-				mapItem = mMenu.findItem(R.id.terrainMapOption);
-				break;
-			case GoogleMap.MAP_TYPE_NONE:
-				mapItem = mMenu.findItem(R.id.offlineMapOption);
-				break;
-			default:
-				mapItem = mMenu.findItem(R.id.normalMapOption);
+			switch (mMap.getMapType())
+			{
+				case GoogleMap.MAP_TYPE_NORMAL:
+					mapItem = mMenu.findItem(R.id.normalMapOption);
+					break;
+				case GoogleMap.MAP_TYPE_SATELLITE:
+					mapItem = mMenu.findItem(R.id.satelliteMapOption);
+					break;
+				case GoogleMap.MAP_TYPE_HYBRID:
+					mapItem = mMenu.findItem(R.id.hybridMapOption);
+					break;
+				case GoogleMap.MAP_TYPE_TERRAIN:
+					mapItem = mMenu.findItem(R.id.terrainMapOption);
+					break;
+				case GoogleMap.MAP_TYPE_NONE:
+					mapItem = mMenu.findItem(R.id.offlineMapOption);
+					break;
+				default:
+					mapItem = mMenu.findItem(R.id.normalMapOption);
 			}
 
-			if (mapItem != null) {
+			if (mapItem != null)
+			{
 				mapItem.setChecked(true);
 			}
 		}
@@ -1042,21 +1164,26 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		int shapeType = settings.getPreferenceLong(Constants.nics_MAP_CURRENT_SHAPE_TYPE).intValue();
 
 		mCoordinateManager.setCurrentShapeType(shapeType);
-		if (shapeType != -1 && addingMarkupEnabled) {
+		if (shapeType != -1 && addingMarkupEnabled)
+		{
 			mCoordinateManager.show(shapeType);
 			mCoordinateManager.setButtonsVisibility(View.GONE);
 			mShapesListView.setVisibility(View.GONE);
 			mShapesListProgress.setVisibility(View.GONE);
 			mIgnoreUpdate = true;
 
-			if (mRenderMarkupFeaturesTask != null) {
+			if (mRenderMarkupFeaturesTask != null)
+			{
 				mRenderMarkupFeaturesTask.cancel(true);
 				mRenderMarkupFeaturesTask = null;
 			}
-		} else {
-			if (addingMarkupEnabled) {
+		} else
+		{
+			if (addingMarkupEnabled)
+			{
 				mCoordinateManager.setButtonsVisibility(View.VISIBLE);
-			} else {
+			} else
+			{
 				mCoordinateManager.setButtonsVisibility(View.GONE);
 			}
 			mShapesListView.setVisibility(View.GONE);
@@ -1066,25 +1193,30 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		}
 
 		String pos = settings.getPreferenceString(Constants.nics_MAP_PREVIOUS_CAMERA);
-	
-		if (pos != null) {
+
+		if (pos != null)
+		{
 			String[] posDetails = pos.split(",");
 			CameraPosition camPos = new CameraPosition(new LatLng(Double.valueOf(posDetails[0]), Double.valueOf(posDetails[1])), Float.valueOf(posDetails[2]), Float.valueOf(posDetails[3]), Float.valueOf(posDetails[4]));
 			mMap.moveCamera(CameraUpdateFactory.newCameraPosition(camPos));
-		}else {
-			
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+		} else
+		{
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
+			{
 				mIncidentFocusButton.callOnClick();
-			} else {
+			} else
+			{
 				mIncidentFocusButton.performClick();
 			}
 		}
-		
-		mColor = new int[] { 255, settings.getPreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_RED, "255").intValue(), settings.getPreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_GREEN, "255").intValue(), settings.getPreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_BLUE, "255").intValue() };
+
+		mColor = new int[]{255, settings.getPreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_RED, "255").intValue(), settings.getPreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_GREEN, "255").intValue(), settings.getPreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_BLUE, "255").intValue()};
 		mCoordinateManager.setColor(Color.argb(255, mColor[1], mColor[2], mColor[3]));
 
 		mCurrentSymbolResourceId = settings.getPreferenceLong(Constants.nics_MAP_CURRENT_SYMBOL_RESOURCE_ID, "-1").intValue();
-		if (mCurrentSymbolResourceId == -1) {
+		if (mCurrentSymbolResourceId == -1)
+		{
 			mCurrentSymbolResourceId = R.drawable.small_x;
 		}
 
@@ -1100,10 +1232,12 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		handler.post(postRestoreHandler);
 	}
 
-	private Runnable postRestoreHandler = new Runnable() {
+	private Runnable postRestoreHandler = new Runnable()
+	{
 
 		@Override
-		public void run() {
+		public void run()
+		{
 			addMarkupFromServer();
 
 			Handler handler = new Handler();
@@ -1111,21 +1245,27 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		}
 	};
 
-	private Runnable postInitialMarkupLoad = new Runnable() {
+	private Runnable postInitialMarkupLoad = new Runnable()
+	{
 		@Override
-		public void run() {
-			for (TrackingLayerPayload layer : mDataManager.getTrackingLayers()) {
-				try {
-					if(layer.isActive()){
-						if (layer.getDisplayname().equals(getResources().getString(R.string.wfslayer_nics_simple_report_title))) {
+		public void run()
+		{
+			for (TrackingLayerPayload layer : mDataManager.getTrackingLayers())
+			{
+				try
+				{
+					if (layer.isActive())
+					{
+						if (layer.getDisplayname().equals(getResources().getString(R.string.wfslayer_nics_simple_report_title)))
+						{
 							addSimpleReportLayer(layer);
-						} else if (layer.getDisplayname().equals(getResources().getString(R.string.wfslayer_nics_damage_report_title))) {
-							addDamageReportLayer(layer);
-						} else {
+						} else
+						{
 							addMapLayer(layer);
 						}
 					}
-				} catch (Exception e) {
+				} catch (Exception e)
+				{
 					mDataManager.addPersonalHistory("Failed to add WFS Layer " + layer.getLayername() + " to the map.");
 					Log.e(Constants.nics_DEBUG_ANDROID_TAG, "Failed to add WFS Layer " + layer.getLayername() + " to the map.");
 				}
@@ -1133,73 +1273,80 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		}
 	};
 
-	public void saveMapState() {
-		
+	public void saveMapState()
+	{
+
 		EncryptedPreferences settings = new EncryptedPreferences(this.mContext.getSharedPreferences(Constants.nics_MAP_MARKUP_STATE, 0));
 
-		settings.savePreferenceLong(Constants.nics_MAP_TYPE,(long) mMap.getMapType());
+		settings.savePreferenceLong(Constants.nics_MAP_TYPE, (long) mMap.getMapType());
 		settings.savePreferenceBoolean(Constants.nics_MAP_TRAFFIC_ENABLED, mMap.isTrafficEnabled());
 
-		settings.savePreferenceLong(Constants.nics_MAP_CURRENT_SYMBOL_RESOURCE_ID,(long) mCurrentSymbolResourceId);
+		settings.savePreferenceLong(Constants.nics_MAP_CURRENT_SYMBOL_RESOURCE_ID, (long) mCurrentSymbolResourceId);
 		settings.savePreferenceBoolean(Constants.nics_MAP_INDOOR_ENABLED, mMap.isIndoorEnabled());
 		settings.savePreferenceString(Constants.nics_MAP_MARKUP_COORDINATES, mCoordinateManager.getCoordinates());
-		settings.savePreferenceLong(Constants.nics_MAP_CURRENT_SHAPE_TYPE,(long) mCoordinateManager.getCurrentShapeType());
+		settings.savePreferenceLong(Constants.nics_MAP_CURRENT_SHAPE_TYPE, (long) mCoordinateManager.getCurrentShapeType());
 
 		CameraPosition pos = mMap.getCameraPosition();
 		String cameraPos = pos.target.latitude + "," + pos.target.longitude + "," + pos.zoom + "," + pos.tilt + "," + pos.bearing;
 		settings.savePreferenceString(Constants.nics_MAP_PREVIOUS_CAMERA, cameraPos);
 
-		if (mColor != null) {
-			settings.savePreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_RED, (long)mColor[1]);
-			settings.savePreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_GREEN,(long) mColor[2]);
-			settings.savePreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_BLUE,(long) mColor[3]);
+		if (mColor != null)
+		{
+			settings.savePreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_RED, (long) mColor[1]);
+			settings.savePreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_GREEN, (long) mColor[2]);
+			settings.savePreferenceLong(Constants.nics_MAP_COORDINATES_COLOR_BLUE, (long) mColor[3]);
 		}
 
 //		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 //			editor.putStringSet(Constants.nics_MAP_ACTIVE_WFS_LAYERS, mMarkupLayers.keySet());
 //		} else {
-			String layers = "";
-			for (String layerName : mMarkupLayers.keySet()) {
-				layers += layerName + ";";
-			}
-			settings.savePreferenceString(Constants.nics_MAP_ACTIVE_WFS_LAYERS, layers);
+		String layers = "";
+		for (String layerName : mMarkupLayers.keySet())
+		{
+			layers += layerName + ";";
+		}
+		settings.savePreferenceString(Constants.nics_MAP_ACTIVE_WFS_LAYERS, layers);
 //		}
 	}
 
-	public static void addMapLayer(TrackingLayerPayload layerPayload) {
+	public static void addMapLayer(TrackingLayerPayload layerPayload)
+	{
 		MarkupLayer layer = mMarkupLayers.remove(layerPayload.getDisplayname());
-		if(layer != null) {
+		if (layer != null)
+		{
 			layer.unregister();
 		}
 		mMarkupLayers.put(layerPayload.getDisplayname(), new MarkupLayer(MainActivity.getAppContext(), layerPayload, mMap));
 	}
 
-	public static void addSimpleReportLayer(TrackingLayerPayload layerPayload) {
+	public static void addSimpleReportLayer(TrackingLayerPayload layerPayload)
+	{
 		mMarkupLayers.put(layerPayload.getDisplayname(), new SimpleReportLayer(MainActivity.getAppContext(), layerPayload, mMap));
 	}
-	
-	public static void addDamageReportLayer(TrackingLayerPayload layerPayload) {
-		mMarkupLayers.put(layerPayload.getDisplayname(), new DamageReportLayer(MainActivity.getAppContext(), layerPayload, mMap));
-	}
 
-	public static void removeMapLayer(String string) {
+	public static void removeMapLayer(String string)
+	{
 		MarkupLayer removedLayer = mMarkupLayers.remove(string);
-		if (removedLayer != null) {
+		if (removedLayer != null)
+		{
 			removedLayer.clearFromMap();
 			removedLayer.unregister();
 		}
 	}
 
-	public static void changeMapType(int mapType) {
+	public static void changeMapType(int mapType)
+	{
 		mMap.setMapType(mapType);
-		
-		if(wmsTileOverlay != null) {
+
+		if (wmsTileOverlay != null)
+		{
 			wmsTileOverlay.remove();
 			wmsTileOverlay = null;
 			wmsTileProvider = null;
 		}
-		 
-		if(mapType == GoogleMap.MAP_TYPE_NONE) {
+
+		if (mapType == GoogleMap.MAP_TYPE_NONE)
+		{
 			wmsTileProvider = new MarkupWMSTileProvider(256, 256);
 			TileOverlayOptions wmsOverlayOptions = new TileOverlayOptions();
 			wmsOverlayOptions.tileProvider(wmsTileProvider);
@@ -1207,39 +1354,46 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		}
 	}
 
-	public static void enableTraffic(boolean isTrafficEnabled) {
+	public static void enableTraffic(boolean isTrafficEnabled)
+	{
 		mMap.setTrafficEnabled(isTrafficEnabled);
 	}
 
-	public static void enableIndoor(boolean isIndoorEnabled) {
+	public static void enableIndoor(boolean isIndoorEnabled)
+	{
 		mMap.setIndoorEnabled(isIndoorEnabled);
 	}
 
 	@Override
-	public boolean onTouch(View v, MotionEvent event) {
+	public boolean onTouch(View v, MotionEvent event)
+	{
 		mLastPressLocation = mMap.getProjection().fromScreenLocation(new Point(Math.round(event.getX()), Math.round(event.getY())));
 
-		if (MotionEvent.ACTION_UP == event.getAction()) {
+		if (MotionEvent.ACTION_UP == event.getAction())
+		{
 			v.performClick();
 		}
 
 		return false;
 	}
 
-	public void removeMapFragment() {
-		if (mMapFragment != null && mFragmentManager != null) {
+	public void removeMapFragment()
+	{
+		if (mMapFragment != null && mFragmentManager != null)
+		{
 			mFragmentManager.beginTransaction().remove(mMapFragment).commit();
 			mMapFragment = null;
 		}
 	}
 
 	@Override
-	public void onDestroyView() {
+	public void onDestroyView()
+	{
 		super.onDestroyView();
 
 		markerOptionsTabletReport = null;
 		markerTabletReport = null;
-		
+
 //		if (markerReceiverRegistered) {
 //			mContext.unregisterReceiver(markupReceiver);
 //			mContext.unregisterReceiver(collabRoomSwitchedReceiver);
@@ -1251,22 +1405,27 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 //		}
 
 		mDataManager.stopPollingMarkup();
-		if (mRenderMarkupFeaturesTask != null) {
+		if (mRenderMarkupFeaturesTask != null)
+		{
 			mRenderMarkupFeaturesTask.cancel(true);
 			mRenderMarkupFeaturesTask = null;
 		}
-		
+
 		((ViewGroup) mRootView.getParent()).removeView(mRootView);
 	}
 
-	private BroadcastReceiver markupReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver markupReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
-			try {
-								
+		public void onReceive(Context context, Intent intent)
+		{
+			try
+			{
+
 				Log.i(Constants.nics_DEBUG_ANDROID_TAG, "Rendering shapes");
-				if (intent.getLongExtra("collabroomId", -99) == mDataManager.getSelectedCollabRoom().getCollabRoomId()) {
+				if (intent.getLongExtra("collabroomId", -99) == mDataManager.getSelectedCollabRoom().getCollabRoomId())
+				{
 					//String[] addMarkup = intent.getStringArrayExtra("featuresToAdd");
 					String[] addMarkup = ReceivedMarkupFeaturesData.getFeaturesToAdd();
 
@@ -1274,12 +1433,15 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 					String[] removeMarkup = ReceivedMarkupFeaturesData.getFeaturesToRemove();
 
-					if (addMarkup != null) {
-						for (String markupPayloadString : addMarkup) {
+					if (addMarkup != null)
+					{
+						for (String markupPayloadString : addMarkup)
+						{
 							MarkupFeature feature = mBuilder.create().fromJson(markupPayloadString, MarkupFeature.class);
 
 							MarkupBaseShape shape = mMarkupShapes.get(feature.getFeatureId());
-							if (shape != null) {
+							if (shape != null)
+							{
 								shape.removeFromMap();
 								mFeatures.remove(shape.getFeature());
 								mMarkupShapes.remove(shape);
@@ -1289,11 +1451,14 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 						}
 					}
 
-					if (removeMarkup != null) {
-						for (String featureId : removeMarkup) {
+					if (removeMarkup != null)
+					{
+						for (String featureId : removeMarkup)
+						{
 							MarkupBaseShape shape = mMarkupShapes.get(featureId);
 
-							if (shape != null) {
+							if (shape != null)
+							{
 								shape.removeFromMap();
 								mFeatures.remove(shape.getFeature());
 								mMarkupShapes.remove(shape);
@@ -1303,55 +1468,67 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 					mFirelineFeatures.clear();
 
-					if (markupTileProvider != null) {
+					if (markupTileProvider != null)
+					{
 						markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 					}
 
-					if (tileOverlay != null) {
+					if (tileOverlay != null)
+					{
 						tileOverlay.clearTileCache();
 					}
-					
-					if(wmsTileOverlay != null) {
+
+					if (wmsTileOverlay != null)
+					{
 						wmsTileOverlay.clearTileCache();
 					}
 
 					addMarkupFromServer();
-				} else if (!mFirstLoad && !mIgnoreUpdate && mCoordinateManager.getCurrentShapeType() == -1) {
+				} else if (!mFirstLoad && !mIgnoreUpdate && mCoordinateManager.getCurrentShapeType() == -1)
+				{
 					mShapesListView.setVisibility(View.VISIBLE);
 					mShapesListProgress.setVisibility(View.GONE);
 				}
-			} catch (Exception e) {
+			} catch (Exception e)
+			{
 				e.printStackTrace();
 			}
 		}
 	};
 
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 100) {
+	public void onActivityResult(int requestCode, int resultCode, Intent data)
+	{
+		if (requestCode == 100)
+		{
 			mCurrentSymbolResourceId = data.getExtras().getInt("resourceId");
 			mCoordinateManager.setSymbol(mCurrentSymbolResourceId);
 		}
 
-		if (requestCode == 200) {
+		if (requestCode == 200)
+		{
 			int temp = data.getExtras().getInt("pickedColor");
-			mColor = new int[] { 255, Color.red(temp), Color.green(temp), Color.blue(temp) };
+			mColor = new int[]{255, Color.red(temp), Color.green(temp), Color.blue(temp)};
 			mCoordinateManager.setColor(temp);
 
-			if (mCurrentShape != null) {
+			if (mCurrentShape != null)
+			{
 				mCurrentShape.setStrokeColor(mColor);
 
 			}
 		}
 	}
 
-	public void showDeleteDialog(final MarkupBaseShape shape) {
+	public void showDeleteDialog(final MarkupBaseShape shape)
+	{
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
 		builder.setMessage(R.string.markup_confrim_delete);
 
-		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
+		builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface dialog, int id)
+			{
 				RestClient.deleteMarkup(shape.getFeatureId());
 				shape.removeFromMap();
 				mFeatures.remove(shape.getFeature());
@@ -1363,8 +1540,10 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			}
 
 		});
-		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
+		builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface dialog, int id)
+			{
 				setIgnoreUpdate(false);
 				dialog.dismiss();
 			}
@@ -1374,16 +1553,20 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		dialog.show();
 	}
 
-	public void showConfirmDialog(final String title, final String message, final String activeModeName) {
+	public void showConfirmDialog(final String title, final String message, final String activeModeName)
+	{
 
-		if (mCurrentShape != null) {
+		if (mCurrentShape != null)
+		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
 			builder.setMessage(message);
 			builder.setTitle(title);
 
-			builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
+			builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+			{
+				public void onClick(DialogInterface dialog, int id)
+				{
 					mDataManager.addMarkupFeatureToStoreAndForward(mCurrentShape.toFeature());
 
 					mDataManager.sendMarkupFeatures();
@@ -1398,104 +1581,121 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 					mIgnoreUpdate = false;
 				}
 			});
-			builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
+			builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+			{
+				public void onClick(DialogInterface dialog, int id)
+				{
 					dialog.dismiss();
 				}
 			});
 
 			AlertDialog dialog = builder.create();
 			dialog.show();
-		} else {
+		} else
+		{
 
 		}
 	}
-	
-	OnClickListener confirmListener = new OnClickListener() {
+
+	OnClickListener confirmListener = new OnClickListener()
+	{
 
 		@Override
-		public void onClick(View v) {
+		public void onClick(View v)
+		{
 			boolean success = false;
 
-			switch (v.getId()) {
-			case R.id.coordinateOkButton:
+			switch (v.getId())
+			{
+				case R.id.coordinateOkButton:
 
-				MarkupType type = null;
-				if (mCurrentShape != null) {
-					type = mCurrentShape.getType();
-				}
-				
-				ArrayList<LatLng> points = mCoordinateManager.getCoordinatesArray();
-				//enclosed shapes must end with their starting point
+					MarkupType type = null;
+					if (mCurrentShape != null)
+					{
+						type = mCurrentShape.getType();
+					}
+
+					ArrayList<LatLng> points = mCoordinateManager.getCoordinatesArray();
+					//enclosed shapes must end with their starting point
 //				if(type == MarkupType.circle || type == MarkupType.hexagon || type == MarkupType.polygon || type == MarkupType.square || type == MarkupType.triangle){
 //					points.add(points.get(0));
 //				}
-				int size = points.size();
+					int size = points.size();
 
-				if (mCurrentShape == null && size > 0) {
-					onMapClick(points.get(0));
-				}
-
-				if (mCurrentShape == null || type == MarkupType.marker && size != 1 || type == MarkupType.sketch && size != 2 || type == MarkupType.polygon && size < 3 || type == MarkupType.square && size != 5) {
-					final AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
-					alertDialog.setTitle(getString(R.string.markup_shape_incomplete));
-					alertDialog.setMessage(getString(R.string.markup_confirm_fields));
-					alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.ok), new DialogInterface.OnClickListener() {
-
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							alertDialog.dismiss();
-						}
-					});
-					alertDialog.show();
-				} else {
-					
-					mCurrentShape.setPoints(mCoordinateManager.getCoordinatesArray());
-					mCurrentShape.setStrokeColor(mColor);
-					mCurrentShape.setTime(System.currentTimeMillis());
-					mCurrentShape.setFeatureId(mCurrentShapeId);
-
-					mDataManager.addMarkupFeatureToStoreAndForward(mCurrentShape.toFeature());
-					mDataManager.sendMarkupFeatures();
-
-					if (type == MarkupType.marker) {
-						JsonObject attr = new JsonObject();
-						Resources resources = mContext.getResources();
-						try {
-							attr.addProperty("icon", mCurrentSymbolResourceId);
-							attr.addProperty(resources.getString(R.string.markup_user), mDataManager.getUsername());
-							attr.addProperty(resources.getString(R.string.markup_timestamp), mCurrentShape.getTime());
-						} catch (Exception e) {
-						}
-						
-						MarkupSymbol temp = ((MarkupSymbol) mCurrentShape);
-
-						Bitmap symbolBitmap = generateRotatedBitmap(mCurrentSymbolResourceId, 0);
-						String symbolPath = Symbols.ALL.getKey(mCurrentSymbolResourceId);
-						temp.setTitle(attr.toString());
-						temp.setIcon(symbolBitmap, new int[] { 255, 255, 255, 255 });
-						temp.setSymbolPath(symbolPath);
-
+					if (mCurrentShape == null && size > 0)
+					{
+						onMapClick(points.get(0));
 					}
-					
-					mTempShapes.put(mCurrentShapeId, mCurrentShape);
-					mCurrentShape = null;
-					mCurrentShapeId = null;
+
+					if (mCurrentShape == null || type == MarkupType.marker && size != 1 || type == MarkupType.sketch && size != 2 || type == MarkupType.polygon && size < 3 || type == MarkupType.square && size != 5)
+					{
+						final AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
+						alertDialog.setTitle(getString(R.string.markup_shape_incomplete));
+						alertDialog.setMessage(getString(R.string.markup_confirm_fields));
+						alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.ok), new DialogInterface.OnClickListener()
+						{
+
+							@Override
+							public void onClick(DialogInterface dialog, int which)
+							{
+								alertDialog.dismiss();
+							}
+						});
+						alertDialog.show();
+					} else
+					{
+
+						mCurrentShape.setPoints(mCoordinateManager.getCoordinatesArray());
+						mCurrentShape.setStrokeColor(mColor);
+						mCurrentShape.setTime(System.currentTimeMillis());
+						mCurrentShape.setFeatureId(mCurrentShapeId);
+
+						mDataManager.addMarkupFeatureToStoreAndForward(mCurrentShape.toFeature());
+						mDataManager.sendMarkupFeatures();
+
+						if (type == MarkupType.marker)
+						{
+							JsonObject attr = new JsonObject();
+							Resources resources = mContext.getResources();
+							try
+							{
+								attr.addProperty("icon", mCurrentSymbolResourceId);
+								attr.addProperty(resources.getString(R.string.markup_user), mDataManager.getUsername());
+								attr.addProperty(resources.getString(R.string.markup_timestamp), mCurrentShape.getTime());
+							} catch (Exception e)
+							{
+							}
+
+							MarkupSymbol temp = ((MarkupSymbol) mCurrentShape);
+
+							Bitmap symbolBitmap = generateRotatedBitmap(mCurrentSymbolResourceId, 0);
+							String symbolPath = Symbols.ALL.getKey(mCurrentSymbolResourceId);
+							temp.setTitle(attr.toString());
+							temp.setIcon(symbolBitmap, new int[]{255, 255, 255, 255});
+							temp.setSymbolPath(symbolPath);
+
+						}
+
+						mTempShapes.put(mCurrentShapeId, mCurrentShape);
+						mCurrentShape = null;
+						mCurrentShapeId = null;
+						success = true;
+					}
+					break;
+				case R.id.coordinateCancelButton:
+
+					if (mCurrentShape != null)
+					{
+						mCurrentShape.removeFromMap();
+						mMarkupShapes.remove(mCurrentShapeId);
+
+						mCurrentShape = null;
+						mCurrentShapeId = null;
+					}
 					success = true;
-				}
-				break;
-			case R.id.coordinateCancelButton:
-
-				if (mCurrentShape != null) {
-					mCurrentShape.removeFromMap();
-					mMarkupShapes.remove(mCurrentShapeId);
-
-					mCurrentShape = null;
-					mCurrentShapeId = null;
-				}
-				success = true;
 			}
-			if (success) {
+			if (success)
+			{
 				mCoordinateManager.setCurrentShapeType(-1);
 				mCoordinateManager.clearCoordinates();
 				mCoordinateManager.hide();
@@ -1504,7 +1704,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 			mIgnoreUpdate = false;
 
-			for (MarkupFireLine fireline : mFirelineFeatures) {
+			for (MarkupFireLine fireline : mFirelineFeatures)
+			{
 				fireline.removeFromMap();
 			}
 			mFirelineFeatures.clear();
@@ -1514,62 +1715,77 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		}
 	};
 
-	public void hideListView() {
+	public void hideListView()
+	{
 		mShapesListView.setVisibility(View.GONE);
 	}
 
-	private Comparator<? super MarkupFeature> markupComparator = new Comparator<MarkupFeature>() {
+	private Comparator<? super MarkupFeature> markupComparator = new Comparator<MarkupFeature>()
+	{
 
 		@Override
-		public int compare(MarkupFeature lhs, MarkupFeature rhs) {
+		public int compare(MarkupFeature lhs, MarkupFeature rhs)
+		{
 			return rhs.getSeqTime().compareTo(lhs.getSeqTime());
 		}
 	};
 
-	private Comparator<? super MarkupFeature> markupComparatorOlder = new Comparator<MarkupFeature>() {
+	private Comparator<? super MarkupFeature> markupComparatorOlder = new Comparator<MarkupFeature>()
+	{
 
 		@Override
-		public int compare(MarkupFeature lhs, MarkupFeature rhs) {
+		public int compare(MarkupFeature lhs, MarkupFeature rhs)
+		{
 			return lhs.getSeqTime().compareTo(rhs.getSeqTime());
 		}
 	};
 	public Builder extentBuilder;
 
-	private class RenderMarkupFeaturesTask extends AsyncTask<ArrayList<MarkupFeature>, Object, Integer> {
+	private class RenderMarkupFeaturesTask extends AsyncTask<ArrayList<MarkupFeature>, Object, Integer>
+	{
 
 		private boolean isCancelled;
 		protected float zoom;
 		private boolean mClearTiles;
 		private boolean mCenterMap;
 
-		public RenderMarkupFeaturesTask() {
+		public RenderMarkupFeaturesTask()
+		{
 		}
 
 		@Override
-		protected void onCancelled() {
+		protected void onCancelled()
+		{
 			super.onCancelled();
 
 			isCancelled = true;
 
-			if (mIgnoreUpdate && mCoordinateManager.getCurrentShapeType() != -1) {
+			if (mIgnoreUpdate && mCoordinateManager.getCurrentShapeType() != -1)
+			{
 				mShapesListView.setVisibility(View.GONE);
 				mShapesListProgress.setVisibility(View.GONE);
 			}
 		}
 
 		@Override
-		protected Integer doInBackground(@SuppressWarnings("unchecked") ArrayList<MarkupFeature>... markupFeatures) {
+		protected Integer doInBackground(@SuppressWarnings("unchecked") ArrayList<MarkupFeature>... markupFeatures)
+		{
 			Integer numParsed = 0;
 
-			if (!isCancelled) {
-				if (mFeatures.size() == 0) {
+			if (!isCancelled)
+			{
+				if (mFeatures.size() == 0)
+				{
 					mFirstLoad = true;
 				}
 
-				if (mFirstLoad) {
-					try {
+				if (mFirstLoad)
+				{
+					try
+					{
 						Thread.sleep(100);
-					} catch (InterruptedException e) {
+					} catch (InterruptedException e)
+					{
 						e.printStackTrace();
 					}
 
@@ -1578,13 +1794,15 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 					//Flippeding lat and lon values of draft features.
 					//currently the web api accepts these coordinates backwards. so they don't show up properly on mobile when they are a draft
 					//this can be removed once the lat lon web bug is fixed
-					for(int i = 0; i < mFeatures.size(); i++){
+					for (int i = 0; i < mFeatures.size(); i++)
+					{
 						ArrayList<Vector2> latLonList = mFeatures.get(i).getGeometryVector2();
-						
-						for(int latlonIndex =0; latlonIndex < latLonList.size(); latlonIndex++){
+
+						for (int latlonIndex = 0; latlonIndex < latLonList.size(); latlonIndex++)
+						{
 							double x = latLonList.get(latlonIndex).x;
 							double y = latLonList.get(latlonIndex).y;
-							
+
 							latLonList.get(latlonIndex).x = y;
 							latLonList.get(latlonIndex).y = x;
 						}
@@ -1592,11 +1810,13 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 					}
 					mFeatures.addAll(mDataManager.getMarkupHistoryForCollabroom(mDataManager.getSelectedCollabRoom().getCollabRoomId()));
 
-					if (mFeatures.size() > 0) {
+					if (mFeatures.size() > 0)
+					{
 						mFirstLoad = false;
 						mCenterMap = true;
 						mClearTiles = true;
-					} else if (RestClient.isParsingMarkup() || RestClient.isFetchingMarkup()) {
+					} else if (RestClient.isParsingMarkup() || RestClient.isFetchingMarkup())
+					{
 						return -1;
 					}
 				}
@@ -1611,7 +1831,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 				Collections.sort(mFeatures, markupComparatorOlder);
 
-				try {
+				try
+				{
 					extentBuilder = LatLngBounds.builder();
 					for (final MarkupFeature feature : mFeatures)
 					{
@@ -1624,11 +1845,10 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 						{
 							try
 							{
-								if(feature.getStrokeColor() != null)
+								if (feature.getStrokeColor() != null)
 								{
-										color = Color.parseColor(feature.getStrokeColor());
-								}
-								else
+									color = Color.parseColor(feature.getStrokeColor());
+								} else
 								{
 									color = Color.WHITE;
 								}
@@ -1636,13 +1856,12 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 							{
 								color = Color.WHITE;
 							}
-							serverColor = new int[] { Color.alpha(color), Color.red(color), Color.green(color), Color.blue(color) };
+							serverColor = new int[]{Color.alpha(color), Color.red(color), Color.green(color), Color.blue(color)};
 
-							if(feature.getFillColor() != null)
+							if (feature.getFillColor() != null)
 							{
 								fillColor = Color.parseColor(feature.getFillColor());
-							}
-							else
+							} else
 							{
 								fillColor = Color.WHITE;
 							}
@@ -1653,7 +1872,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 								alpha = (feature.getOpacity() * 255);
 							}
 
-							lastFillColor = new int[] { alpha.intValue(), Color.red(fillColor), Color.green(fillColor), Color.blue(fillColor) };
+							lastFillColor = new int[]{alpha.intValue(), Color.red(fillColor), Color.green(fillColor), Color.blue(fillColor)};
 
 							if (feature.getType().equals(MarkupType.marker.toString()) || feature.getType().equals("marker"))
 							{
@@ -1673,8 +1892,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 											}
 										});
 
-							}
-							else if (feature.getType().equals(MarkupType.marker.toString()) || feature.getType().equals("sketch") || feature.getType().equals("line"))
+							} else if (feature.getType().equals(MarkupType.marker.toString()) || feature.getType().equals("sketch") || feature.getType().equals("line"))
 							{
 								if (feature.getDashStyle() == null/* || feature.getDashStyle().equals("solid") || feature.getDashStyle().equals("completedLine")*/)
 								{
@@ -1709,61 +1927,70 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 								}
 								//else
 								//{
-									final MarkupFireLine fireline = new MarkupFireLine(mDataManager, feature, serverColor, zoom);
-									mMarkupShapes.put(feature.getFeatureId(), fireline);
-									mFirelineFeatures.add(fireline);
+								final MarkupFireLine fireline = new MarkupFireLine(mDataManager, feature, serverColor, zoom);
+								mMarkupShapes.put(feature.getFeatureId(), fireline);
+								mFirelineFeatures.add(fireline);
 								//}
-							}
-							else if (feature.getType().equals(MarkupType.square.toString()))
+							} else if (feature.getType().equals(MarkupType.square.toString()))
 							{
 								final MarkupRectangle rectangle = new MarkupRectangle(mDataManager, feature, serverColor, lastFillColor);
 								mMarkupShapes.put(feature.getFeatureId(), rectangle);
 
-								mContext.runOnUiThread(new Runnable() {
+								mContext.runOnUiThread(new Runnable()
+								{
 
 									@Override
-									public void run() {
+									public void run()
+									{
 										rectangle.setPolygon(mMap.addPolygon(rectangle.getOptions()));
 										feature.setRendered(true);
 									}
 								});
 
-							}
-							else if (feature.getType().equals(MarkupType.polygon.toString()) || feature.getType().equals("box") || feature.getType().equals(MarkupType.circle.toString())
-									|| (feature.getType().equals("circle") && feature.getGeometryVector2().size() > 1) || feature.getType().equals("triangle") || feature.getType().equals("polygon") || feature.getType().equals("hexagon")) {
+							} else if (feature.getType().equals(MarkupType.polygon.toString()) || feature.getType().equals("box") || feature.getType().equals(MarkupType.circle.toString())
+									|| (feature.getType().equals("circle") && feature.getGeometryVector2().size() > 1) || feature.getType().equals("triangle") || feature.getType().equals("polygon") || feature.getType().equals("hexagon"))
+							{
 								final MarkupRectangle trapezoid = new MarkupRectangle(mDataManager, feature, serverColor, lastFillColor);
 								mMarkupShapes.put(feature.getFeatureId(), trapezoid);
 
-								mContext.runOnUiThread(new Runnable() {
+								mContext.runOnUiThread(new Runnable()
+								{
 
 									@Override
-									public void run() {
+									public void run()
+									{
 										trapezoid.setPolygon(mMap.addPolygon(trapezoid.getOptions()));
 										feature.setRendered(true);
 									}
 								});
 
-							} else if (feature.getType().equals("label")) {
+							} else if (feature.getType().equals("label"))
+							{
 								final MarkupText text = new MarkupText(mDataManager, feature, serverColor);
 								mMarkupShapes.put(feature.getFeatureId(), text);
 
-								mContext.runOnUiThread(new Runnable() {
+								mContext.runOnUiThread(new Runnable()
+								{
 
 									@Override
-									public void run() {
+									public void run()
+									{
 										text.setMarker(mMap.addMarker(text.getOptions()));
 										feature.setRendered(true);
 									}
 								});
 
-							} else if (feature.getType().equals(MarkupType.circle.toString()) || feature.getType().equals("circle")) {
+							} else if (feature.getType().equals(MarkupType.circle.toString()) || feature.getType().equals("circle"))
+							{
 								final MarkupCircle circle = new MarkupCircle(mDataManager, feature, serverColor, lastFillColor);
 								mMarkupShapes.put(feature.getFeatureId(), circle);
 
-								mContext.runOnUiThread(new Runnable() {
+								mContext.runOnUiThread(new Runnable()
+								{
 
 									@Override
-									public void run() {
+									public void run()
+									{
 										circle.setCircle(mMap.addCircle(circle.getOptions()));
 										feature.setRendered(true);
 									}
@@ -1772,24 +1999,29 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 							numParsed++;
 						}
 					}
-				} catch (Exception e) {
+				} catch (Exception e)
+				{
 					e.printStackTrace();
 				}
 
-				if (mShapesListView != null) {
+				if (mShapesListView != null)
+				{
 					final int index = mShapesListView.getFirstVisiblePosition();
 					View v = mShapesListView.getChildAt(0);
 					final int top = (v == null) ? 0 : v.getTop();
 
 					Collections.sort(mFeatures, markupComparator);
 
-					mContext.runOnUiThread(new Runnable() {
+					mContext.runOnUiThread(new Runnable()
+					{
 
 						@Override
-						public void run() {
+						public void run()
+						{
 							mShapesListView.setSelectionFromTop(index, top);
 							mShapesAdapter.notifyDataSetChanged();
-							if (mCurrentShape == null && mCoordinateManager.getCurrentShapeType() == -1 && !mIgnoreUpdate) {
+							if (mCurrentShape == null && mCoordinateManager.getCurrentShapeType() == -1 && !mIgnoreUpdate)
+							{
 								mShapesListView.setVisibility(View.VISIBLE);
 								mShapesListProgress.setVisibility(View.GONE);
 							}
@@ -1804,7 +2036,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 			mIgnoreUpdate = false;
 
-			if (numParsed > 0) {
+			if (numParsed > 0)
+			{
 				// TODO: notifications for markup?
 				// mNotificationHandler.createChatNotification(chatPayloads[0],
 				// mDataManager.getActiveIncidentId());
@@ -1814,32 +2047,39 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 		}
 
 		@Override
-		protected void onPostExecute(Integer numParsed) {
+		protected void onPostExecute(Integer numParsed)
+		{
 			super.onPostExecute(numParsed);
-			if (numParsed == 0 && mFirstLoad) {
+			if (numParsed == 0 && mFirstLoad)
+			{
 				Log.i(Constants.nics_DEBUG_ANDROID_TAG, "No features found.");
 				mShapesListView.setVisibility(View.VISIBLE);
 				mShapesListProgress.setVisibility(View.GONE);
 				mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), false);
 				mFirstLoad = false;
-			} else {
+			} else
+			{
 				Log.i(Constants.nics_DEBUG_ANDROID_TAG, "Successfully rendered " + numParsed + " markup features.");
 
-				if (RestClient.isParsingMarkup() || RestClient.isFetchingMarkup()) {
+				if (RestClient.isParsingMarkup() || RestClient.isFetchingMarkup())
+				{
 					mShapesListView.setVisibility(View.GONE);
 					mShapesListProgress.setVisibility(View.VISIBLE);
-				} else {
+				} else
+				{
 					mShapesListView.setVisibility(View.VISIBLE);
 					mShapesListProgress.setVisibility(View.GONE);
 				}
 			}
 
-			if (mRenderMarkupFeaturesTask != null) {
+			if (mRenderMarkupFeaturesTask != null)
+			{
 				mRenderMarkupFeaturesTask.cancel(true);
 				mRenderMarkupFeaturesTask = null;
 			}
 
-			if (mClearTiles) {
+			if (mClearTiles)
+			{
 				markupTileProvider.setFirelineFeatures(mFirelineFeatures);
 				tileOverlay.clearTileCache();
 				mClearTiles = false;
@@ -1857,42 +2097,49 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 	}
 
-	public void setIgnoreUpdate(boolean ignoreUpdate) {
+	public void setIgnoreUpdate(boolean ignoreUpdate)
+	{
 		mIgnoreUpdate = ignoreUpdate;
 
-		if (mRenderMarkupFeaturesTask != null) {
+		if (mRenderMarkupFeaturesTask != null)
+		{
 			mRenderMarkupFeaturesTask.cancel(true);
 			mRenderMarkupFeaturesTask = null;
 		}
 
-		if (ignoreUpdate) {
+		if (ignoreUpdate)
+		{
 			mShapesListView.setVisibility(View.VISIBLE);
 			mShapesListProgress.setVisibility(View.GONE);
 		}
 	}
 
-	public boolean isAddingMarkupEnabled() {
+	public boolean isAddingMarkupEnabled()
+	{
 		return addingMarkupEnabled;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.mapmarkup_layer_provider) {
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		if (item.getItemId() == R.id.mapmarkup_layer_provider)
+		{
 //			String[] wfsNameArray = getResources().getStringArray(R.array.wfslayer_title_array);
 //			final String[] wfsLayer = getResources().getStringArray(R.array.wfslayer_array);
-			
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			
+
 			ArrayList<TrackingLayerPayload> layerPayloads = mDataManager.getTrackingLayers();
-			
+
 			String[] wfsNameArray = new String[layerPayloads.size()];
 			boolean[] wfsActiveArray = new boolean[layerPayloads.size()];
-			
-			for(int i = 0; i < layerPayloads.size(); i++){
+
+			for (int i = 0; i < layerPayloads.size(); i++)
+			{
 				wfsNameArray[i] = layerPayloads.get(i).getDisplayname();
 				wfsActiveArray[i] = layerPayloads.get(i).isActive();
 			}
-			
+
 
 //			if (activeWFSLayers != null) {
 //				for (String layer : activeWFSLayers) {
@@ -1910,26 +2157,31 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 //				}
 //			}
 
-			builder.setMultiChoiceItems(wfsNameArray, wfsActiveArray, new OnMultiChoiceClickListener() {
+			builder.setMultiChoiceItems(wfsNameArray, wfsActiveArray, new OnMultiChoiceClickListener()
+			{
 				@Override
-				public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+				public void onClick(DialogInterface dialog, int which, boolean isChecked)
+				{
 					TrackingLayerPayload selectedLayer = mDataManager.getTrackingLayers().get(which);
-					if (isChecked) {
-						if (selectedLayer.getDisplayname().equals(getResources().getString(R.string.wfslayer_nics_simple_report_title))) {
+					if (isChecked)
+					{
+						if (selectedLayer.getDisplayname().equals(getResources().getString(R.string.wfslayer_nics_simple_report_title)))
+						{
 							addSimpleReportLayer(selectedLayer);
-						} else if (selectedLayer.getDisplayname().equals(getResources().getString(R.string.wfslayer_nics_damage_report_title))) {
-							addDamageReportLayer(selectedLayer);
-						} else {
+						}
+						else
+						{
 							addMapLayer(selectedLayer);
 						}
-					} else {
+					} else
+					{
 						removeMapLayer(selectedLayer.getDisplayname());
 					}
-					
+
 					TrackingLayerPayload payload = mDataManager.getTrackingLayers().get(which);
 					payload.setActive(isChecked);
 					mDataManager.UpdateTrackingLayerData(payload);
-					
+
 //					EncryptedPreferences settings = new EncryptedPreferences(mContext.getSharedPreferences(Constants.nics_MAP_MARKUP_STATE, 0));
 //					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 //						editor.putStringSet(Constants.nics_MAP_ACTIVE_WFS_LAYERS, mMarkupLayers.keySet());
@@ -1942,10 +2194,12 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 //					}
 				}
 			});
-			
-			builder.setPositiveButton(R.string.ok, new Dialog.OnClickListener() {
+
+			builder.setPositiveButton(R.string.ok, new Dialog.OnClickListener()
+			{
 				@Override
-				public void onClick(DialogInterface dialog, int which) {
+				public void onClick(DialogInterface dialog, int which)
+				{
 					dialog.dismiss();
 				}
 			});
@@ -1955,74 +2209,86 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 
 		return super.onOptionsItemSelected(item);
 	}
-	
-	
-	
-	private BroadcastReceiver mapFeatureFailedToPostReceiver = new BroadcastReceiver() {
+
+
+	private BroadcastReceiver mapFeatureFailedToPostReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
-			
+		public void onReceive(Context context, Intent intent)
+		{
+
 			saveMapState();
-			
+
 			mMap.clear();
 			mFeatures.clear();
 			mMarkupShapes.clear();
 			setUpMapIfNeeded();
-			
+
 			mShapesAdapter.notifyDataSetChanged();
-			
+
 			final AlertDialog alertDialog = new AlertDialog.Builder(mContext).create();
 			alertDialog.setTitle("Feature Failed To Post");
 			alertDialog.setMessage(intent.getExtras().getString("message"));
-			alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.ok), new DialogInterface.OnClickListener() {
-				
+			alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.ok), new DialogInterface.OnClickListener()
+			{
+
 				@Override
-				public void onClick(DialogInterface dialog, int which) {
+				public void onClick(DialogInterface dialog, int which)
+				{
 					alertDialog.dismiss();
 				}
 			});
 			alertDialog.show();
-			
+
 		}
 	};
-	
-	private BroadcastReceiver collabRoomSwitchedReceiver = new BroadcastReceiver() {
+
+	private BroadcastReceiver collabRoomSwitchedReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(Context context, Intent intent)
+		{
 			mMap.clear();
 			mFeatures.clear();
 			mMarkupShapes.clear();
-			if(mDataManager.getActiveCollabroomId() != -1){
+			if (mDataManager.getActiveCollabroomId() != -1)
+			{
 				setUpMapIfNeeded();
 			}
 			mShapesAdapter.notifyDataSetChanged();
 		}
 	};
-	
-	private BroadcastReceiver incidentSwitchedReceiver = new BroadcastReceiver() {
+
+	private BroadcastReceiver incidentSwitchedReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(Context context, Intent intent)
+		{
 			mMap.clear();
 			mFeatures.clear();
 			mMarkupShapes.clear();
-			if(mDataManager.getActiveCollabroomId() != -1){
+			if (mDataManager.getActiveCollabroomId() != -1)
+			{
 				setUpMapIfNeeded();
 			}
 			mShapesAdapter.notifyDataSetChanged();
 		}
 	};
-	
-	private BroadcastReceiver localMapDataClearedReceiver = new BroadcastReceiver() {
+
+	private BroadcastReceiver localMapDataClearedReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
+		public void onReceive(Context context, Intent intent)
+		{
 			mMap.clear();
 			mFeatures.clear();
 			mMarkupShapes.clear();
-			if(mDataManager.getActiveCollabroomId() != -1){
+			if (mDataManager.getActiveCollabroomId() != -1)
+			{
 				setUpMapIfNeeded();
 			}
 			mShapesAdapter.notifyDataSetChanged();

@@ -42,17 +42,9 @@ import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.app.NotificationCompat.InboxStyle;
 import android.support.v4.app.TaskStackBuilder;
 import scout.edu.mit.ll.nics.android.api.R;
-import scout.edu.mit.ll.nics.android.api.data.DamageReportData;
-import scout.edu.mit.ll.nics.android.api.data.FieldReportData;
-import scout.edu.mit.ll.nics.android.api.data.ResourceRequestData;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportData;
-import scout.edu.mit.ll.nics.android.api.data.WeatherReportData;
 import scout.edu.mit.ll.nics.android.api.payload.AssignmentPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.DamageReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.FieldReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.ResourceRequestPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.WeatherReportPayload;
 import scout.edu.mit.ll.nics.android.utils.Constants.NavigationOptions;
 
 public class NotificationsHandler {
@@ -63,11 +55,7 @@ public class NotificationsHandler {
 	private NotificationManager mNotificationManager;
 
 	private int numberOfNewSimpleReports = 0;
-	private int numberOfNewFieldReports = 0;
-	private int numberOfNewDamageReports = 0;
-	private int numberOfNewResourceRequests = 0;
-	private int numberOfNewWeatherReports = 0;
-	
+
 	private InboxStyle mSimpleReportInboxStyle;
 	private InboxStyle mFieldReportInboxStyle;
 	private InboxStyle mDamageReportInboxStyle;
@@ -149,108 +137,6 @@ public class NotificationsHandler {
 		mNotificationManager.notify(SIMPLE_REPORT_NOTIFICATION_ID, mBuilder.build());
 		
 	}
-	
-	public void createFieldReportNotification(ArrayList<FieldReportPayload> payloads, long activeIncidentId) {
-		mBuilder.setContentTitle("NICS");
-		mBuilder.setContentText("Field Report(s) Receieved");
-
-		for(FieldReportPayload payload : payloads) {
-			if(payload.getIncidentId() == activeIncidentId) {
-				FieldReportData data = payload.getMessageData();
-				mFieldReportInboxStyle.addLine(data.getUser() + " - " + data.getIncidentName());
-				numberOfNewFieldReports++;
-			}
-		}
-		
-		mBuilder.setNumber(numberOfNewFieldReports);
-		mBuilder.setStyle(mFieldReportInboxStyle);
-		
-		mBuilder.setAutoCancel(true);
-		
-		mBuilder.setDefaults(Notification.DEFAULT_ALL);
-		
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-		
-		Intent activityIntent = new Intent(Intents.nics_VIEW_FIELD_REPORTS_LIST);
-		activityIntent.setClassName("scout.edu.mit.ll.nics.android", "scout.edu.mit.ll.nics.android.MainActivity");
-		activityIntent.putExtra("selected_navigation_item", NavigationOptions.FIELDREPORT.getValue());
-		if(payloads.size() == 1) {
-			activityIntent.putExtra("fr_edit_json", payloads.get(0).toJsonString());
-		}
-		stackBuilder.addNextIntent(activityIntent);
-		
-		mBuilder.setContentIntent(stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT));
-		
-		mNotificationManager.notify(FIELD_REPORT_NOTIFICATION_ID, mBuilder.build());
-	}
-	
-	public void createDamageReportNotification(ArrayList<DamageReportPayload> payloads, long activeIncidentId) {
-		mBuilder.setContentTitle("NICS");
-		mBuilder.setContentText("Damage Report(s) Receieved");
-
-		for(DamageReportPayload payload : payloads) {
-			if(payload.getIncidentId() == activeIncidentId) {
-				DamageReportData data = payload.getMessageData();
-				mDamageReportInboxStyle.addLine(data.getUser() + " - " + data.getPropertyAddress());
-				numberOfNewDamageReports++;
-			}
-		}
-		
-		mBuilder.setNumber(numberOfNewDamageReports);
-		mBuilder.setStyle(mDamageReportInboxStyle);
-		
-		mBuilder.setAutoCancel(true);
-		
-		mBuilder.setDefaults(Notification.DEFAULT_ALL);
-		
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-		
-		Intent activityIntent = new Intent(Intents.nics_VIEW_DAMAGE_REPORTS_LIST);
-		activityIntent.setClassName("scout.edu.mit.ll.nics.android", "scout.edu.mit.ll.nics.android.MainActivity");
-		activityIntent.putExtra("selected_navigation_item", NavigationOptions.DAMAGESURVEY.getValue());
-		if(payloads.size() == 1) {
-			activityIntent.putExtra("dr_edit_json", payloads.get(0).toJsonString());
-		}
-		stackBuilder.addNextIntent(activityIntent);
-		
-		mBuilder.setContentIntent(stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT));
-		
-		mNotificationManager.notify(DAMAGE_REPORT_NOTIFICATION_ID, mBuilder.build());
-	}
-	
-	public void createResourceRequestNotification(ArrayList<ResourceRequestPayload> payloads, long activeIncidentId) {
-		mBuilder.setContentTitle("NICS");
-		mBuilder.setContentText("Resource Request(s) Receieved");
-
-		for(ResourceRequestPayload payload : payloads) {
-			if(payload.getIncidentId() == activeIncidentId) {
-				ResourceRequestData data = payload.getMessageData();
-				mResourceRequestInboxStyle.addLine(data.getUser() + " - " + data.getDescription());
-				numberOfNewResourceRequests++;
-			}
-		}
-		
-		mBuilder.setNumber(numberOfNewResourceRequests);
-		mBuilder.setStyle(mResourceRequestInboxStyle);
-		
-		mBuilder.setAutoCancel(true);
-		
-		mBuilder.setDefaults(Notification.DEFAULT_ALL);
-		
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-		
-		Intent activityIntent = new Intent(Intents.nics_VIEW_RESOURCE_REQUESTS_LIST);
-		activityIntent.setClassName("scout.edu.mit.ll.nics.android", "scout.edu.mit.ll.nics.android.MainActivity");
-		activityIntent.putExtra("selected_navigation_item", NavigationOptions.RESOURCEREQUEST.getValue());
-		if(payloads.size() == 1) {
-			activityIntent.putExtra("resreq_edit_json", payloads.get(0).toJsonString());
-		}
-		stackBuilder.addNextIntent(activityIntent);
-		
-		mBuilder.setContentIntent(stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT));
-		
-		mNotificationManager.notify(RESOURCE_REQUEST_NOTIFICATION_ID, mBuilder.build());
-	}
 
 	public void createAssignmentChangeNotification(AssignmentPayload payload) {
 		mBuilder.setContentTitle("NICS Assignment Change");
@@ -275,41 +161,7 @@ public class NotificationsHandler {
 		
 		mNotificationManager.notify(ASSIGNMENT_CHANGE_NOTIFICATION_ID, mBuilder.build());
 	}
-	
-	public void createWeatherReportNotification(ArrayList<WeatherReportPayload> payloads, long activeIncidentId) {
-		mBuilder.setContentTitle("NICS");
-		mBuilder.setContentText("Weather Report(s) Receieved");
 
-		for(WeatherReportPayload payload : payloads) {
-			if(payload.getIncidentId() == activeIncidentId) {
-				WeatherReportData data = payload.getMessageData();
-				mWeatherReportInboxStyle.addLine(data.getUser());
-				numberOfNewWeatherReports++;
-			}
-		}
-		
-		mBuilder.setNumber(numberOfNewWeatherReports);
-		mBuilder.setStyle(mWeatherReportInboxStyle);
-		
-		mBuilder.setAutoCancel(true);
-		
-		mBuilder.setDefaults(Notification.DEFAULT_ALL);
-		
-		TaskStackBuilder stackBuilder = TaskStackBuilder.create(mContext);
-		
-		Intent activityIntent = new Intent(Intents.nics_VIEW_WEATHER_REPORTS_LIST);
-		activityIntent.setClassName("scout.edu.mit.ll.nics.android", "scout.edu.mit.ll.nics.android.MainActivity");
-		activityIntent.putExtra("selected_navigation_item", NavigationOptions.WEATHERREPORT.getValue());
-		if(payloads.size() == 1) {
-			activityIntent.putExtra("wr_edit_json", payloads.get(0).toJsonString());
-		}
-		stackBuilder.addNextIntent(activityIntent);
-		
-		mBuilder.setContentIntent(stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT));
-		
-		mNotificationManager.notify(WEATHER_REPORT_NOTIFICATION_ID, mBuilder.build());
-	}
-	
 	public static NotificationsHandler getInstance(Context context) {
 		if(mNotificationsHandler == null) {
 			mContext = context;

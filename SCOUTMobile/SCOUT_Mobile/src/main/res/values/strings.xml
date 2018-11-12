@@ -72,6 +72,7 @@ Press Okay to close the application"</string>
 	<string name="FIELDREPORT">Field Report</string>
 	<string name="GENERALMESSAGE">Field Report</string>
 	<string name="WEATHERREPORT">Weather Report</string>
+	<string name="ROCFORM">ROC Form</string>
 	<string name="CATANREQUEST">Catan Request</string>
 	<string name="LOGOUT">Logout</string>
 	<string name="MAPCOLLABORATION">Map Collaboration</string>
@@ -309,4 +310,10 @@ Press Okay to close the application"</string>
 	<string name="about_google_display_name"></string>
 	<string name="about_legal_section_icons_display_name">Legal Notice - Icons</string>
 	<string name="about_icons_display_name"></string>
+	<!-- SECTION: ROC -->
+	<string name="roc_view">View</string>
+	<string name="roc_new">New</string>
+	<string name="roc_update">Update</string>
+	<string name="roc_final">Final</string>
+
 </resources>

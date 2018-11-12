@@ -67,26 +67,26 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight=".5"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/sr_imagebutton_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content">
 
             <Button
                 android:id="@+id/sr_capture_image_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
-                android:text="@string/capture_image" />
+                android:text="@string/capture_image"/>
 
             <Button
                 android:id="@+id/sr_browse_image_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
-                android:text="@string/browse_gallery" />
+                android:text="@string/browse_gallery"/>
         </LinearLayout>
 
         <TextView
@@ -95,7 +95,7 @@
             android:layout_height="wrap_content"
             android:text="@string/recipient"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <Spinner
             android:id="@+id/sr_category_spinner"
@@ -109,13 +109,13 @@
             android:layout_height="wrap_content"
             android:text="@string/location"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <LinearLayout
             android:id="@+id/sr_coordinate_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical" >
+            android:gravity="center_vertical">
 
             <EditText
                 android:id="@+id/sr_latitude_input"
@@ -126,9 +126,9 @@
                 android:hint="@string/markup_latitude"
                 android:inputType="numberDecimal|numberSigned"
                 android:nextFocusDown="@+id/sr_longitude_input"
-                android:textSize="14sp" >
+                android:textSize="14sp">
 
-                <requestFocus />
+                <requestFocus/>
             </EditText>
 
             <EditText
@@ -139,7 +139,7 @@
                 android:ems="5"
                 android:hint="@string/markup_longitude"
                 android:inputType="numberDecimal|numberSigned"
-                android:textSize="14sp" />
+                android:textSize="14sp"/>
 
             <ImageButton
                 android:id="@+id/sr_lrf0"
@@ -153,7 +153,7 @@
                 android:maxWidth="32dp"
                 android:minHeight="32dip"
                 android:minWidth="32dip"
-                android:src="@drawable/lrf" />
+                android:src="@drawable/lrf"/>
 
             <ImageButton
                 android:id="@+id/sr_mylocation0"
@@ -167,7 +167,7 @@
                 android:maxWidth="32dp"
                 android:minHeight="32dip"
                 android:minWidth="32dip"
-                android:src="@drawable/myloc" />
+                android:src="@drawable/myloc"/>
         </LinearLayout>
 
         <TextView
@@ -176,7 +176,7 @@
             android:layout_height="wrap_content"
             android:text="@string/message"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <EditText
             android:id="@+id/sr_description"
@@ -186,7 +186,7 @@
             android:ems="10"
             android:gravity="top"
             android:hint="@string/message"
-            android:inputType="textMultiLine" />
+            android:inputType="textMultiLine"/>
 
         <LinearLayout
             android:id="@+id/sr_submitbutton_layout"
@@ -194,7 +194,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:gravity="center_horizontal" >
+            android:gravity="center_horizontal">
 
             <Button
                 android:id="@+id/simpleReportSaveButton"
@@ -202,7 +202,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".5"
-                android:text="@string/button_save_draft" />
+                android:text="@string/button_save_draft"/>
 
             <Button
                 android:id="@+id/simpleReportSubmitButton"
@@ -210,7 +210,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".33"
-                android:text="@string/button_submit" />
+                android:text="@string/button_submit"/>
 
             <Button
                 android:id="@+id/simpleReportClearButton"
@@ -218,7 +218,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".33"
-                android:text="@string/button_clear" />
+                android:text="@string/button_clear"/>
         </LinearLayout>
     </LinearLayout>
 

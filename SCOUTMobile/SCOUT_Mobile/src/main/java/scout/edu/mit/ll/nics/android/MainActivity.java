@@ -69,26 +69,14 @@ import scout.edu.mit.ll.nics.android.api.RestClient;
 import scout.edu.mit.ll.nics.android.api.data.UserData;
 import scout.edu.mit.ll.nics.android.api.payload.CollabroomPayload;
 import scout.edu.mit.ll.nics.android.api.payload.OrganizationPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.DamageReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.FieldReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.WeatherReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.ResourceRequestPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
 import scout.edu.mit.ll.nics.android.fragments.ChatListFragment;
-import scout.edu.mit.ll.nics.android.fragments.DamageReportFragment;
-import scout.edu.mit.ll.nics.android.fragments.DamageReportListFragment;
-import scout.edu.mit.ll.nics.android.fragments.FieldReportFragment;
-import scout.edu.mit.ll.nics.android.fragments.FieldReportListFragment;
 import scout.edu.mit.ll.nics.android.fragments.MapMarkupLocationPickerFragment;
-import scout.edu.mit.ll.nics.android.fragments.WeatherReportFragment;
-import scout.edu.mit.ll.nics.android.fragments.WeatherReportListFragment;
+import scout.edu.mit.ll.nics.android.fragments.ReportOnConditionActionFragment;
 import scout.edu.mit.ll.nics.android.fragments.FormFragment;
-import scout.edu.mit.ll.nics.android.fragments.GarFragment;
 import scout.edu.mit.ll.nics.android.fragments.GeneralMessageFragment;
 import scout.edu.mit.ll.nics.android.fragments.MapMarkupFragment;
 import scout.edu.mit.ll.nics.android.fragments.OverviewFragment;
-import scout.edu.mit.ll.nics.android.fragments.ResourceRequestFragment;
-import scout.edu.mit.ll.nics.android.fragments.ResourceRequestListFragment;
 import scout.edu.mit.ll.nics.android.fragments.SimpleReportListFragment;
 import scout.edu.mit.ll.nics.android.utils.Constants;
 import scout.edu.mit.ll.nics.android.utils.Constants.NavigationOptions;
@@ -103,17 +91,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 	private static final String STATE_BACK_STACK = "back_stack";
 	private static final String STATE_REPORT_OPENED_FROM_MAP = "report_opened_from_map";
-	private static final String STATE_IS_EDIT_FIELD_REPORT = "is_edit_field_report";
-	private static final String STATE_IS_VIEW_FIELD_REPORT = "is_view_field_report";
-	private static final String STATE_IS_EDIT_DAMAGE_REPORT = "is_edit_damage_report";
-	private static final String STATE_IS_VIEW_DAMAGE_REPORT = "is_view_damage_report";
 	private static final String STATE_IS_EDIT_SIMPLE_REPORT = "is_edit_simple_report";
 	private static final String STATE_IS_VIEW_SIMPLE_REPORT = "is_view_simple_report";
-	private static final String STATE_IS_EDIT_RESOURCE_REQUEST = "is_edit_resource_request";
-	private static final String STATE_IS_VIEW_RESOURCE_REQUEST = "is_view_resource_request";
-	private static final String STATE_IS_EDIT_WEATHER_REPORT = "is_edit_weather_report";
-	private static final String STATE_IS_VIEW_WEATHER_REPORT = "is_view_weather_report";
-	
+
 	private int mLastPosition = NavigationOptions.OVERVIEW.getValue();
 	private FragmentManager mFragmentManager;
 	private Stack<Integer> mBackStack;
@@ -121,61 +101,31 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	private OverviewFragment mOverviewFragment;
 	public MapMarkupFragment mMapMarkupFragment;
 	private MapMarkupLocationPickerFragment mMapMarkupLocationPickerFragment;
-	
-	private DamageReportListFragment mDamageReportListFragment;
-	public DamageReportFragment mDamageReportFragment;
-	
+
 	private SimpleReportListFragment mSimpleReportListFragment;
 	public GeneralMessageFragment mSimpleReportFragment;
-	
-	private FieldReportListFragment mFieldReportListFragment;
-	public FieldReportFragment mFieldReportFragment;
-	
-	private ResourceRequestListFragment mResourceRequestListFragment;
-	public ResourceRequestFragment mResourceRequestFragment;
-	
-	private WeatherReportListFragment mWeatherReportListFragment;
-	public WeatherReportFragment mWeatherReportFragment;
+
+	private ReportOnConditionActionFragment mReportOnConditionActionFragment;
 	
 //	private ChatFragment mChatFragment;
 	private ChatListFragment mChatFragment;
 	
 	private FormFragment mUserInfoFragment;
-	
-	private GarFragment mGarFragment;
 
 	private static Context mContext;
 	
 	private boolean mIsBackKey = false;
-	public boolean mEditDamageReport = false;
-	public boolean mViewDamageReport = false;
-	public boolean mEditFieldReport = false;
-	public boolean mViewFieldReport = false;
 	public boolean mEditSimpleReport = false;
 	public boolean mViewSimpleReport = false;
-	public boolean mEditResourceRequest = false;
-	public boolean mViewResourceRequest = false;
-	public boolean mEditWeatherReport = false;
-	public boolean mViewWeatherReport = false;
 	public boolean mViewMapLocationPicker = false;
+
+	public boolean mViewReportOnConditionAction = false;
 	
 	private DataManager mDataManager;
-	
-	public String mOpenedDamageReportPayload;
-	public long mOpenedDamageReportId;
-	
+
 	public String mOpenedSimpleReportPayload;
 	public long mOpenedSimpleReportId;
-	
-	private String mOpenedFieldReportPayload;
-	private long mOpenedFieldReportId;
-	
-	private String mOpenedResourceRequestPayload;
-	private long mOpenedResourceRequestId;
-	
-	private String mOpenedWeatherReportPayload;
-	private long mOpenedWeatherReportId;
-	
+
 	private boolean mMapMarkupOpenTablet = false;
 	
 	private String[] navDropdownOptions;
@@ -214,14 +164,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 	
 	private String[] navOptionsAsArray() {
-	    NavigationOptions[] states = NavigationOptions.values();
-	    String[] names = new String[states.length];
+		NavigationOptions[] states = NavigationOptions.values();
+		String[] names = new String[states.length];
 
-	    for (int i = 0; i < states.length; i++) {
-	        names[i] = states[i].getLabel(this);
-	    }
+		for (int i = 0; i < states.length; i++) {
+			names[i] = states[i].getLabel(this);
+		}
 
-	    return names;
+		return names;
 	}
 	
 	public static Context getAppContext() {
@@ -271,35 +221,11 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				onNavigationItemSelected(NavigationOptions.LOGOUT.getValue(), -1);
 				mLastPosition = NavigationOptions.LOGOUT.getValue();
 			}
-			
-			mOpenedDamageReportPayload = intent.getStringExtra("dr_edit_json");
-			if(mOpenedDamageReportPayload != null) {
-				mViewDamageReport = true;
-				mEditDamageReport = false;
-			}
-			
+
 			mOpenedSimpleReportPayload = intent.getStringExtra("sr_edit_json");
 			if(mOpenedSimpleReportPayload != null) {
 				mViewSimpleReport = true;
 				mEditSimpleReport = false;
-			}
-			
-			mOpenedFieldReportPayload = intent.getStringExtra("fr_edit_json");
-			if(mOpenedFieldReportPayload != null) {
-				mViewFieldReport = true;
-				mEditFieldReport = false;
-			}
-			
-			mOpenedResourceRequestPayload = intent.getStringExtra("resreq_edit_json");
-			if(mOpenedResourceRequestPayload != null) {
-				mViewResourceRequest = true;
-				mEditResourceRequest = false;
-			}
-			
-			mOpenedWeatherReportPayload = intent.getStringExtra("wr_edit_json");
-			if(mOpenedWeatherReportPayload != null) {
-				mViewWeatherReport = true;
-				mEditWeatherReport = false;
 			}
 			
 			if(position != NavigationOptions.OVERVIEW.getValue()) {
@@ -355,15 +281,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		Builder mDialogBuilder = new AlertDialog.Builder(this);
 		mDialogBuilder.setTitle(R.string.select_an_organization);
 		mDialogBuilder.setMessage(null);
-	    mDialogBuilder.setPositiveButton(null, null);
-	    HashMap<String, OrganizationPayload> orgMap = mDataManager.getOrganizations();
-	    if(orgMap != null) {
-		    mOrgArray = new String[orgMap.size()];
-		    orgMap.keySet().toArray(mOrgArray);
-		    Arrays.sort(mOrgArray);
+		mDialogBuilder.setPositiveButton(null, null);
+		HashMap<String, OrganizationPayload> orgMap = mDataManager.getOrganizations();
+		if(orgMap != null) {
+			mOrgArray = new String[orgMap.size()];
+			orgMap.keySet().toArray(mOrgArray);
+			Arrays.sort(mOrgArray);
 			mDialogBuilder.setItems(mOrgArray, orgSelected);
 			mDialogBuilder.create().show();
-	    }
+		}
 	}
 	
 	DialogInterface.OnClickListener orgSelected = new DialogInterface.OnClickListener() {
@@ -510,23 +436,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		if(savedInstanceState.containsKey(STATE_REPORT_OPENED_FROM_MAP)) {
 			mReportOpenedFromMap = savedInstanceState.getBoolean(STATE_REPORT_OPENED_FROM_MAP);
 		}
-		
-		if(savedInstanceState.containsKey(STATE_IS_VIEW_DAMAGE_REPORT)) {
-			mViewDamageReport = savedInstanceState.getBoolean(STATE_IS_VIEW_DAMAGE_REPORT);
-		}
-		
-		if(savedInstanceState.containsKey(STATE_IS_EDIT_DAMAGE_REPORT)) {
-			mEditDamageReport = savedInstanceState.getBoolean(STATE_IS_EDIT_DAMAGE_REPORT);
-		}
-		
-		if(savedInstanceState.containsKey(STATE_IS_EDIT_FIELD_REPORT)) {
-			mEditFieldReport = savedInstanceState.getBoolean(STATE_IS_EDIT_FIELD_REPORT);
-		}
-		
-		if(savedInstanceState.containsKey(STATE_IS_VIEW_FIELD_REPORT)) {
-			mViewFieldReport = savedInstanceState.getBoolean(STATE_IS_VIEW_FIELD_REPORT);
-		}
-		
+
 		if(savedInstanceState.containsKey(STATE_IS_EDIT_SIMPLE_REPORT)) {
 			mEditSimpleReport = savedInstanceState.getBoolean(STATE_IS_EDIT_SIMPLE_REPORT);
 		}
@@ -535,60 +445,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			mViewSimpleReport = savedInstanceState.getBoolean(STATE_IS_VIEW_SIMPLE_REPORT);
 		}
 		
-		if(savedInstanceState.containsKey(STATE_IS_EDIT_RESOURCE_REQUEST)) {
-			mEditResourceRequest = savedInstanceState.getBoolean(STATE_IS_EDIT_RESOURCE_REQUEST);
-		}
-		
-		if(savedInstanceState.containsKey(STATE_IS_VIEW_RESOURCE_REQUEST)) {
-			mViewResourceRequest = savedInstanceState.getBoolean(STATE_IS_VIEW_RESOURCE_REQUEST);
-		}
-		
-		if(savedInstanceState.containsKey(STATE_IS_EDIT_WEATHER_REPORT)) {
-			mEditWeatherReport = savedInstanceState.getBoolean(STATE_IS_EDIT_WEATHER_REPORT);
-		}
-		
-		if(savedInstanceState.containsKey(STATE_IS_VIEW_WEATHER_REPORT)) {
-			mViewWeatherReport = savedInstanceState.getBoolean(STATE_IS_VIEW_WEATHER_REPORT);
-		}
-		
-		if(savedInstanceState.containsKey("dr_edit_json")) {
-			mOpenedDamageReportPayload = savedInstanceState.getString("dr_edit_json");
-		}
-		
-		if(savedInstanceState.containsKey("dr_edit_id")) {
-			mOpenedDamageReportId = savedInstanceState.getLong("dr_edit_id");
-		}
-		
 		if(savedInstanceState.containsKey("sr_edit_json")) {
 			mOpenedSimpleReportPayload = savedInstanceState.getString("sr_edit_json");
 		}
 		
 		if(savedInstanceState.containsKey("sr_edit_id")) {
 			mOpenedSimpleReportId = savedInstanceState.getLong("sr_edit_id");
-		}
-		
-		if(savedInstanceState.containsKey("fr_edit_json")) {
-			mOpenedFieldReportPayload = savedInstanceState.getString("fr_edit_json");
-		}
-		
-		if(savedInstanceState.containsKey("fr_edit_id")) {
-			mOpenedFieldReportId = savedInstanceState.getLong("fr_edit_id");
-		}
-		
-		if(savedInstanceState.containsKey("resreq_edit_json")) {
-			mOpenedResourceRequestPayload = savedInstanceState.getString("resreq_edit_json");
-		}
-		
-		if(savedInstanceState.containsKey("resreq_edit_id")) {
-			mOpenedResourceRequestId = savedInstanceState.getLong("resreq_edit_id");
-		}
-		
-		if(savedInstanceState.containsKey("wr_edit_json")) {
-			mOpenedWeatherReportPayload = savedInstanceState.getString("wr_edit_json");
-		}
-		
-		if(savedInstanceState.containsKey("wr_edit_id")) {
-			mOpenedWeatherReportId = savedInstanceState.getLong("wr_edit_id");
 		}
 		
 		// Restore the previously serialized current dropdown position.
@@ -610,17 +472,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		outState.putIntegerArrayList(STATE_BACK_STACK, list);
 		
 		outState.putBoolean(STATE_REPORT_OPENED_FROM_MAP, mReportOpenedFromMap);
-		outState.putBoolean(STATE_IS_EDIT_DAMAGE_REPORT, mEditDamageReport);
-		outState.putBoolean(STATE_IS_VIEW_DAMAGE_REPORT, mViewDamageReport);
-		outState.putBoolean(STATE_IS_EDIT_FIELD_REPORT, mEditFieldReport);
-		outState.putBoolean(STATE_IS_VIEW_FIELD_REPORT, mViewFieldReport);
 		outState.putBoolean(STATE_IS_EDIT_SIMPLE_REPORT, mEditSimpleReport);
 		outState.putBoolean(STATE_IS_VIEW_SIMPLE_REPORT, mViewSimpleReport);
-		outState.putBoolean(STATE_IS_EDIT_RESOURCE_REQUEST, mEditResourceRequest);
-		outState.putBoolean(STATE_IS_VIEW_RESOURCE_REQUEST, mViewResourceRequest);
-		outState.putBoolean(STATE_IS_EDIT_WEATHER_REPORT, mEditWeatherReport);
-		outState.putBoolean(STATE_IS_VIEW_WEATHER_REPORT, mViewWeatherReport);
-		
+
 		if(mSimpleReportFragment != null) {
 			mOpenedSimpleReportPayload = mSimpleReportFragment.getPayload().toJsonString();
 			mOpenedSimpleReportId = mSimpleReportFragment.getReportId();
@@ -630,46 +484,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			outState.putString("sr_edit_json", mOpenedSimpleReportPayload);
 			outState.putLong("sr_edit_id", mOpenedSimpleReportId);
 		}
-		
-		if(mDamageReportFragment != null) {
-			mOpenedDamageReportPayload = mDamageReportFragment.getPayload().toJsonString();
-			mOpenedDamageReportId = mDamageReportFragment.getReportId();
-		}
-		
-		if(mOpenedDamageReportPayload != null) {
-			outState.putString("dr_edit_json", mOpenedDamageReportPayload);
-			outState.putLong("dr_edit_id", mOpenedDamageReportId);
-		}
-		
-		if(mFieldReportFragment != null) {
-			mOpenedFieldReportPayload = mFieldReportFragment.getPayload().toJsonString();
-			mOpenedFieldReportId = mFieldReportFragment.getReportId();
-		}
-		
-		if(mOpenedFieldReportPayload != null) {
-			outState.putString("fr_edit_json", mOpenedFieldReportPayload);
-			outState.putLong("fr_edit_id", mOpenedFieldReportId);
-		}
-		
-		if(mResourceRequestFragment != null) {
-			mOpenedResourceRequestPayload = mResourceRequestFragment.getPayload().toJsonString();
-			mOpenedResourceRequestId = mResourceRequestFragment.getReportId();
-		}
-		
-		if(mOpenedResourceRequestPayload != null) {
-			outState.putString("resreq_edit_json", mOpenedResourceRequestPayload);
-			outState.putLong("resreq_edit_id", mOpenedResourceRequestId);
-		}
-		
-		if(mWeatherReportFragment != null) {
-			mOpenedWeatherReportPayload = mWeatherReportFragment.getPayload().toJsonString();
-			mOpenedWeatherReportId = mWeatherReportFragment.getReportId();
-		}
-		
-		if(mOpenedWeatherReportPayload != null) {
-			outState.putString("wr_edit_json", mOpenedWeatherReportPayload);
-			outState.putLong("wr_edit_id", mOpenedWeatherReportId);
-		}
+
 	}
 
 	@Override
@@ -709,220 +524,66 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		mViewSimpleReport = false;
 	}
 
-	public void addDamageReportToDetailView(boolean isCopy){
-		if(mDamageReportFragment == null) {
-			mDamageReportFragment = new DamageReportFragment();
-		}
-		if(mDataManager.getTabletLayoutOn() && mMapMarkupOpenTablet){
-			animateFragmentReplace(R.id.container2, mDamageReportFragment,false);
-		}else{
-			animateFragmentReplace(R.id.container, mDamageReportFragment,false);
-		}
-		mFragmentManager.executePendingTransactions();
-		
-		if(isCopy){
-			mDamageReportFragment.populate(mDamageReportFragment.getFormString(), -1L, true);
-		}else{
-			mDamageReportFragment.populate(mDataManager.getIncidentInfoJson(), -1L, true);
-		}
-		mOpenedDamageReportPayload = mDamageReportFragment.getPayload().toJsonString();
-		mOpenedDamageReportId = -1;
-		
-		mEditDamageReport = true;
-		mViewDamageReport = false;
-	}
-	
-	public void addWeatherReportToDetailView(boolean isCopy){
-		if(mWeatherReportFragment == null) {
-			mWeatherReportFragment = new WeatherReportFragment();
-		}
-		if(mDataManager.getTabletLayoutOn() && mMapMarkupOpenTablet){
-			animateFragmentReplace(R.id.container2, mWeatherReportFragment,false);
-		}else{
-			animateFragmentReplace(R.id.container, mWeatherReportFragment,false);
-		}
-		mFragmentManager.executePendingTransactions();
-		
-		if(isCopy){
-			mWeatherReportFragment.populate(mWeatherReportFragment.getFormString(), -1L, true);
-		}else{
-			mWeatherReportFragment.populate(mDataManager.getIncidentInfoJson(), -1L, true);
-		}
-		mOpenedWeatherReportPayload = mWeatherReportFragment.getPayload().toJsonString();
-		mOpenedWeatherReportId = -1;
-		
-		mEditWeatherReport = true;
-		mViewWeatherReport = false;
-	}
-	
-	public void addFieldReportToDetailView(boolean isCopy){
-		if(mFieldReportFragment == null) {
-			mFieldReportFragment = new FieldReportFragment();
-		}
-		if(mDataManager.getTabletLayoutOn() && mMapMarkupOpenTablet){
-			animateFragmentReplace(R.id.container2, mFieldReportFragment,false);
-		}else{
-			animateFragmentReplace(R.id.container, mFieldReportFragment,false);
-		}
-		mFragmentManager.executePendingTransactions();
-		
-		if(isCopy){
-			mFieldReportFragment.populate(mFieldReportFragment.getFormString(), -1L, true);
-		}else{
-			mFieldReportFragment.populate(mDataManager.getIncidentInfoJson(), -1L, true);
-		}
-		mOpenedFieldReportPayload = mFieldReportFragment.getPayload().toJsonString();
-		mOpenedFieldReportId = -1;
-		
-		mEditFieldReport = true;
-		mViewFieldReport = false;
-	}
-	
-	public void addResourceRequestToDetailView(boolean isCopy){
-		if(mResourceRequestFragment == null) {
-			mResourceRequestFragment = new ResourceRequestFragment();
-		}
-		
-		if(mDataManager.getTabletLayoutOn() && mMapMarkupOpenTablet){
-			animateFragmentReplace(R.id.container2, mResourceRequestFragment,false);
-		}else{
-			animateFragmentReplace(R.id.container, mResourceRequestFragment,false);
-		}
-		mFragmentManager.executePendingTransactions();
-		
-		if(isCopy){
-			mResourceRequestFragment.populate(mResourceRequestFragment.getFormString(), -1L, true);
-		}else{
-			mResourceRequestFragment.populate(mDataManager.getIncidentInfoJson(), -1L, true);
-		}
-		mOpenedResourceRequestPayload = mResourceRequestFragment.getPayload().toJsonString();
-		mOpenedResourceRequestId = -1;
-		
-		mEditResourceRequest = true;
-		mViewResourceRequest = false;
-	}
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	    	case android.R.id.home:
-	    		onNavigationItemSelected(NavigationOptions.OVERVIEW.getValue(), -1);
-	    		break;
-	        case R.id.action_settings:
+		// Handle item selection
+		switch (item.getItemId()) {
+			case android.R.id.home:
+				onNavigationItemSelected(NavigationOptions.OVERVIEW.getValue(), -1);
+				break;
+			case R.id.action_settings:
 				Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
 				if(mDataManager.getSelectedCollabRoom().getCollabRoomId() == -1) {
-			        intent.putExtra("hideGarCollab", true);
+					intent.putExtra("hideGarCollab", true);
 				}
 				
-		        intent.putExtra("currentServer", mDataManager.getServer());
+				intent.putExtra("currentServer", mDataManager.getServer());
 				startActivityForResult(intent, 1001);
-		        break;
-		        
-	        case R.id.action_logout:
-	        	onNavigationItemSelected(NavigationOptions.LOGOUT.getValue(), -1);
-	        	break;
-	        	
-	        case R.id.action_help:
-	        	
-	        	Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://public.nics.ll.mit.edu/nicshelp/"));
-	        	startActivity(browserIntent);
-	        	
-	        	break;
-	        	
-	        case R.id.action_about:
-	        	intent = new Intent(MainActivity.this, AboutActivity.class);
+				break;
+
+			case R.id.action_logout:
+				onNavigationItemSelected(NavigationOptions.LOGOUT.getValue(), -1);
+				break;
+
+			case R.id.action_help:
+
+				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://public.nics.ll.mit.edu/nicshelp/"));
+				startActivity(browserIntent);
+
+				break;
+
+			case R.id.action_about:
+				intent = new Intent(MainActivity.this, AboutActivity.class);
 				startActivity(intent);
 				break;
-		        
-	        case R.id.addDamageReportOption:
-	        	addDamageReportToDetailView(false);
-				break;
-				
-	        case R.id.addFieldReportOption:
-	        	addFieldReportToDetailView(false);
-				break;
-				
-	        case R.id.addSimpleReportOption:
-	        	addSimpleReportToDetailView(false);
-				break;
-				
-	        case R.id.addWeatherReportOption:
-	        	addWeatherReportToDetailView(false);
-				break;
-												
-	        case R.id.markAllSrAsRead:
-	        	mSimpleReportListFragment.MarkAllMessagesAsRead();
-	        	break;
-	        case R.id.markAllDrAsRead:
-	        	mDamageReportListFragment.MarkAllMessagesAsRead();
-	        	break;
-	        case R.id.markAllWrAsRead:
-	        	mWeatherReportListFragment.MarkAllMessagesAsRead();
-	        	break;
-	        case R.id.markAllFrAsRead:
-//	        	mFieldReportListFragment.MarkAllMessagesAsRead();
-	        	break;
-	        case R.id.markAllResReqAsRead:
-//	        	mResourceRequestListFragment.MarkAllMessagesAsRead();
-	        	break;
-	        case R.id.addResourceRequestOption:
-	        	addResourceRequestToDetailView(false);
-				break;
-				
-	        case R.id.copyDamageReportOption:
-	        	addDamageReportToDetailView(true);
-				break;
-				
-	        case R.id.copyGeneralMessageOption:
-	        	addSimpleReportToDetailView(true);
-				break;
-				
-	        case R.id.copyFieldReportOption:
-	        	addFieldReportToDetailView(true);
-				break;
-				
-	        case R.id.copyWeatherReportOption:
-	        	addWeatherReportToDetailView(true);
-				break;
-								
-	        case R.id.refreshSimpleReportOption:
-	        	mDataManager.requestSimpleReports();
-				break;
-	        case R.id.refreshDamageReportOption:
-	        	mDataManager.requestDamageReports();
-				break;
-	        case R.id.refreshWeatherReportOption:
-	        	mDataManager.requestWeatherReports();
-				break;
-	        case R.id.refreshFieldReportOption:
-	        	mDataManager.requestFieldReports();
-				break;
-	        case R.id.refreshResourceRequestOption:
-	        	mDataManager.requestResourceRequests();
-				break;
-	        case R.id.refreshChatMessagesOption:
-	        	mDataManager.requestChatHistory(mDataManager.getActiveIncidentId(), mDataManager.getSelectedCollabRoom().getCollabRoomId());
-				break;
-	        case R.id.refreshMapOption:
-	        	mDataManager.requestMarkupUpdate();
+
+			case R.id.addSimpleReportOption:
+				addSimpleReportToDetailView(false);
 				break;
 
+			case R.id.markAllSrAsRead:
+				mSimpleReportListFragment.MarkAllMessagesAsRead();
+				break;
+			case R.id.copyGeneralMessageOption:
+				addSimpleReportToDetailView(true);
+				break;
+			case R.id.refreshSimpleReportOption:
+				mDataManager.requestSimpleReports();
+				break;
+			case R.id.refreshChatMessagesOption:
+				mDataManager.requestChatHistory(mDataManager.getActiveIncidentId(), mDataManager.getSelectedCollabRoom().getCollabRoomId());
+				break;
+			case R.id.refreshMapOption:
+				mDataManager.requestMarkupUpdate();
+				break;
 			case R.id.action_switch_orgs:
-	        	showOrgSelector();
-	        	break;
-	        	
+				showOrgSelector();
+				break;
 			case R.id.action_low_data_mode:
-					
 				mDataManager.setLowDataMode(!mDataManager.getLowDataMode());
-				if(mDataManager.getLowDataMode()){
-					LowDataModeIcon.setIcon(R.drawable.stat_sys_r_signal_1_cdma);
-				}else{
-					LowDataModeIcon.setIcon(R.drawable.stat_sys_r_signal_4_cdma);
-				}
-		        break;
-	    }
-
+				LowDataModeIcon.setIcon( mDataManager.getLowDataMode() ? R.drawable.stat_sys_r_signal_1_cdma : R.drawable.stat_sys_r_signal_4_cdma);
+				break;
+		}
 		return super.onOptionsItemSelected(item);
 	}
  
@@ -943,18 +604,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			}
 		}
 		
-		if(mEditDamageReport || mViewDamageReport) {
-			if(mDamageReportFragment == null && mOpenedDamageReportPayload != null) {
-				DamageReportPayload payload = new Gson().fromJson(mOpenedDamageReportPayload, DamageReportPayload.class);
-				payload.parse();
-				
-				openDamageReport(payload, mEditDamageReport);
-			}
-			
-			if(mDamageReportFragment != null) {
-				mDamageReportFragment.onActivityResult(requestCode, resultCode, data);
-			}
-		}
 		if(mEditSimpleReport || mViewSimpleReport) {
 			if(mSimpleReportFragment == null && mOpenedSimpleReportPayload != null) {
 				SimpleReportPayload payload = new Gson().fromJson(mOpenedSimpleReportPayload, SimpleReportPayload.class);
@@ -979,21 +628,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		boolean prompt = false;
 		
 		if(position == mLastPosition && id == -2) {
-			if(mEditFieldReport) {
-				mEditFieldReport = false;
-			} else if(mEditSimpleReport) {
+			if(mEditSimpleReport) {
 				mEditSimpleReport = false;
-			} else if(mEditResourceRequest) {
-				mEditResourceRequest = false;
-			} else if(mEditDamageReport) {
-				mEditDamageReport = false;
-			}else if(mEditWeatherReport) {
-				mEditWeatherReport = false;
 			}
 		}
-		
+
+		// Prompting the user that their report progress will be lost if they continue
 		if(!isEditReport()) {
-	    	mPreventNavigation = false;
+			mPreventNavigation = false;
 		} else if(position == mLastPosition && position == id) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -1001,21 +643,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			String title = getString(R.string.exit_report_draft_dialog_title);
 			String message = getString(R.string.exit_report_draft_dialog_msg);
 
-			if(mEditFieldReport) {
+			 if(mEditSimpleReport) {
 				prompt = true;
-		//		message = String.format(message, getString(R.string.FIELDREPORT));
-			} else if(mEditSimpleReport) {
-				prompt = true;
-		//		message = String.format(message, getString(R.string.GENERALMESSAGE));
-			} else if(mEditResourceRequest) {
-				prompt = true;
-		//		message = String.format(message, getString(R.string.RESOURCEREQUEST));
-			} else if(mEditDamageReport) {
-				prompt = true;
-		//		message = String.format(message, getString(R.string.DAMAGESURVEY));
-			}else if(mEditWeatherReport) {
-				prompt = true;
-		//		message = String.format(message, getString(R.string.WEATHERREPORT));
 			}
 
 			if(prompt) {
@@ -1030,44 +659,34 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 							public void onClick(DialogInterface dialog, int id)
 							{
 								mPreventNavigation = false;
-
-								mEditDamageReport = false;
-								mEditFieldReport = false;
-								mEditResourceRequest = false;
 								mEditSimpleReport = false;
-								mEditWeatherReport = false;
 								onNavigationItemSelected(position, id);
 							}
 						});
 
 				// Save draft and close button
 				builder.setPositiveButton(R.string.exit_report_draft_dialog_save, new DialogInterface.OnClickListener() {
-		            public void onClick(DialogInterface dialog, int id) {
-		            	mPreventNavigation = false;
-		            	
-		            	mEditDamageReport = false;
-		            	mEditFieldReport = false;
-		            	mEditResourceRequest = false;
-		            	mEditSimpleReport = false;
-		            	mEditWeatherReport = false; 
-		            	onNavigationItemSelected(position, id);
+					public void onClick(DialogInterface dialog, int id) {
+						mPreventNavigation = false;
+						mEditSimpleReport = false;
+						onNavigationItemSelected(position, id);
 
 						// This saves a simpleReport draft, but this code is only ever called from a simpleReport
 						// SimpleReport draft applies to GeneralMessages (which have been renamed to Field Reports)
 						mSimpleReportFragment.saveDraft();
-		            }
-		        });
+					}
+				});
 
 				// Continue editing button
 				builder.setNegativeButton(R.string.exit_report_draft_dialog_cancel, new DialogInterface.OnClickListener() {
 
 					public void onClick(DialogInterface dialog, int id) {
-		            	dialog.dismiss();
-		            	mPreventNavigation  = true;
+						dialog.dismiss();
+						mPreventNavigation  = true;
 
 						onNavigationItemSelected(mLastPosition, -1);
-		            }
-		        });
+					}
+				});
 				
 				final AlertDialog alertdialog = builder.create();
 
@@ -1093,14 +712,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			}
 		}
 		
-		
+
+		// Creating the view fragment
 		if(!prompt && !mPreventNavigation) {
 			Fragment fragment = null;
 			Fragment fragment2 = null;
 			Fragment fragmentOverview = null;
 			
-			Fragment currentFragment = (Fragment) mFragmentManager.findFragmentById(R.id.container);
-			Fragment currentFragment2 = (Fragment) mFragmentManager.findFragmentById(R.id.container2);
+			Fragment currentFragment = mFragmentManager.findFragmentById(R.id.container);
+			Fragment currentFragment2 = mFragmentManager.findFragmentById(R.id.container2);
 			
 			if(mMapMarkupFragment != null && !mMapMarkupFragment.isVisible()) {
 				mMapMarkupFragment.removeMapFragment();
@@ -1108,12 +728,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			
 			mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), false);
 			mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), false);
-			mDataManager.requestDamageReportRepeating(mDataManager.getIncidentDataRate(), false);
-			mDataManager.requestFieldReportRepeating(mDataManager.getIncidentDataRate(), false);
 			mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), false);
-			mDataManager.requestResourceRequestRepeating(mDataManager.getIncidentDataRate(), false);
-			mDataManager.requestWeatherReportRepeating(mDataManager.getIncidentDataRate(), false);
-			
+
 			boolean showIncidentName = false;
 
 			String viewTitle = null;
@@ -1173,145 +789,66 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					showIncidentName = true;
 					
 					break;
-					
-				case FIELDREPORT:
-					if(currentFragment != null && currentFragment2 != null ){
-						if(currentFragment == mFieldReportFragment && currentFragment2 ==  mFieldReportListFragment){
-							break;
-						}
+
+				case ROCFORM:
+					//TODO create the ROC form fragment
+					if(currentFragment != null && currentFragment2 != null )
+					{
+						// If we're already on the page, stop.
+						//FIXME: add ROCFORM fragment
+						//if(currentFragment == mSimpleReportFragment && currentFragment2 ==  mSimpleReportListFragment)
+						//{
+						//	break;
+						//}
 					}
-					
-					if(mFieldReportListFragment == null) {
-						mFieldReportListFragment = new FieldReportListFragment();
+					if(mReportOnConditionActionFragment == null) {
+						mReportOnConditionActionFragment = new ReportOnConditionActionFragment();
 					}
-					fragment2 = mFieldReportListFragment;
-					viewTitle = getString(R.string.fragment_title_field_report);
-					
+
+					//viewTitle = getString(R.string.fragment_title_field_report);
+
 					//if using tablet view and map is closed
 					//set detail view on left side
-					if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet){
-						
-						FieldReportPayload payload = new Gson().fromJson(mOpenedFieldReportPayload, FieldReportPayload.class);
-						if(payload == null){
-							payload = mDataManager.getLastFieldReportPayload();
+					fragment = mReportOnConditionActionFragment;
+					/*if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet)
+					{
+
+						SimpleReportPayload payload = new Gson().fromJson(mOpenedSimpleReportPayload, SimpleReportPayload.class);
+						if(payload == null)
+						{
+							payload = mDataManager.getLastSimpleReportPayload();
 						}
-						if(payload == null){
-							addFieldReportToDetailView(false);
-						}else{
+						if(payload == null)
+						{
+							addSimpleReportToDetailView(false);
+						}
+						else
+						{
 							payload.parse();
-							openFieldReport(payload, mEditFieldReport);
+							openSimpleReport(payload, mEditSimpleReport);
 						}
-						
+
 						mBackStack.clear();
-					}else if((mViewFieldReport || mEditFieldReport) && mOpenedFieldReportPayload != null) {
-						FieldReportPayload payload = new Gson().fromJson(mOpenedFieldReportPayload, FieldReportPayload.class);
+					}
+					else if((mViewSimpleReport || mEditSimpleReport) && mOpenedSimpleReportPayload != null)
+					{
+						SimpleReportPayload payload = new Gson().fromJson(mOpenedSimpleReportPayload, SimpleReportPayload.class);
 						payload.parse();
-						
-						openFieldReport(payload, mEditFieldReport);
-						if(!mMapMarkupOpenTablet && mDataManager.getTabletLayoutOn()){
-							fragment = mFieldReportListFragment;
+
+						openSimpleReport(payload, this.mEditSimpleReport);
+						if(!mMapMarkupOpenTablet && mDataManager.getTabletLayoutOn())
+						{
+							fragment = mSimpleReportListFragment;
 							mBackStack.clear();
-						}else{
-							fragment2 = mFieldReportFragment;
 						}
-					}
-					mDataManager.requestFieldReportRepeating(mDataManager.getIncidentDataRate(), false);
-					showIncidentName = true;
-					
-					break;
-					
-				case DAMAGESURVEY:
-					
-					if(currentFragment != null && currentFragment2 != null ){
-						if(currentFragment == mDamageReportFragment && currentFragment2 ==  mDamageReportListFragment){
-							break;
+						else
+						{
+							fragment2 = mSimpleReportFragment;
 						}
-					}
-					
-					if(mDamageReportListFragment == null) {
-						mDamageReportListFragment = new DamageReportListFragment();
-					}
-					fragment2 = mDamageReportListFragment;
-					viewTitle = getString(R.string.fragment_title_damage_report);
-					
-					//if using tablet view and map is closed
-					//set detail view on left side
-					if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet){
-						
-						DamageReportPayload payload = new Gson().fromJson(mOpenedDamageReportPayload, DamageReportPayload.class);
-						if(payload == null){
-							payload = mDataManager.getLastDamageReportPayload();
-						}
-						if(payload == null){
-							addDamageReportToDetailView(false);
-						}else{
-							payload.parse();
-							openDamageReport(payload, mEditDamageReport);
-						}
-						
-						mBackStack.clear();
-					}else if((mViewDamageReport || mEditDamageReport) && mOpenedDamageReportPayload != null) {
-						DamageReportPayload payload = new Gson().fromJson(mOpenedDamageReportPayload, DamageReportPayload.class);
-						payload.parse();
-						
-						openDamageReport(payload, mEditDamageReport);
-						if(!mMapMarkupOpenTablet && mDataManager.getTabletLayoutOn()){
-							fragment = mDamageReportListFragment;
-							mBackStack.clear();
-						}else{
-							fragment2 = mDamageReportFragment;
-						}
-					}
-					mDataManager.requestDamageReportRepeating(mDataManager.getIncidentDataRate(), false);
-					showIncidentName = true;
-					
-					break;
-					
-				case WEATHERREPORT:
-					
-					if(currentFragment != null && currentFragment2 != null ){
-						if(currentFragment == mWeatherReportFragment && currentFragment2 ==  mWeatherReportListFragment){
-							break;
-						}
-					}
-					if(mWeatherReportListFragment == null) {
-						mWeatherReportListFragment = new WeatherReportListFragment();
-					}
-					fragment2 = mWeatherReportListFragment;
-					viewTitle = getString(R.string.fragment_title_weather_report);
-					
-					//if using tablet view and map is closed
-					//set detail view on left side
-					if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet){
-						
-						WeatherReportPayload payload = new Gson().fromJson(mOpenedWeatherReportPayload, WeatherReportPayload.class);
-						if(payload == null){
-							payload = mDataManager.getLastWeatherReportPayload();
-						}
-						if(payload == null){
-							addWeatherReportToDetailView(false);
-						}else{
-							payload.parse();
-							openWeatherReport(payload, mEditWeatherReport);
-						}
-						
-						mBackStack.clear();
-						
-					}else if((mViewWeatherReport || mEditWeatherReport) && mOpenedWeatherReportPayload != null) {
-						WeatherReportPayload payload = new Gson().fromJson(mOpenedWeatherReportPayload, WeatherReportPayload.class);
-						payload.parse();
-						
-						openWeatherReport(payload, mEditWeatherReport);
-						if(!mMapMarkupOpenTablet && mDataManager.getTabletLayoutOn()){
-							fragment = mWeatherReportListFragment;
-							mBackStack.clear();
-						}else{
-							fragment2 = mWeatherReportFragment;
-						}
-					}
-					mDataManager.requestWeatherReportRepeating(mDataManager.getIncidentDataRate(), false);
-					showIncidentName = true;
-					
+					}*/
+					//TODO - dataManager request roc forms
+					//mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), false);
+					//showIncidentName = true;
 					break;
 				case MAPCOLLABORATION:
 					if(mMapMarkupFragment == null) {
@@ -1357,66 +894,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					}
 					
 					break;
-				case RESOURCEREQUEST:
-
-					if(currentFragment != null && currentFragment2 != null ){
-						if(currentFragment == mResourceRequestFragment && currentFragment2 ==  mResourceRequestListFragment){
-							break;
-						}
-					}
-					if(mResourceRequestListFragment == null) {
-						mResourceRequestListFragment = new ResourceRequestListFragment();
-					}
-					fragment2 = mResourceRequestListFragment;
-					
-					//if using tablet view and map is closed
-					//set detail view on left side
-					if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet){
-						
-						ResourceRequestPayload payload = new Gson().fromJson(mOpenedResourceRequestPayload, ResourceRequestPayload.class);
-						if(payload == null){
-							payload = mDataManager.getLastResourceRequestPayload();
-						}
-						if(payload == null){
-							addResourceRequestToDetailView(false);
-						}else{
-							payload.parse();
-							openResourceRequest(payload, mEditResourceRequest);
-						}
-						
-						mBackStack.clear();
-						
-					}else if((mViewResourceRequest || mEditResourceRequest) && mOpenedResourceRequestPayload != null) {
-						ResourceRequestPayload payload = new Gson().fromJson(mOpenedResourceRequestPayload, ResourceRequestPayload.class);
-						payload.parse();
-						
-						openResourceRequest(payload, mEditResourceRequest);
-						if(!mMapMarkupOpenTablet && mDataManager.getTabletLayoutOn()){
-							fragment = mResourceRequestListFragment;
-							mBackStack.clear();
-						}else{
-							fragment2 = mResourceRequestFragment;
-						}
-					}
-					mDataManager.requestResourceRequestRepeating(mDataManager.getIncidentDataRate(), false);
-					showIncidentName = true;
-					
-					break;
-				case GAR:
-					if(mGarFragment == null) {
-						mGarFragment = new GarFragment();
-					}
-					fragment2 = mGarFragment;
-					break;
 				
 				case SELECTINCIDENT:
 					mBackStack.clear();
 					Intent selectIncidentIntent = new Intent(MainActivity.this, LoginActivity.class);
 					selectIncidentIntent.putExtra("hideSplash", true);
 					selectIncidentIntent.putExtra("showIncidentSelect", true);
-			        startActivity(selectIncidentIntent);
-			        finish();
-			        break;
+					startActivity(selectIncidentIntent);
+					finish();
+					break;
 					
 				case LOGOUT:
 					mDataManager.setLoggedIn(false);
@@ -1435,10 +921,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 //					} else {
 						Intent intent = new Intent(MainActivity.this, LoginActivity.class);
 						intent.putExtra("hideSplash", true);
-				        startActivity(intent);
+						startActivity(intent);
 //					}
-			        break;
-			        
+					break;
+
 				default:
 					break;
 			}
@@ -1446,37 +932,53 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			try {
 				if(fragment != null) {
 					if( mDataManager.getTabletLayoutOn()){
-						if(mMapMarkupOpenTablet){
+						if(mMapMarkupOpenTablet)
+						{
 							animateFragmentReplace(R.id.container, fragment,true);
-						}else{
-							if(fragment == mMapMarkupFragment){
+						}
+						else
+						{
+							if(fragment == mMapMarkupFragment)
+							{
 								checkForOpenReportsAndSwapContainer();
 							}
 						}
-					}else{
+					}
+					else
+					{
 						animateFragmentReplace(R.id.container, fragment,true);
 					}
 				}
-				if(fragment2 != null) {
-					if(mDataManager.getTabletLayoutOn()){
+				if(fragment2 != null)
+				{
+					if(mDataManager.getTabletLayoutOn())
+					{
 						animateFragmentReplace(R.id.container2, fragment2,true);
-					}else{
+					}
+					else
+					{
 						animateFragmentReplace(R.id.container, fragment2,true);
 					}
 				}
-				if(fragmentOverview != null){
-					if(mDataManager.getTabletLayoutOn()){
+				if(fragmentOverview != null)
+				{
+					if(mDataManager.getTabletLayoutOn())
+					{
 						animateFragmentReplace(R.id.containerOverview, fragmentOverview,true);
-					}else{
+					}
+					else
+					{
 						animateFragmentReplace(R.id.container, fragmentOverview,true);
 					}					
 				}
-			} catch (Exception ex) {
+			} catch (Exception ex)
+			{
 				Log.e("nics", ex.toString());
 			}
 			
 			// Have to wait for view to exist before populating data
-			if(position == NavigationOptions.USERINFO.getValue()) {
+			if(position == NavigationOptions.USERINFO.getValue())
+			{
 				final Handler handler = new Handler();
 				handler.postDelayed(new Runnable() {
 				  @Override
@@ -1487,25 +989,34 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				}, 200);
 			}
 			
-			if(position != NavigationOptions.MAPCOLLABORATION.getValue()) {
+			if(position != NavigationOptions.MAPCOLLABORATION.getValue())
+			{
 				mDataManager.stopPollingMarkup();
 			}
 	
-			if(position != mLastPosition && !mIsBackKey ) {
+			if(position != mLastPosition && !mIsBackKey )
+			{
 				mBackStack.push(mLastPosition);
 				mLastPosition = position;
-			} else {
+			} else
+			{
 				mIsBackKey = false;
 				mLastPosition = position;
 			}
 
 			//Set the view title depending on what view we are in
-			if(mBreadcrumbTextView != null) {
-				if (position == NavigationOptions.OVERVIEW.getValue()) {
+			if(mBreadcrumbTextView != null)
+			{
+				if (position == NavigationOptions.OVERVIEW.getValue())
+				{
 					clearViewTitle();
-				} else {
+				}
+				else
+				{
 					if(viewTitle != null)
+					{
 						setViewTitle(viewTitle);
+					}
 
 					if(showIncidentName)
 					{
@@ -1572,50 +1083,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			} else {
 				onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), NavigationOptions.GENERALMESSAGE.getValue());
 			}
-		} else if(mEditFieldReport || mViewFieldReport) {
-			mViewFieldReport = false;
-			mOpenedFieldReportPayload = null;
-			mOpenedFieldReportId = -1;
-			if( mReportOpenedFromMap) {
-				mReportOpenedFromMap = false;
-				mBackStack.pop();
-				onNavigationItemSelected(NavigationOptions.MAPCOLLABORATION.getValue(), -1);
-			} else {
-				onNavigationItemSelected(NavigationOptions.FIELDREPORT.getValue(), NavigationOptions.FIELDREPORT.getValue());
-			}
-		} else if(mEditWeatherReport || mViewWeatherReport) {
-			mViewWeatherReport = false;
-			mOpenedWeatherReportPayload = null;
-			mOpenedWeatherReportId = -1;
-			if( mReportOpenedFromMap) {
-				mReportOpenedFromMap = false;
-				mBackStack.pop();
-				onNavigationItemSelected(NavigationOptions.MAPCOLLABORATION.getValue(), -1);
-			} else {
-				onNavigationItemSelected(NavigationOptions.WEATHERREPORT.getValue(), NavigationOptions.WEATHERREPORT.getValue());
-			}
-		}  else if(mEditResourceRequest || mViewResourceRequest) {
-			mViewResourceRequest = false;
-			mOpenedResourceRequestPayload = null;
-			mOpenedResourceRequestId = -1;
-			if( mReportOpenedFromMap) {
-				mReportOpenedFromMap = false;
-				mBackStack.pop();
-				onNavigationItemSelected(NavigationOptions.MAPCOLLABORATION.getValue(), -1);
-			} else {
-				onNavigationItemSelected(NavigationOptions.RESOURCEREQUEST.getValue(), NavigationOptions.RESOURCEREQUEST.getValue());
-			}
-		} else if(mEditDamageReport || mViewDamageReport) {
-			mViewDamageReport = false;
-			mOpenedDamageReportPayload = null;
-			mOpenedDamageReportId = -1;
-			if( mReportOpenedFromMap) {
-				mReportOpenedFromMap = false;
-				mBackStack.pop();
-				onNavigationItemSelected(NavigationOptions.MAPCOLLABORATION.getValue(), -1);
-			} else {
-				onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), NavigationOptions.DAMAGESURVEY.getValue());
-			}
 		} else if(mBackStack.size() > 0) {
 			onNavigationItemSelected(mBackStack.pop(), -1);
 		} else {
@@ -1630,34 +1097,20 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	}
 	
 	void tabletBackButtonPressed(){
-		Fragment currentFragment2 = (Fragment) mFragmentManager.findFragmentById(R.id.container2);
+		Fragment currentFragment2 = mFragmentManager.findFragmentById(R.id.container2);
 	
-		if(currentFragment2 == mSimpleReportFragment){
+		if(currentFragment2 == mSimpleReportFragment)
+		{
 			mViewSimpleReport = false;
 			mOpenedSimpleReportPayload = null;
 			onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -1);
-		}else if(currentFragment2 == mDamageReportFragment){
-			mViewDamageReport = false;
-			mOpenedDamageReportPayload = null;
-			onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -1);
-		}else if(currentFragment2 == mWeatherReportFragment){
-			mViewWeatherReport = false;
-			mOpenedWeatherReportPayload = null;
-			onNavigationItemSelected(NavigationOptions.WEATHERREPORT.getValue(), -1);
-		}else if(currentFragment2 == mResourceRequestFragment){
-			mViewResourceRequest = false;
-			mOpenedResourceRequestPayload = null;
-			onNavigationItemSelected(NavigationOptions.RESOURCEREQUEST.getValue(), -1);
-		}else if(currentFragment2 == mFieldReportFragment){
-			mViewFieldReport = false;
-			mOpenedFieldReportPayload = null;
-			onNavigationItemSelected(NavigationOptions.FIELDREPORT.getValue(), -1);
 		}
 	}
 	
-	void checkForOpenReportsAndSwapContainer(){
-		Fragment currentFragment = (Fragment) mFragmentManager.findFragmentById(R.id.container);
-		Fragment currentFragment2 = (Fragment) mFragmentManager.findFragmentById(R.id.container2);
+	void checkForOpenReportsAndSwapContainer()
+	{
+		Fragment currentFragment = mFragmentManager.findFragmentById(R.id.container);
+		Fragment currentFragment2 = mFragmentManager.findFragmentById(R.id.container2);
 		
 		if(mSimpleReportFragment == currentFragment2 && currentFragment2 != null){
 			
@@ -1681,186 +1134,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				payload = mDataManager.getLastSimpleReportPayload();
 			}
 			openSimpleReport(payload,mEditSimpleReport);
-		}else if(mDamageReportFragment == currentFragment2 && currentFragment2 != null){
-			
-			animateFragmentRemove(currentFragment2,false);
-			mFragmentManager.executePendingTransactions();
-			
-			animateFragmentReplace(R.id.container2, mDamageReportListFragment,false);
-			DamageReportPayload payload = mDamageReportFragment.getPayload();
-			if(payload == null){
-				payload = mDataManager.getLastDamageReportPayload();
-			}
-			openDamageReport(payload,mEditDamageReport);	
-		}else if(mDamageReportListFragment == currentFragment2 && currentFragment2 != null){
-			
-			if(mDamageReportFragment == null){
-				mDamageReportFragment = new DamageReportFragment();
-			}
-			
-			DamageReportPayload payload = mDamageReportFragment.getPayload();
-			if(payload == null){
-				payload = mDataManager.getLastDamageReportPayload();
-			}
-			openDamageReport(payload,mEditDamageReport);
-		}else if(mWeatherReportFragment == currentFragment2 && currentFragment2 != null){
-			
-			animateFragmentRemove(currentFragment2,false);
-			mFragmentManager.executePendingTransactions();
-			
-			animateFragmentReplace(R.id.container2, mWeatherReportListFragment,false);
-			
-			WeatherReportPayload payload = mWeatherReportFragment.getPayload();
-			if(payload == null){
-				payload = mDataManager.getLastWeatherReportPayload();
-			}
-			openWeatherReport(payload,mEditWeatherReport);	
-		}else if(mWeatherReportListFragment == currentFragment2 && currentFragment2 != null){
-			
-			if(mWeatherReportFragment == null){
-				mWeatherReportFragment = new WeatherReportFragment();
-			}
-			
-			WeatherReportPayload payload = mWeatherReportFragment.getPayload();
-			if(payload == null){
-				payload = mDataManager.getLastWeatherReportPayload();
-			}
-			openWeatherReport(payload,mEditWeatherReport);
-		}else if(mFieldReportFragment == currentFragment2 && currentFragment2 != null){
-			
-			animateFragmentRemove(currentFragment2,false);
-			mFragmentManager.executePendingTransactions();
-			
-			animateFragmentReplace(R.id.container2, mFieldReportListFragment,false);
-			
-			FieldReportPayload payload = mFieldReportFragment.getPayload();
-			if(payload == null){
-				payload = mDataManager.getLastFieldReportPayload();
-			}
-			openFieldReport(payload,mEditFieldReport);	
-		}else if(mFieldReportListFragment == currentFragment2 && currentFragment2 != null){
-			
-			if(mFieldReportFragment == null){
-				mFieldReportFragment = new FieldReportFragment();
-			}
-			
-			FieldReportPayload payload = mFieldReportFragment.getPayload();
-			if(payload == null){
-				payload = mDataManager.getLastFieldReportPayload();
-			}
-			openFieldReport(payload,mEditFieldReport);
-		}else if(mResourceRequestFragment == currentFragment2 && currentFragment2 != null){
-			
-			animateFragmentRemove(currentFragment2,false);
-			mFragmentManager.executePendingTransactions();
-			
-			animateFragmentReplace(R.id.container2, mResourceRequestListFragment,false);
-			
-			ResourceRequestPayload payload = mResourceRequestFragment.getPayload();
-			if(payload == null){
-				payload = mDataManager.getLastResourceRequestPayload();
-			}
-			openResourceRequest(payload,mEditResourceRequest);	
-		}else if(mResourceRequestListFragment == currentFragment2 && currentFragment2 != null){
-			
-			if(mResourceRequestFragment == null){
-				mResourceRequestFragment = new ResourceRequestFragment();
-			}
-			
-			ResourceRequestPayload payload = mResourceRequestFragment.getPayload();
-			if(payload == null){
-				payload = mDataManager.getLastResourceRequestPayload();
-			}
-			openResourceRequest(payload,mEditResourceRequest);
-		}else{
+		}
+		else{
 			if(currentFragment == mMapMarkupFragment){
 				animateFragmentRemove(currentFragment,false);
 				mFragmentManager.executePendingTransactions();
 			}
 		}
 	}
-	
-	public void openDamageReport(DamageReportPayload damageReportPayload, boolean editable) {
-		if(mDamageReportFragment == null) {
-			mDamageReportFragment = new DamageReportFragment();
-		}
-		
-		if(!mDataManager.getTabletLayoutOn() || !mMapMarkupOpenTablet){
-			if(mDamageReportFragment != (Fragment) mFragmentManager.findFragmentById(R.id.container)){
-				animateFragmentReplace(R.id.container, mDamageReportFragment,false);
-				mFragmentManager.executePendingTransactions();
-			}
-		}else{
-			animateFragmentReplace(R.id.container2, mDamageReportFragment,false);
-			mFragmentManager.executePendingTransactions();
-		}
-		
-		damageReportPayload.setDraft(editable);
-		mOpenedDamageReportPayload = damageReportPayload.toJsonString();
-		mDamageReportFragment.setPayload(damageReportPayload, editable);
 
-		if(editable) {
-			mEditDamageReport = true;
-			mViewDamageReport = false;
-		} else {
-			mEditDamageReport = false;
-			mViewDamageReport = true;
-		}
-	}
-
-	public void openFieldReport(FieldReportPayload fieldReportPayload, boolean editable) {
-		if(mFieldReportFragment == null) {
-			mFieldReportFragment = new FieldReportFragment();
-		}
-		if(!mDataManager.getTabletLayoutOn() || !mMapMarkupOpenTablet){
-			if(mFieldReportFragment != (Fragment) mFragmentManager.findFragmentById(R.id.container)){
-				animateFragmentReplace(R.id.container, mFieldReportFragment,false);
-				mFragmentManager.executePendingTransactions();
-			}
-		}else{
-			animateFragmentReplace(R.id.container2, mFieldReportFragment,false);
-			mFragmentManager.executePendingTransactions();
-		}
-		
-		fieldReportPayload.setDraft(editable);
-		mOpenedFieldReportPayload = fieldReportPayload.toJsonString();
-		mFieldReportFragment.setPayload(fieldReportPayload, editable);
-		
-		if(editable) {
-			mEditFieldReport = true;
-			mViewFieldReport = false;
-		} else {
-			mEditFieldReport = false;
-			mViewFieldReport = true;
-		}
-	}
-	
-	public void openResourceRequest(ResourceRequestPayload resourceRequestPayload, boolean editable) {
-		if(mResourceRequestFragment == null) {
-			mResourceRequestFragment = new ResourceRequestFragment();
-		}
-		if(!mDataManager.getTabletLayoutOn() || !mMapMarkupOpenTablet){
-			if(mResourceRequestFragment != (Fragment) mFragmentManager.findFragmentById(R.id.container)){
-				animateFragmentReplace(R.id.container, mResourceRequestFragment,false);
-				mFragmentManager.executePendingTransactions();
-			}
-		}else{
-			animateFragmentReplace(R.id.container2, mResourceRequestFragment,false);
-			mFragmentManager.executePendingTransactions();
-		}
-
-		resourceRequestPayload.setDraft(editable);
-		mOpenedResourceRequestPayload = resourceRequestPayload.toJsonString();
-		mResourceRequestFragment.setPayload(resourceRequestPayload, editable);
-		
-		if(editable) {
-			mEditResourceRequest = true;
-			mViewResourceRequest = false;
-		} else {
-			mEditResourceRequest = false;
-			mViewResourceRequest = true;
-		}
-	}
 
 	public void openSimpleReport(SimpleReportPayload simpleReportPayload, boolean editable) {
 		if(mSimpleReportFragment == null) {
@@ -1868,7 +1150,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		}
 		
 		if(!mDataManager.getTabletLayoutOn() || !mMapMarkupOpenTablet){
-			if(mSimpleReportFragment != (Fragment) mFragmentManager.findFragmentById(R.id.container)){
+			if(mSimpleReportFragment != mFragmentManager.findFragmentById(R.id.container)){
 				animateFragmentReplace(R.id.container, mSimpleReportFragment,false);
 				mFragmentManager.executePendingTransactions();
 			}
@@ -1888,65 +1170,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			mEditSimpleReport = false;
 			mViewSimpleReport = true;
 		}
-	}
-	
-	public void openWeatherReport(WeatherReportPayload weatherReportPayload, boolean editable) {
-		if(mWeatherReportFragment == null) {
-			mWeatherReportFragment = new WeatherReportFragment();
-		}
-		
-		if(!mDataManager.getTabletLayoutOn() || !mMapMarkupOpenTablet){
-			if(mWeatherReportFragment != (Fragment) mFragmentManager.findFragmentById(R.id.container)){
-				
-				animateFragmentReplace(R.id.container, mWeatherReportFragment,false);
-				mFragmentManager.executePendingTransactions();
-			}
-		}else{
-			animateFragmentReplace(R.id.container2, mWeatherReportFragment,false);
-			mFragmentManager.executePendingTransactions();
-		}
-
-		weatherReportPayload.setDraft(editable);
-		mOpenedWeatherReportPayload = weatherReportPayload.toJsonString();
-		mWeatherReportFragment.setPayload(weatherReportPayload, editable);
-		
-		if(editable) {
-			mEditWeatherReport = true;
-			mViewWeatherReport = false;
-		} else {
-			mEditWeatherReport = false;
-			mViewWeatherReport = true;
-		}
-	}
-
-	public void openMapLocationPicker() {
-
-		int fragmentID =((Fragment) mFragmentManager.findFragmentById(R.id.container)).getId();
-		String previousReport = "";
-		
-		if(mSimpleReportFragment != null){
-			if(fragmentID == mSimpleReportFragment.getId()){
-				previousReport = getString(R.string.GENERALMESSAGE);
-			}
-		}if(mDamageReportFragment != null){
-			if( fragmentID == mDamageReportFragment.getId()){
-				previousReport = getString(R.string.DAMAGESURVEY);
-			}
-		}if(mWeatherReportFragment != null){
-			if(fragmentID == mWeatherReportFragment.getId()){
-				previousReport = getString(R.string.WEATHERREPORT);	
-			}
-		}
-		
-		if(mMapMarkupLocationPickerFragment == null) {
-			mMapMarkupLocationPickerFragment = new MapMarkupLocationPickerFragment(previousReport);
-		}else{
-			mMapMarkupLocationPickerFragment.setPreviousReport(previousReport);
-		}
-		animateFragmentReplace(R.id.container, mMapMarkupLocationPickerFragment,false);
-		mFragmentManager.executePendingTransactions();
-		
-		mViewMapLocationPicker = true;
 	}
 
 	@Override
@@ -1978,12 +1201,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		alertDialog.show();
 	}
 
-	public boolean isEditReport() {
-		return mEditFieldReport || mEditSimpleReport || mEditResourceRequest || mEditDamageReport || mEditWeatherReport;
+	public boolean isEditReport()
+	{
+		return mEditSimpleReport;
 	}
 
-	public boolean isViewReport() {
-		return mViewFieldReport || mViewSimpleReport || mViewResourceRequest || mViewDamageReport || mViewWeatherReport;
+	public boolean isViewReport()
+	{
+		return mViewSimpleReport;
 	}
 
 //	@Override

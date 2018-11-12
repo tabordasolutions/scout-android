@@ -32,112 +32,120 @@ package scout.edu.mit.ll.nics.android.utils;
 
 /**
  * @author Glenn L. Primmer
- *
- * This defines the enumeration of the different log levels.
+ *         <p>
+ *         This defines the enumeration of the different log levels.
  */
-public enum FormType {
-	NONE     (0, ""),
-    ROC      (1, "Report on Condition"),
-    RESC     (2, ""),
-    ABC      (3, ""),
-    TWO_15   (4, "215"),
-    SITREP	 (5, "SITREP"),
-    ASSGN    (6, "Assignment Form"),
-    SR       (7, "US Coast Guard Simple Report"),
-    FR       (8, "US Coast Guard Field Report"),
-    TASK	 (9, "Task"),
-    RESREQ   (10, "Resource Request"),
-    NINE_110 (11, "9110 - Notification Report"),
-    DR       (12, "Damage Report"),
-    UXO      (13, "Explosive Report"),
-    SVRRPT   (14, "Catan Survivor Request"),
-    AGRRPT	 (15, "Catan Survivor Aggrogate Request"),
-    MITAM	 (16, "MITAM"),
-    WR		 (17, "Weather Report");
+public enum FormType
+{
+	//-------------------------------------
+	NONE(0, ""),
+	ROC(1, "Report on Condition"),
+	//RESC(2, ""),
+	//ABC(3, ""),
+	//TWO_15(4, "215"),
+	//SITREP(5, "SITREP"),
+	//ASSGN(6, "Assignment Form"),
+	SR(7, "US Coast Guard Simple Report"),
+	//FR       (8, "US Coast Guard Field Report"),
+	//TASK(9, "Task"),
+	//RESREQ   (10, "Resource Request"),
+	//NINE_110(11, "9110 - Notification Report"),
+	//DR       (12, "Damage Report"),
+	//UXO      (13, "Explosive Report"),
+	//SVRRPT(14, "Catan Survivor Request"),
+	//AGRRPT(15, "Catan Survivor Aggrogate Request"),
+	//MITAM(16, "MITAM")
+	//WR		 (17, "Weather Report")
+	;
+	//-------------------------------------
 
-    /**
-     * The log levels numerical value (safer than using ordinal)
-     */
-    int    id;
+	/**
+	 * The log levels numerical value (safer than using ordinal)
+	 */
+	int id;
 
-    /**
-     * The log level textual representation.
-     */
-    String text;
+	/**
+	 * The log level textual representation.
+	 */
+	String text;
 
-    /**
-     * Enumeration constructor, extended so that textual representation and an integer value
-     * can be defined (safer than use of ordinal values).
-     *
-     * @param id The numerical representation of the enumerated value.
-     *
-     * @param text The textual representation of the enumerated value.
-     */
-    FormType (final int    id,
-              final String text) {
-        this.id   = id;
-        this.text = text;
-    }
+	/**
+	 * Enumeration constructor, extended so that textual representation and an integer value
+	 * can be defined (safer than use of ordinal values).
+	 *
+	 * @param id   The numerical representation of the enumerated value.
+	 * @param text The textual representation of the enumerated value.
+	 */
+	FormType(final int id, final String text)
+	{
+		this.id = id;
+		this.text = text;
+	}
 
-    /**
-     * Gets the numerical representation of the enumerated value.
-     *
-     * @return The numerical representation of the enumerated value.
-     */
-    public int getId () {
-        return id;
-    }
+	/**
+	 * Gets the numerical representation of the enumerated value.
+	 *
+	 * @return The numerical representation of the enumerated value.
+	 */
+	public int getId()
+	{
+		return id;
+	}
 
-    /**
-     * Gets the textual representation of the enumerated value.
-     *
-     * @return The textual representation of the enumerated value.
-     */
-    public String getText () {
-        return text;
-    }
+	/**
+	 * Gets the textual representation of the enumerated value.
+	 *
+	 * @return The textual representation of the enumerated value.
+	 */
+	public String getText()
+	{
+		return text;
+	}
 
-    /**
-     * Looks up an Form Type for the provided numerical representation of a Form Type.
-     *
-     * @param id Numerical representation of a Form Type.
-     *
-     * @return The Form Type that corresponds to the numerical representation provided.  If there is no Form Type
-     * that corresponds to the numerical representation provided then 'null' will be returned.
-     */
-    public static FormType lookUp (final int id) {
-        FormType value = null;
+	/**
+	 * Looks up an Form Type for the provided numerical representation of a Form Type.
+	 *
+	 * @param id Numerical representation of a Form Type.
+	 * @return The Form Type that corresponds to the numerical representation provided.  If there is no Form Type
+	 * that corresponds to the numerical representation provided then 'null' will be returned.
+	 */
+	public static FormType lookUp(final int id)
+	{
+		FormType value = null;
 
-        for (FormType formType : FormType.values ()) {
-            if (formType.getId () == id) {
-                value = formType;
+		for (FormType formType : FormType.values())
+		{
+			if (formType.getId() == id)
+			{
+				value = formType;
+				break;
+			}
+		}
 
-                break;
-            }
-        }
+		return value;
+	}
 
-        return value;
-    }
+	/**
+	 * Looks up an Form Type for the provided textual representation of a Form Type.
+	 *
+	 * @param text Textual representation of an Form Type.
+	 * @return The Log Level that corresponds to the textual representation provided.  If there is no Form Type
+	 * that corresponds to the textual representation provided then 'null' will be returned.
+	 */
+	public static FormType lookUp(final String text)
+	{
+		FormType value = null;
 
-    /**
-     * Looks up an Form Type for the provided textual representation of a Form Type.
-     *
-     * @param text Textual representation of an Form Type.
-     *
-     * @return The Log Level that corresponds to the textual representation provided.  If there is no Form Type
-     * that corresponds to the textual representation provided then 'null' will be returned.
-     */
-    public static FormType lookUp (final String text) {
-        FormType value = null;
+		for (FormType formType : FormType.values())
+		{
+			if (formType.getText().equals(text))
+			{
+				value = formType;
 
-        for (FormType formType : FormType.values ()) {
-            if (formType.getText ().equals (text)) {
-                value = formType;
+				break;
+			}
+		}
 
-                break;
-            }
-        }
-
-        return value;
-    }
+		return value;
+	}
 }

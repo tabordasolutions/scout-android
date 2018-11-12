@@ -96,9 +96,7 @@ public class ChatActionProvider extends ActionProvider implements OnMenuItemClic
 			item.setChecked(!item.isChecked());
 			
 			if(ref.isViewReport()) {
-            	ref.mViewFieldReport = false;
-            	ref.mViewResourceRequest = false;
-            	ref.mViewSimpleReport = false; 
+            	ref.mViewSimpleReport = false;
 			}
 			
 			mNewMessageCount = 0;
@@ -110,18 +108,10 @@ public class ChatActionProvider extends ActionProvider implements OnMenuItemClic
 			String message = mContext.getString(R.string.confirm_continue_to_description);
 			boolean prompt = false;
 			
-			if(ref.mEditDamageReport) {
-				prompt = true;
-				message = String.format(message, mContext.getString(R.string.DAMAGESURVEY));
-			} else if(ref.mEditFieldReport) {
-				prompt = true;
-				message = String.format(message, mContext.getString(R.string.FIELDREPORT));
-			} else if(ref.mEditSimpleReport) {
+			if(ref.mEditSimpleReport)
+			{
 				prompt = true;
 				message = String.format(message, mContext.getString(R.string.GENERALMESSAGE));
-			} else if(ref.mEditResourceRequest) {
-				prompt = true;
-				message = String.format(message, mContext.getString(R.string.RESOURCEREQUEST));
 			}
 			
 			message += mContext.getString(R.string.confirm_form_cancel);	
@@ -133,11 +123,8 @@ public class ChatActionProvider extends ActionProvider implements OnMenuItemClic
 				builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
 		            public void onClick(DialogInterface dialog, int id) {
 		            	
-		            	ref.mEditFieldReport = false;
-		            	ref.mEditResourceRequest = false;
 		            	ref.mEditSimpleReport = false;
-		            	ref.mEditDamageReport = false;
-		            	
+
 		    			item.setChecked(!item.isChecked());
 		    			
 		    			mNewMessageCount = 0;

@@ -63,7 +63,6 @@ import scout.edu.mit.ll.nics.android.R;
 import scout.edu.mit.ll.nics.android.formgen.FormCheckBox;
 import scout.edu.mit.ll.nics.android.formgen.FormColorPicker;
 import scout.edu.mit.ll.nics.android.formgen.FormCoordinate;
-import scout.edu.mit.ll.nics.android.formgen.FormDamageInformation;
 import scout.edu.mit.ll.nics.android.formgen.FormEditText;
 import scout.edu.mit.ll.nics.android.formgen.FormImageSelector;
 import scout.edu.mit.ll.nics.android.formgen.FormNumericEditText;
@@ -85,7 +84,6 @@ public class FormFragment extends Fragment implements OnFocusChangeListener {
 	public static String SCHEMA_KEY_BOOL = "boolean";
 	public static String SCHEMA_KEY_INT = "integer";
 	public static String SCHEMA_KEY_STRING = "string";
-	public static String SCHEMA_KEY_DAMAGE = "damage";
 	public static String SCHEMA_KEY_COORDS = "coordinate";
 	public static String SCHEMA_KEY_PRIORITY = "priority";
 	public static String SCHEMA_KEY_TOGGLES = "toggles";
@@ -473,10 +471,6 @@ public class FormFragment extends Fragment implements OnFocusChangeListener {
 				} else {
 					return new FormNumericEditText(activity, name, displayText, enabled, this,this);
 				}
-			}
-			if (type.equals(FormFragment.SCHEMA_KEY_DAMAGE)) {
-				JSONObject options = property.getJSONObject(FormFragment.SCHEMA_KEY_OPTIONS);
-				return new FormDamageInformation(activity, name, displayText, options, enabled, this,this);
 			}
 			
 			if(type.equals(FormFragment.SCHEMA_KEY_COORDS)) {

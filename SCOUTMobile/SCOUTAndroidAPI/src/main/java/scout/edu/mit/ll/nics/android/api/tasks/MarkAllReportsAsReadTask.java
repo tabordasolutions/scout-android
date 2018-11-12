@@ -30,9 +30,7 @@ package scout.edu.mit.ll.nics.android.api.tasks;
 import java.util.ArrayList;
 
 import scout.edu.mit.ll.nics.android.api.DataManager;
-import scout.edu.mit.ll.nics.android.api.payload.forms.DamageReportPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.WeatherReportPayload;
 import scout.edu.mit.ll.nics.android.utils.FormType;
 import scout.edu.mit.ll.nics.android.utils.Intents;
 import android.content.Context;
@@ -65,47 +63,7 @@ public class MarkAllReportsAsReadTask extends AsyncTask<FormType,String,String> 
 					mDataManager.addSimpleReportToHistory(payload);
 				}
 		    	break;
-			case ABC:
-				break;
-			case AGRRPT:
-				break;
-			case ASSGN:
-				break;
-			case DR:
-				ArrayList<DamageReportPayload> damageReports= mDataManager.getDamageReportHistoryForIncident(mDataManager.getActiveIncidentId());
-				mDataManager.deleteDamageReportFromHistoryByIncident(mDataManager.getActiveIncidentId());
-				
-				for (DamageReportPayload payload : damageReports){
-					payload.setNew(false);
-					mDataManager.addDamageReportToHistory(payload);
-				}
-				break;
-			case FR:
-				break;
-			case NINE_110:
-				break;
-			case RESC:
-				break;
-			case RESREQ:
-				break;
 			case ROC:
-				break;
-			case SITREP:
-				break;
-			case SVRRPT:
-				break;
-			case TASK:
-				break;
-			case TWO_15:
-				break;
-			case WR:
-				ArrayList<WeatherReportPayload> weatherReports = mDataManager.getWeatherReportHistoryForIncident(mDataManager.getActiveIncidentId());
-				mDataManager.deleteWeatherReportFromHistoryByIncident(mDataManager.getActiveIncidentId());
-				
-				for (WeatherReportPayload payload : weatherReports){
-					payload.setNew(false);
-					mDataManager.addWeatherReportToHistory(payload);
-				}
 				break;
 			default:
 				break;

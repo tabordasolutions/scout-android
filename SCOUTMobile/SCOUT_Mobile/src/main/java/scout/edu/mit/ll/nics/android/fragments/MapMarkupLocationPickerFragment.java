@@ -33,96 +33,81 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import scout.edu.mit.ll.nics.android.MainActivity;
 import scout.edu.mit.ll.nics.android.R;
-import scout.edu.mit.ll.nics.android.api.data.DamageReportData;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportData;
-import scout.edu.mit.ll.nics.android.api.data.WeatherReportData;
-import scout.edu.mit.ll.nics.android.api.payload.forms.DamageReportPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.WeatherReportPayload;
+
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 
-public class MapMarkupLocationPickerFragment extends MapMarkupFragment{
+public class MapMarkupLocationPickerFragment extends MapMarkupFragment
+{
 
 	private MarkerOptions markerOptions = null;
 	private Marker marker = null;
-	
+
 	private String PreviousFragment;
 	private MainActivity mMainActivity;
-	
+
 	private SimpleReportPayload mSimpleReportPayload;
-	private DamageReportPayload mDamageReportPayload;
-	private WeatherReportPayload mWeatherReportPayload;
-	
-	public  MapMarkupLocationPickerFragment(String _previousFragment){
+
+	public MapMarkupLocationPickerFragment(String _previousFragment)
+	{
 		PreviousFragment = _previousFragment;
 	}
-	
+
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
-		
+
 		mMainActivity = (MainActivity) mContext;
 	}
-	
+
 	@Override
-	public void onResume() {
+	public void onResume()
+	{
 		super.onResume();
-				
+
 		mPickerCompleteButton.setVisibility(View.INVISIBLE);
-		mPickerCompleteButton.setOnClickListener(new OnClickListener() {
+		mPickerCompleteButton.setOnClickListener(new OnClickListener()
+		{
 
 			@Override
-			public void onClick(View v) {
-				
-			setPayload();
-			mMainActivity.mViewMapLocationPicker = false;
-			
-			if(marker!= null){
-				marker.remove();
-			}
-			marker = null;
-			markerOptions = null;
-			 
+			public void onClick(View v)
+			{
+
+				setPayload();
+				mMainActivity.mViewMapLocationPicker = false;
+
+				if (marker != null)
+				{
+					marker.remove();
+				}
+				marker = null;
+				markerOptions = null;
+
 			}
 		});
 	}
-	
-	private void setPayload(){
 
-		if(PreviousFragment == getString(R.string.GENERALMESSAGE)){
-						
+	private void setPayload()
+	{
+
+		if (PreviousFragment == getString(R.string.GENERALMESSAGE))
+		{
+
 			mSimpleReportPayload = mMainActivity.mSimpleReportFragment.getPayload();
-			
+
 			SimpleReportData reportData = mSimpleReportPayload.getMessageData();
 			reportData.setLatitude(markerOptions.getPosition().latitude);
 			reportData.setLongitude(markerOptions.getPosition().longitude);
 			mSimpleReportPayload.setMessageData(reportData);
 			mMainActivity.openSimpleReport(mSimpleReportPayload, true);
 
-		}else if(PreviousFragment == getString(R.string.DAMAGESURVEY)){
-		
-			mDamageReportPayload = mMainActivity.mDamageReportFragment.getPayload();
-			
-			DamageReportData reportData = mDamageReportPayload.getMessageData();
-			reportData.setPropertyLatitude( Double.toString( markerOptions.getPosition().latitude));
-			reportData.setPropertyLongitude(Double.toString( markerOptions.getPosition().longitude));
-			mDamageReportPayload.setMessageData(reportData);
-			mMainActivity.openDamageReport(mDamageReportPayload, true);
-			
-		}else if(PreviousFragment == getString(R.string.WEATHERREPORT)){
-		
-			mWeatherReportPayload = mMainActivity.mWeatherReportFragment.getPayload();
-			
-			WeatherReportData reportData = mWeatherReportPayload.getMessageData();
-			reportData.setLatitude(Double.toString(markerOptions.getPosition().latitude));
-			reportData.setLongitude(Double.toString(markerOptions.getPosition().longitude));
-			mWeatherReportPayload.setMessageData(reportData);
-			mMainActivity.openWeatherReport(mWeatherReportPayload, true);
 		}
 	}
-	
+
 	/*
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
@@ -131,54 +116,56 @@ public class MapMarkupLocationPickerFragment extends MapMarkupFragment{
 	}
 	*/
 	@Override
-	public void onMapClick(LatLng coordinate) {
-	
-		if(markerOptions == null){
+	public void onMapClick(LatLng coordinate)
+	{
+
+		if (markerOptions == null)
+		{
 			markerOptions = new MarkerOptions();
 			markerOptions.position(new LatLng(coordinate.latitude, coordinate.longitude));
 			markerOptions.draggable(true);
-			
+
 			marker = mMap.addMarker(markerOptions);
 			marker.setPosition(new LatLng(coordinate.latitude, coordinate.longitude));
-			
+
 			mPickerCompleteButton.setVisibility(View.VISIBLE);
-			
-		}else{
+
+		} else
+		{
 			markerOptions.position(new LatLng(coordinate.latitude, coordinate.longitude));
 			marker.setPosition(new LatLng(coordinate.latitude, coordinate.longitude));
 			marker.setTitle(Double.toString(coordinate.latitude));
 
 		}
 	}
-	
+
 	@Override
-	public void onDestroyView() {
+	public void onDestroyView()
+	{
 		super.onDestroyView();
 
-		if(marker!= null){
+		if (marker != null)
+		{
 			marker.remove();
 		}
 		marker = null;
 		markerOptions = null;
-		
+
 	}
-	
-	public void BackButtonPressed(){
+
+	public void BackButtonPressed()
+	{
 		mMainActivity.mViewMapLocationPicker = false;
-		
-		if(PreviousFragment == getString(R.string.GENERALMESSAGE)){
+
+		if (PreviousFragment == getString(R.string.GENERALMESSAGE))
+		{
 			mSimpleReportPayload = mMainActivity.mSimpleReportFragment.getPayload();
-			mMainActivity.openSimpleReport(mSimpleReportPayload, true);	
-		}else if(PreviousFragment == getString(R.string.DAMAGESURVEY)){
-			mDamageReportPayload = mMainActivity.mDamageReportFragment.getPayload();
-			mMainActivity.openDamageReport(mDamageReportPayload, true);
-		}else if(PreviousFragment == getString(R.string.WEATHERREPORT)){
-			mWeatherReportPayload = mMainActivity.mWeatherReportFragment.getPayload();
-			mMainActivity.openWeatherReport(mWeatherReportPayload, true);
+			mMainActivity.openSimpleReport(mSimpleReportPayload, true);
 		}
 	}
-	
-	public void setPreviousReport(String fragment){	
+
+	public void setPreviousReport(String fragment)
+	{
 		PreviousFragment = fragment;
 	}
 }
