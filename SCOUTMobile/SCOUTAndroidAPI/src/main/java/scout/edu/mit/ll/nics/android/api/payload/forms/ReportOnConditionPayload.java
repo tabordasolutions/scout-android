@@ -28,21 +28,61 @@
 /**
  *
  */
-package scout.edu.mit.ll.nics.android.api.messages;
+package scout.edu.mit.ll.nics.android.api.payload.forms;
 
-import java.util.ArrayList;
+import com.google.gson.Gson;
 
-import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class SimpleReportMessage {
-    private ArrayList<SimpleReportPayload> reports;
+import scout.edu.mit.ll.nics.android.api.DataManager;
+import scout.edu.mit.ll.nics.android.api.data.ReportOnConditionData;
 
-	public ArrayList<SimpleReportPayload> getReports() {
-		return reports;
+public class ReportOnConditionPayload extends ReportPayload
+{
+	//OES-828 TODO Need to properly implement this.
+
+	private transient ReportOnConditionData messageData;
+
+	public ReportOnConditionData getMessageData()
+	{
+		return messageData;
 	}
 
-	public void setReports(ArrayList<SimpleReportPayload> reports) {
-		this.reports = reports;
+	public void setMessageData(ReportOnConditionData messageData)
+	{
+		this.messageData = messageData;
 	}
-    
+
+	public void parse() {
+/*    	messageData = new Gson().fromJson(getMessage().replace("NaN", "0.0"), ReportOnConditionData.class);
+
+    	try
+    	{
+			JSONObject object = new JSONObject(getMessage());
+			if(object.has("cat")){
+				Object category = object.get("cat");
+				String categoryString = category.toString();
+
+				String reverseLanguageResults = DataManager.getInstance().reverseLanguageLookup(categoryString);
+				SimpleReportCategoryType categoryType = SimpleReportCategoryType.lookUp(reverseLanguageResults);
+
+				messageData.setCategory(categoryType);
+			}
+
+		}
+		catch (JSONException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+*/
+	}
+
+	public String toJsonString()
+	{
+		setMessage(new Gson().toJson(getMessageData()));
+
+		return new Gson().toJson(this);
+	}
 }

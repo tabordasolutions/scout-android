@@ -730,25 +730,15 @@ public class OverviewFragment extends Fragment
 		}
 	};
 
+	// This is the dialog for selecting the "Reports" menu from the main activity
 	DialogInterface.OnClickListener reportSelected = new DialogInterface.OnClickListener()
 	{
 
 		@Override
 		public void onClick(DialogInterface dialog, int which)
 		{
-			if (activeReports.get(which).equals(resources.getString(R.string.DAMAGESURVEY)))
-			{
-				mMainActivity.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -1);
-			} else if (activeReports.get(which).equals(resources.getString(R.string.FIELDREPORT)))
-			{
-				mMainActivity.onNavigationItemSelected(NavigationOptions.FIELDREPORT.getValue(), -1);
-			} else if (activeReports.get(which).equals(resources.getString(R.string.RESOURCEREQUEST)))
-			{
-				mMainActivity.onNavigationItemSelected(NavigationOptions.RESOURCEREQUEST.getValue(), -1);
-			} else if (activeReports.get(which).equals(resources.getString(R.string.WEATHERREPORT)))
-			{
-				mMainActivity.onNavigationItemSelected(NavigationOptions.WEATHERREPORT.getValue(), -1);
-			} else if (activeReports.get(which).equals(resources.getString(R.string.ROCFORM)))
+			// If the user selects ROC, take them to the ROC page.
+			if (activeReports.get(which).equals(resources.getString(R.string.ROCFORM)))
 			{
 				Log.e("tag", "hullo - ROC option selected!");
 				//SALAD - todo, need to add the appropriate navigation functionality for getting us to the ROC form

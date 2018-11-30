@@ -79,6 +79,7 @@ public class Intents {
 	public static final String nics_POLLING_TASK_DAMAGE_REPORT = "nics_POLLING_TASK_DAMAGE_REPORT";
 	public static final String nics_POLLING_TASK_FIELD_REPORT = "nics_POLLING_TASK_FIELD_REPORT";
 	public static final String nics_POLLING_TASK_SIMPLE_REPORT = "nics_POLLING_TASK_SIMPLE_REPORT";
+	public static final String nics_POLLING_TASK_REPORT_ON_CONDITION = "nics_POLLING_TASK_REPORT_ON_CONDITION";
 	public static final String nics_POLLING_TASK_RESOURCE_REQUEST = "nics_POLLING_TASK_RESOURCE_REQUEST";
 	public static final String nics_POLLING_TASK_WEATHER_REPORT = "nics_POLLING_TASK_WEATHER_REPORT";
 	public static final String nics_POLLING_TASK_CHAT_MESSAGES = "nics_POLLING_TASK_CHAT_MESSAGES";

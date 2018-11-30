@@ -77,13 +77,15 @@ import scout.edu.mit.ll.nics.android.fragments.FormFragment;
 import scout.edu.mit.ll.nics.android.fragments.GeneralMessageFragment;
 import scout.edu.mit.ll.nics.android.fragments.MapMarkupFragment;
 import scout.edu.mit.ll.nics.android.fragments.OverviewFragment;
+import scout.edu.mit.ll.nics.android.fragments.ReportOnConditionViewFragment;
 import scout.edu.mit.ll.nics.android.fragments.SimpleReportListFragment;
 import scout.edu.mit.ll.nics.android.utils.Constants;
 import scout.edu.mit.ll.nics.android.utils.Constants.NavigationOptions;
 import scout.edu.mit.ll.nics.android.utils.EncryptedPreferences;
 
-public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener{	//, UncaughtExceptionHandler {
-	
+public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener
+{    //, UncaughtExceptionHandler {
+
 	/**
 	 * The serialization (saved instance state) Bundle key representing the
 	 * current dropdown position.
@@ -97,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	private int mLastPosition = NavigationOptions.OVERVIEW.getValue();
 	private FragmentManager mFragmentManager;
 	private Stack<Integer> mBackStack;
-	
+
 	private OverviewFragment mOverviewFragment;
 	public MapMarkupFragment mMapMarkupFragment;
 	private MapMarkupLocationPickerFragment mMapMarkupLocationPickerFragment;
@@ -106,37 +108,41 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	public GeneralMessageFragment mSimpleReportFragment;
 
 	private ReportOnConditionActionFragment mReportOnConditionActionFragment;
-	
-//	private ChatFragment mChatFragment;
+	private ReportOnConditionViewFragment mReportOnConditionViewFragment;
+	//OES828 TODO - Add ReportOnConditionActionFragment
+
+	//	private ChatFragment mChatFragment;
 	private ChatListFragment mChatFragment;
-	
+
 	private FormFragment mUserInfoFragment;
 
 	private static Context mContext;
-	
+
 	private boolean mIsBackKey = false;
 	public boolean mEditSimpleReport = false;
 	public boolean mViewSimpleReport = false;
+	//OES828 TODO - edit and view booleans for ROCs
 	public boolean mViewMapLocationPicker = false;
 
 	public boolean mViewReportOnConditionAction = false;
-	
+
 	private DataManager mDataManager;
 
 	public String mOpenedSimpleReportPayload;
 	public long mOpenedSimpleReportId;
+	//OES828 TODO - store the current ROC payload and ROC ID
 
 	private boolean mMapMarkupOpenTablet = false;
-	
+
 	private String[] navDropdownOptions;
-	
+
 	protected boolean mPreventNavigation = false;
-	
+
 	private TextView mBreadcrumbTextView;
 	private String mCurBreadcrumbText;
 	private boolean mReportOpenedFromMap;
 	private String[] mOrgArray;
-	
+
 	public static MenuItem LowDataModeIcon;
 
 
@@ -162,94 +168,110 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	static final int invalidSessionIDDelay = 1000;
 
 
-	
-	private String[] navOptionsAsArray() {
+	private String[] navOptionsAsArray ()
+	{
 		NavigationOptions[] states = NavigationOptions.values();
 		String[] names = new String[states.length];
 
-		for (int i = 0; i < states.length; i++) {
+		for (int i = 0; i < states.length; i++)
+		{
 			names[i] = states[i].getLabel(this);
 		}
 
 		return names;
 	}
-	
-	public static Context getAppContext() {
+
+	public static Context getAppContext ()
+	{
 		return mContext;
 	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate (Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
-		
+
 		mContext = this;
 		mDataManager = DataManager.getInstance(getApplicationContext(), this);
-		
-		if(mDataManager.getTabletLayoutOn()){
+
+		if (mDataManager.getTabletLayoutOn())
+		{
 			setContentView(R.layout.activity_main_tablet);
-		}else{
+		}
+		else
+		{
 			setContentView(R.layout.activity_main);
 		}
-		
+
 //		Thread.setDefaultUncaughtExceptionHandler(this);
-		
-		if(mDataManager.isMDTEnabled()) {
+
+		if (mDataManager.isMDTEnabled())
+		{
 			mDataManager.getLocationSource();
 		}
-		
+
 		mFragmentManager = getSupportFragmentManager();
 		mBackStack = new Stack<Integer>();
-		
+
 		// Set up the action bar to show a dropdown list.
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setDisplayShowHomeEnabled(true);
 		actionBar.setTitle(R.string.app_name);
 		navDropdownOptions = navOptionsAsArray();
-		
+
 //		actionBar.setBackgroundDrawable(new ColorDrawable(0xffffffff));
-		
-		
+
+
 		Intent intent = getIntent();
-		
-		if(intent != null && savedInstanceState == null) {
+
+		if (intent != null && savedInstanceState == null)
+		{
 			int position = intent.getIntExtra(STATE_SELECTED_NAVIGATION_ITEM, NavigationOptions.OVERVIEW.getValue());
-			if(mDataManager.isLoggedIn()) {
+			if (mDataManager.isLoggedIn())
+			{
 				onNavigationItemSelected(position, -1);
 				mLastPosition = position;
-			} else {
+			}
+			else
+			{
 				onNavigationItemSelected(NavigationOptions.LOGOUT.getValue(), -1);
 				mLastPosition = NavigationOptions.LOGOUT.getValue();
 			}
 
 			mOpenedSimpleReportPayload = intent.getStringExtra("sr_edit_json");
-			if(mOpenedSimpleReportPayload != null) {
+			if (mOpenedSimpleReportPayload != null)
+			{
 				mViewSimpleReport = true;
 				mEditSimpleReport = false;
 			}
-			
-			if(position != NavigationOptions.OVERVIEW.getValue()) {
+
+			//OES828 TODO - Create ROC Payload, mark that we are viewing and not editing
+
+			if (position != NavigationOptions.OVERVIEW.getValue())
+			{
 				mBackStack = new Stack<Integer>();
 				mBackStack.add(NavigationOptions.OVERVIEW.getValue());
 			}
-			
-			if(intent.getBooleanExtra("showOrgSelector", false)) {
+
+			if (intent.getBooleanExtra("showOrgSelector", false))
+			{
 				showOrgSelector();
 			}
 		}
 
-		if(invalidSessionIDHandler == null)
+		if (invalidSessionIDHandler == null)
 		{
 			invalidSessionIDHandler = new Handler();
 			invalidSessionIDRunnable = new Runnable()
 			{
 				@Override
-				public void run()
+				public void run ()
 				{
 					invalidSessionIDCounter++;
 					// Only check against the server every 5 times
 					// This is meant to reduce the amount of network requests
-					if(!invalidSessionID && invalidSessionIDCounter >= 5)
+					if (!invalidSessionID && invalidSessionIDCounter >= 5)
 					{
 						invalidSessionIDCounter = 0;
 						RestClient.validateSessionID();
@@ -260,7 +282,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					//Log.e("USIDDEFECT","ISID: " + invalidSessionID + ", dialogVisible: " + invalidSessionIDDialogVisible + ", reauthing: " + invalidSessionIDReauthenticating);
 
 
-					if(invalidSessionID && !invalidSessionIDDialogVisible && !invalidSessionIDReauthenticating)
+					if (invalidSessionID && !invalidSessionIDDialogVisible && !invalidSessionIDReauthenticating)
 					{
 						invalidSessionIDDialogVisible = true;
 						MainActivity.this.showInvalidSessionIDDialog(invalidSessionIDFromSR);
@@ -276,14 +298,16 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			};
 		}
 	}
-	
-	private void showOrgSelector() {
+
+	private void showOrgSelector ()
+	{
 		Builder mDialogBuilder = new AlertDialog.Builder(this);
 		mDialogBuilder.setTitle(R.string.select_an_organization);
 		mDialogBuilder.setMessage(null);
 		mDialogBuilder.setPositiveButton(null, null);
 		HashMap<String, OrganizationPayload> orgMap = mDataManager.getOrganizations();
-		if(orgMap != null) {
+		if (orgMap != null)
+		{
 			mOrgArray = new String[orgMap.size()];
 			orgMap.keySet().toArray(mOrgArray);
 			Arrays.sort(mOrgArray);
@@ -291,21 +315,24 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			mDialogBuilder.create().show();
 		}
 	}
-	
-	DialogInterface.OnClickListener orgSelected = new DialogInterface.OnClickListener() {
+
+	DialogInterface.OnClickListener orgSelected = new DialogInterface.OnClickListener()
+	{
 		@Override
-		public void onClick(DialogInterface dialog, int which) {
+		public void onClick (DialogInterface dialog, int which)
+		{
 			OrganizationPayload selectedOrg = mDataManager.getOrganizations().get(mOrgArray[which]);
-			
+
 			mDataManager.setCurrentOrganization(selectedOrg);
-			
+
 			TextView orgTextView = (TextView) findViewById(R.id.selectedOrg);
 
-			if(orgTextView != null) {
+			if (orgTextView != null)
+			{
 				orgTextView.setText(selectedOrg.getName());
 			}
 			Log.e(Constants.nics_DEBUG_ANDROID_TAG, selectedOrg.toJsonString());
-			
+
 			RestClient.switchOrgs(selectedOrg.getOrgid());
 		}
 	};
@@ -316,45 +343,58 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	 * <code>getThemedContext</code> is unavailable.
 	 */
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-	private Context getActionBarThemedContextCompat() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+	private Context getActionBarThemedContextCompat ()
+	{
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+		{
 			return getSupportActionBar().getThemedContext();
-		} else {
+		}
+		else
+		{
 			return this;
 		}
 	}
-	
+
 	@Override
-	protected void onResume() {
+	protected void onResume ()
+	{
 		super.onResume();
-		
-		if(mDataManager.isMDTEnabled()) {
+
+		if (mDataManager.isMDTEnabled())
+		{
 			mDataManager.getLocationSource();
 		}
-		
-		if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && !((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE)) {
+
+		if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT && !((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE))
+		{
 			mBreadcrumbTextView = (TextView) findViewById(R.id.breadcrumbTextView);
 			mBreadcrumbTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 			mBreadcrumbTextView.setGravity(Gravity.CENTER_HORIZONTAL);
 			mBreadcrumbTextView.setTextSize(20);
-		} else {
+		}
+		else
+		{
 			TextView other = (TextView) findViewById(R.id.breadcrumbTextView);
 			other.setText("");
 			other.setHeight(0);
 			mBreadcrumbTextView = new TextView(this);
 			mBreadcrumbTextView.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-			mBreadcrumbTextView.setGravity(Gravity.CENTER_VERTICAL| Gravity.RIGHT);
+			mBreadcrumbTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.RIGHT);
 			mBreadcrumbTextView.setTextSize(18);
-			if(!mDataManager.getTabletLayoutOn()){
+			if (!mDataManager.getTabletLayoutOn())
+			{
 				getSupportActionBar().setCustomView(mBreadcrumbTextView);
 				getSupportActionBar().setDisplayShowCustomEnabled(true);
 			}
 		}
 
-		if(mLastPosition != NavigationOptions.OVERVIEW.getValue()) {
+		if (mLastPosition != NavigationOptions.OVERVIEW.getValue())
+		{
 			restoreViewTitle();
 
-		} else {
+		}
+		else
+		{
 			clearViewTitle();
 		}
 
@@ -363,9 +403,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		invalidSessionIDCommand = new DataManager.CustomCommand()
 		{
 			@Override
-			public void performAction()
+			public void performAction ()
 			{
-				Log.v("USIDDEFECT","session id command action invoked");
+				Log.v("USIDDEFECT", "session id command action invoked");
 				MainActivity.invalidSessionID = true;
 			}
 		};
@@ -378,9 +418,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		invalidSRSessionIDCommand = new DataManager.CustomCommand()
 		{
 			@Override
-			public void performAction()
+			public void performAction ()
 			{
-				Log.v("USIDDEFECT","SR session id command action invoked");
+				Log.v("USIDDEFECT", "SR session id command action invoked");
 				MainActivity.invalidSessionIDFromSR = true;
 				MainActivity.invalidSessionID = true;
 			}
@@ -390,35 +430,40 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		mDataManager.setInvalidSRSessionsIDCommand(invalidSRSessionIDCommand);
 
 
-		invalidSessionIDHandler.postDelayed(invalidSessionIDRunnable,invalidSessionIDDelay);
+		invalidSessionIDHandler.postDelayed(invalidSessionIDRunnable, invalidSessionIDDelay);
 	}
 
 	// Restores the view title using current fragments to deduce title
-	public void restoreViewTitle()
+	public void restoreViewTitle ()
 	{
 		mBreadcrumbTextView.setText(mCurBreadcrumbText);
 	}
 
-	public void setViewTitle(String title)
+	public void setViewTitle (String title)
 	{
-		if(mBreadcrumbTextView != null) {
+		if (mBreadcrumbTextView != null)
+		{
 			CollabroomPayload collabRoom = mDataManager.getSelectedCollabRoom();
 
 			// IF we haven't selected a room
-			if(collabRoom.getName().equals(getString(R.string.no_selection))){
+			if (collabRoom.getName().equals(getString(R.string.no_selection)))
+			{
 				mCurBreadcrumbText = "No Room Selected";
 			}
-			else {
+			else
+			{
 				mCurBreadcrumbText = title;
 			}
 
 			mBreadcrumbTextView.setText(mCurBreadcrumbText);
-			if(!mCurBreadcrumbText.isEmpty())
+			if (!mCurBreadcrumbText.isEmpty())
+			{
 				mBreadcrumbTextView.setVisibility(View.VISIBLE);
+			}
 		}
 	}
 
-	public void clearViewTitle()
+	public void clearViewTitle ()
 	{
 		mCurBreadcrumbText = "";
 		setBreadcrumbText("");
@@ -426,37 +471,50 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	}
 
 	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
+	public void onRestoreInstanceState (Bundle savedInstanceState)
+	{
 
-		if(savedInstanceState.containsKey(STATE_BACK_STACK)) {
+		if (savedInstanceState.containsKey(STATE_BACK_STACK))
+		{
 			mBackStack = new Stack<Integer>();
 			mBackStack.addAll(savedInstanceState.getIntegerArrayList(STATE_BACK_STACK));
 		}
-		
-		if(savedInstanceState.containsKey(STATE_REPORT_OPENED_FROM_MAP)) {
+
+		if (savedInstanceState.containsKey(STATE_REPORT_OPENED_FROM_MAP))
+		{
 			mReportOpenedFromMap = savedInstanceState.getBoolean(STATE_REPORT_OPENED_FROM_MAP);
 		}
 
-		if(savedInstanceState.containsKey(STATE_IS_EDIT_SIMPLE_REPORT)) {
+		if (savedInstanceState.containsKey(STATE_IS_EDIT_SIMPLE_REPORT))
+		{
 			mEditSimpleReport = savedInstanceState.getBoolean(STATE_IS_EDIT_SIMPLE_REPORT);
 		}
-		
-		if(savedInstanceState.containsKey(STATE_IS_VIEW_SIMPLE_REPORT)) {
+
+		if (savedInstanceState.containsKey(STATE_IS_VIEW_SIMPLE_REPORT))
+		{
 			mViewSimpleReport = savedInstanceState.getBoolean(STATE_IS_VIEW_SIMPLE_REPORT);
 		}
-		
-		if(savedInstanceState.containsKey("sr_edit_json")) {
+
+		//OES828 TODO - retrieve the state booleans from a savedinstancestate
+
+		if (savedInstanceState.containsKey("sr_edit_json"))
+		{
 			mOpenedSimpleReportPayload = savedInstanceState.getString("sr_edit_json");
 		}
-		
-		if(savedInstanceState.containsKey("sr_edit_id")) {
+
+		if (savedInstanceState.containsKey("sr_edit_id"))
+		{
 			mOpenedSimpleReportId = savedInstanceState.getLong("sr_edit_id");
 		}
-		
+
+		//OES828 TODO - retrieve the Currently active ROC from savedinstance
+
 		// Restore the previously serialized current dropdown position.
-		if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
+		if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM))
+		{
 			mLastPosition = savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM);
-			if(mDataManager.getTabletLayoutOn()){
+			if (mDataManager.getTabletLayoutOn())
+			{
 				onNavigationItemSelected(NavigationOptions.OVERVIEW.getValue(), -1);
 			}
 			onNavigationItemSelected(savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM), -1);
@@ -464,79 +522,104 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public void onSaveInstanceState (Bundle outState)
+	{
 		// Serialize the current dropdown position.
 		outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, mLastPosition);
-		
+
 		ArrayList<Integer> list = new ArrayList<Integer>(mBackStack);
 		outState.putIntegerArrayList(STATE_BACK_STACK, list);
-		
+
 		outState.putBoolean(STATE_REPORT_OPENED_FROM_MAP, mReportOpenedFromMap);
 		outState.putBoolean(STATE_IS_EDIT_SIMPLE_REPORT, mEditSimpleReport);
 		outState.putBoolean(STATE_IS_VIEW_SIMPLE_REPORT, mViewSimpleReport);
 
-		if(mSimpleReportFragment != null) {
+		//OES828 TODO - Store the ROC state
+
+		if (mSimpleReportFragment != null)
+		{
 			mOpenedSimpleReportPayload = mSimpleReportFragment.getPayload().toJsonString();
 			mOpenedSimpleReportId = mSimpleReportFragment.getReportId();
 		}
-		
-		if(mOpenedSimpleReportPayload != null) {
+
+		//OES828 TODO - if ROC fragment is not null, store the ROC payload and ROC ID
+
+		if (mOpenedSimpleReportPayload != null)
+		{
 			outState.putString("sr_edit_json", mOpenedSimpleReportPayload);
 			outState.putLong("sr_edit_id", mOpenedSimpleReportId);
 		}
 
+		//OES828 TODO - if ROC fragment is not null, store the ROC payload and ROC ID
+		// FIXME - what's the difference between the above two calls?
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu (Menu menu)
+	{
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main_logout, menu);
 		LowDataModeIcon = menu.findItem(R.id.action_low_data_mode);
-		if(mDataManager.getLowDataMode()){
+		if (mDataManager.getLowDataMode())
+		{
 			LowDataModeIcon.setIcon(R.drawable.stat_sys_r_signal_1_cdma);
-		}else{
+		}
+		else
+		{
 			LowDataModeIcon.setIcon(R.drawable.stat_sys_r_signal_4_cdma);
 		}
 
 		return true;
 	}
 
-	public void addSimpleReportToDetailView(boolean isCopy){
-		if(mSimpleReportFragment == null) {
+	// Copies a simple report's details to a new simple report for submission
+	public void addSimpleReportToDetailView (boolean isCopy)
+	{
+		if (mSimpleReportFragment == null)
+		{
 			mSimpleReportFragment = new GeneralMessageFragment();
 		}
-		if(mDataManager.getTabletLayoutOn() && mMapMarkupOpenTablet){
-			animateFragmentReplace(R.id.container2, mSimpleReportFragment,false);
-		}else{
-			animateFragmentReplace(R.id.container, mSimpleReportFragment,false);
+		if (mDataManager.getTabletLayoutOn() && mMapMarkupOpenTablet)
+		{
+			animateFragmentReplace(R.id.container2, mSimpleReportFragment, false);
+		}
+		else
+		{
+			animateFragmentReplace(R.id.container, mSimpleReportFragment, false);
 		}
 		mFragmentManager.executePendingTransactions();
-		
-		if(isCopy){
+
+		if (isCopy)
+		{
 			mSimpleReportFragment.populate(mSimpleReportFragment.getFormString(), -1L, true);
-		}else{
+		}
+		else
+		{
 			mSimpleReportFragment.populate(mDataManager.getIncidentInfoJson(), -1L, true);
 		}
 		mOpenedSimpleReportPayload = mSimpleReportFragment.getPayload().toJsonString();
 		mOpenedSimpleReportId = -1;
-		
+
 		mEditSimpleReport = true;
 		mViewSimpleReport = false;
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
+	public boolean onOptionsItemSelected (MenuItem item)
+	{
 		// Handle item selection
-		switch (item.getItemId()) {
+		switch (item.getItemId())
+		{
 			case android.R.id.home:
 				onNavigationItemSelected(NavigationOptions.OVERVIEW.getValue(), -1);
 				break;
 			case R.id.action_settings:
 				Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-				if(mDataManager.getSelectedCollabRoom().getCollabRoomId() == -1) {
+				if (mDataManager.getSelectedCollabRoom().getCollabRoomId() == -1)
+				{
 					intent.putExtra("hideGarCollab", true);
 				}
-				
+
 				intent.putExtra("currentServer", mDataManager.getServer());
 				startActivityForResult(intent, 1001);
 				break;
@@ -546,21 +629,17 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				break;
 
 			case R.id.action_help:
-
 				Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://public.nics.ll.mit.edu/nicshelp/"));
 				startActivity(browserIntent);
-
 				break;
 
 			case R.id.action_about:
 				intent = new Intent(MainActivity.this, AboutActivity.class);
 				startActivity(intent);
 				break;
-
 			case R.id.addSimpleReportOption:
 				addSimpleReportToDetailView(false);
 				break;
-
 			case R.id.markAllSrAsRead:
 				mSimpleReportListFragment.MarkAllMessagesAsRead();
 				break;
@@ -581,73 +660,87 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				break;
 			case R.id.action_low_data_mode:
 				mDataManager.setLowDataMode(!mDataManager.getLowDataMode());
-				LowDataModeIcon.setIcon( mDataManager.getLowDataMode() ? R.drawable.stat_sys_r_signal_1_cdma : R.drawable.stat_sys_r_signal_4_cdma);
+				LowDataModeIcon.setIcon(mDataManager.getLowDataMode() ? R.drawable.stat_sys_r_signal_1_cdma : R.drawable.stat_sys_r_signal_4_cdma);
 				break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
- 
-	
+
+
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(requestCode == 500) {
+	public void onActivityResult (int requestCode, int resultCode, Intent data)
+	{
+		if (requestCode == 500)
+		{
 			BluetoothLRF.getInstance(this, null).findBT();
 		}
-		
-		if(requestCode == 1001 && data != null) {
-			if(data.getBooleanExtra("logoutAndClear", false)) {
-				mDataManager.setCurrentIncidentData(null, -1, "");	
+
+		if (requestCode == 1001 && data != null)
+		{
+			if (data.getBooleanExtra("logoutAndClear", false))
+			{
+				mDataManager.setCurrentIncidentData(null, -1, "");
 				mDataManager.setSelectedCollabRoom(null);
 				onNavigationItemSelected(NavigationOptions.LOGOUT.getValue(), 0);
-			} else if(data.getBooleanExtra("loadGAR", false)) {
-				onNavigationItemSelected(NavigationOptions.GAR.getValue(), -1);
 			}
 		}
-		
-		if(mEditSimpleReport || mViewSimpleReport) {
-			if(mSimpleReportFragment == null && mOpenedSimpleReportPayload != null) {
+
+		if (mEditSimpleReport || mViewSimpleReport)
+		{
+			if (mSimpleReportFragment == null && mOpenedSimpleReportPayload != null)
+			{
 				SimpleReportPayload payload = new Gson().fromJson(mOpenedSimpleReportPayload, SimpleReportPayload.class);
 				payload.parse();
-				
+
 				openSimpleReport(payload, mEditSimpleReport);
 			}
-			
-			if(mSimpleReportFragment != null) {
+
+			if (mSimpleReportFragment != null)
+			{
 				mSimpleReportFragment.onActivityResult(requestCode, resultCode, data);
 			}
-		}else{
+		}
+		else
+		{
 			super.onActivityResult(requestCode, resultCode, data);
 		}
 	}
-	
+
 	@Override
-	public boolean onNavigationItemSelected(final int position, long id) {
-		// When the given dropdown item is selected, show its contents in the
-		// container view.
+	public boolean onNavigationItemSelected (final int position, long id)
+	{
+		// When the given dropdown item is selected, show its contents in the container view
 
 		boolean prompt = false;
-		
-		if(position == mLastPosition && id == -2) {
-			if(mEditSimpleReport) {
+
+		if (position == mLastPosition && id == -2)
+		{
+			if (mEditSimpleReport)
+			{
 				mEditSimpleReport = false;
 			}
 		}
 
 		// Prompting the user that their report progress will be lost if they continue
-		if(!isEditReport()) {
+		if (!isEditReport())
+		{
 			mPreventNavigation = false;
-		} else if(position == mLastPosition && position == id) {
+		}
+		else if (position == mLastPosition && position == id)
+		{
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
 
 			String title = getString(R.string.exit_report_draft_dialog_title);
 			String message = getString(R.string.exit_report_draft_dialog_msg);
 
-			 if(mEditSimpleReport) {
+			if (mEditSimpleReport)
+			{
 				prompt = true;
 			}
 
-			if(prompt) {
+			if (prompt)
+			{
 				builder.setTitle(title);
 				builder.setMessage(message);
 
@@ -656,7 +749,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				builder.setNeutralButton(R.string.exit_report_draft_dialog_ok,
 						new DialogInterface.OnClickListener()
 						{
-							public void onClick(DialogInterface dialog, int id)
+							public void onClick (DialogInterface dialog, int id)
 							{
 								mPreventNavigation = false;
 								mEditSimpleReport = false;
@@ -665,8 +758,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						});
 
 				// Save draft and close button
-				builder.setPositiveButton(R.string.exit_report_draft_dialog_save, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
+				builder.setPositiveButton(R.string.exit_report_draft_dialog_save, new DialogInterface.OnClickListener()
+				{
+					public void onClick (DialogInterface dialog, int id)
+					{
 						mPreventNavigation = false;
 						mEditSimpleReport = false;
 						onNavigationItemSelected(position, id);
@@ -678,23 +773,25 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				});
 
 				// Continue editing button
-				builder.setNegativeButton(R.string.exit_report_draft_dialog_cancel, new DialogInterface.OnClickListener() {
+				builder.setNegativeButton(R.string.exit_report_draft_dialog_cancel, new DialogInterface.OnClickListener()
+				{
 
-					public void onClick(DialogInterface dialog, int id) {
+					public void onClick (DialogInterface dialog, int id)
+					{
 						dialog.dismiss();
-						mPreventNavigation  = true;
+						mPreventNavigation = true;
 
 						onNavigationItemSelected(mLastPosition, -1);
 					}
 				});
-				
+
 				final AlertDialog alertdialog = builder.create();
 
 				// Changing the dialog text button text sizes
 				alertdialog.setOnShowListener(new DialogInterface.OnShowListener()
 				{
 					@Override
-					public void onShow(DialogInterface dialog)
+					public void onShow (DialogInterface dialog)
 					{
 						Button btnPositive = alertdialog.getButton(Dialog.BUTTON_POSITIVE);
 						btnPositive.setTextSize(13);
@@ -703,7 +800,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						Button btnNeutral = alertdialog.getButton(Dialog.BUTTON_NEUTRAL);
 						btnNeutral.setTextSize(13);
 
-						btnNeutral.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+						// Setting the padding to center-justify the button text
+						btnPositive.setPadding( 2, 1, 2, 10);
+						btnNeutral.setPadding( 2, 1, 2, 10);
+						btnNegative.setPadding( 2,1, 2, 10);
 					}
 
 				});
@@ -711,88 +811,107 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				alertdialog.show();
 			}
 		}
-		
+
 
 		// Creating the view fragment
-		if(!prompt && !mPreventNavigation) {
+		if (!prompt && !mPreventNavigation)
+		{
 			Fragment fragment = null;
 			Fragment fragment2 = null;
 			Fragment fragmentOverview = null;
-			
+
 			Fragment currentFragment = mFragmentManager.findFragmentById(R.id.container);
 			Fragment currentFragment2 = mFragmentManager.findFragmentById(R.id.container2);
-			
-			if(mMapMarkupFragment != null && !mMapMarkupFragment.isVisible()) {
+
+			if (mMapMarkupFragment != null && !mMapMarkupFragment.isVisible())
+			{
 				mMapMarkupFragment.removeMapFragment();
 			}
-			
+
 			mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), false);
 			mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), false);
 			mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), false);
 
+			//OES828 TODO - request ROC reports repeating (use getIncidentDataRate() as update frequency)
+
 			boolean showIncidentName = false;
 
 			String viewTitle = null;
-			
-			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "New view is: " +  navDropdownOptions[position]);
-			
-			switch(NavigationOptions.values()[position]) {
+
+			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "New view is: " + navDropdownOptions[position]);
+
+			switch (NavigationOptions.values()[position])
+			{
 				case OVERVIEW:
-					if(mOverviewFragment == null) {
+					if (mOverviewFragment == null)
+					{
 						mOverviewFragment = new OverviewFragment();
 					}
 					fragmentOverview = mOverviewFragment;
 					viewTitle = "";
 					break;
 				case GENERALMESSAGE:
-					if(currentFragment != null && currentFragment2 != null ){
-						if(currentFragment == mSimpleReportFragment && currentFragment2 ==  mSimpleReportListFragment){
+					if (currentFragment != null && currentFragment2 != null)
+					{
+						if (currentFragment == mSimpleReportFragment && currentFragment2 == mSimpleReportListFragment)
+						{
 							break;
 						}
 					}
-					if(mSimpleReportListFragment == null) {
+					if (mSimpleReportListFragment == null)
+					{
 						mSimpleReportListFragment = new SimpleReportListFragment();
 					}
 					fragment2 = mSimpleReportListFragment;
 					viewTitle = getString(R.string.fragment_title_field_report);
 
-					//if using tablet view and map is closed
-					//set detail view on left side
-					if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet){
-						
+					//if using tablet view and map is closed, set detail view on left side
+					if (mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet)
+					{
+
 						SimpleReportPayload payload = new Gson().fromJson(mOpenedSimpleReportPayload, SimpleReportPayload.class);
-						if(payload == null){
+						if (payload == null)
+						{
 							payload = mDataManager.getLastSimpleReportPayload();
 						}
-						if(payload == null){
+						if (payload == null)
+						{
 							addSimpleReportToDetailView(false);
-						}else{
-							
+						}
+						else
+						{
 							payload.parse();
 							openSimpleReport(payload, mEditSimpleReport);
 						}
-						
+
 						mBackStack.clear();
-					}else if((mViewSimpleReport || mEditSimpleReport) && mOpenedSimpleReportPayload != null) {
+					}
+					// If we're viewing or editing a simple report, populate the fragment with the data
+					else if ((mViewSimpleReport || mEditSimpleReport) && mOpenedSimpleReportPayload != null)
+					{
 						SimpleReportPayload payload = new Gson().fromJson(mOpenedSimpleReportPayload, SimpleReportPayload.class);
 						payload.parse();
-						
+
 						openSimpleReport(payload, this.mEditSimpleReport);
-						if(!mMapMarkupOpenTablet && mDataManager.getTabletLayoutOn()){
+						if (!mMapMarkupOpenTablet && mDataManager.getTabletLayoutOn())
+						{
 							fragment = mSimpleReportListFragment;
 							mBackStack.clear();
-						}else{
+						}
+						else
+						{
 							fragment2 = mSimpleReportFragment;
 						}
 					}
 					mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), false);
 					showIncidentName = true;
-					
+
 					break;
 
 				case ROCFORM:
+					//OES828 TODO - if ROC fragment is not null, store the ROC payload and ROC ID
 					//TODO create the ROC form fragment
-					if(currentFragment != null && currentFragment2 != null )
+					if (currentFragment != null && currentFragment2 != null)
 					{
 						// If we're already on the page, stop.
 						//FIXME: add ROCFORM fragment
@@ -801,7 +920,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						//	break;
 						//}
 					}
-					if(mReportOnConditionActionFragment == null) {
+					if (mReportOnConditionActionFragment == null)
+					{
 						mReportOnConditionActionFragment = new ReportOnConditionActionFragment();
 					}
 
@@ -851,50 +971,58 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					//showIncidentName = true;
 					break;
 				case MAPCOLLABORATION:
-					if(mMapMarkupFragment == null) {
+					if (mMapMarkupFragment == null)
+					{
 						mMapMarkupFragment = new MapMarkupFragment();
 					}
 					fragment = mMapMarkupFragment;
 					viewTitle = getString(R.string.fragment_title_map);
 
-					if(mDataManager.getTabletLayoutOn()){
+					if (mDataManager.getTabletLayoutOn())
+					{
 						mMapMarkupOpenTablet = !mMapMarkupOpenTablet;
 					}
-					
+
 					break;
 				case USERINFO:
-					if(mUserInfoFragment == null) {
+					if (mUserInfoFragment == null)
+					{
 						Bundle args = new Bundle();
 						args.putString(FormFragment.SCHEMA_FILE, "userinfo_schema.json");
-						
+
 						mUserInfoFragment = new FormFragment();
 						mUserInfoFragment.setArguments(args);
 					}
 					fragment2 = mUserInfoFragment;
 					break;
 				case CHATLOG:
-					if(currentFragment2 != null && mDataManager.getTabletLayoutOn()){
-						if(currentFragment2 == mChatFragment){
+					if (currentFragment2 != null && mDataManager.getTabletLayoutOn())
+					{
+						if (currentFragment2 == mChatFragment)
+						{
 							break;
 						}
 					}
-					if(mChatFragment == null) {
+					if (mChatFragment == null)
+					{
 //						mChatFragment = new ChatFragment();
 						mChatFragment = new ChatListFragment();
 					}
 					mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), true);
 					fragment2 = mChatFragment;
 					viewTitle = getString(R.string.fragment_title_chat);
-					
-					if(mDataManager.getTabletLayoutOn()){
-						if(currentFragment != null && currentFragment != mMapMarkupFragment){
-							animateFragmentRemove(currentFragment,false);
+
+					if (mDataManager.getTabletLayoutOn())
+					{
+						if (currentFragment != null && currentFragment != mMapMarkupFragment)
+						{
+							animateFragmentRemove(currentFragment, false);
 							mFragmentManager.executePendingTransactions();
 						}
 					}
-					
+
 					break;
-				
+
 				case SELECTINCIDENT:
 					mBackStack.clear();
 					Intent selectIncidentIntent = new Intent(MainActivity.this, LoginActivity.class);
@@ -903,42 +1031,45 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					startActivity(selectIncidentIntent);
 					finish();
 					break;
-					
+
 				case LOGOUT:
 					mDataManager.setLoggedIn(false);
 					mDataManager.requestLogout();
 					mBackStack.clear();
-					
+
 					EncryptedPreferences userPreferences = new EncryptedPreferences(this.getSharedPreferences(Constants.nics_USER_PREFERENCES, 0));
 					userPreferences.savePreferenceBoolean(Constants.nics_AUTO_LOGIN, false);
-					
+
 //					Intent intent = new Intent(MainActivity.this, LoginActivity.class);
 //					intent.putExtra("hideSplash", true);
 //			        startActivity(intent);
-					
+
 //					if(id == -1) {
 //						finish();
 //					} else {
-						Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-						intent.putExtra("hideSplash", true);
-						startActivity(intent);
+					Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+					intent.putExtra("hideSplash", true);
+					startActivity(intent);
 //					}
 					break;
 
 				default:
 					break;
 			}
-			
-			try {
-				if(fragment != null) {
-					if( mDataManager.getTabletLayoutOn()){
-						if(mMapMarkupOpenTablet)
+
+			try
+			{
+				if (fragment != null)
+				{
+					if (mDataManager.getTabletLayoutOn())
+					{
+						if (mMapMarkupOpenTablet)
 						{
-							animateFragmentReplace(R.id.container, fragment,true);
+							animateFragmentReplace(R.id.container, fragment, true);
 						}
 						else
 						{
-							if(fragment == mMapMarkupFragment)
+							if (fragment == mMapMarkupFragment)
 							{
 								checkForOpenReportsAndSwapContainer();
 							}
@@ -946,66 +1077,70 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					}
 					else
 					{
-						animateFragmentReplace(R.id.container, fragment,true);
+						animateFragmentReplace(R.id.container, fragment, true);
 					}
 				}
-				if(fragment2 != null)
+				if (fragment2 != null)
 				{
-					if(mDataManager.getTabletLayoutOn())
+					if (mDataManager.getTabletLayoutOn())
 					{
-						animateFragmentReplace(R.id.container2, fragment2,true);
+						animateFragmentReplace(R.id.container2, fragment2, true);
 					}
 					else
 					{
-						animateFragmentReplace(R.id.container, fragment2,true);
+						animateFragmentReplace(R.id.container, fragment2, true);
 					}
 				}
-				if(fragmentOverview != null)
+				if (fragmentOverview != null)
 				{
-					if(mDataManager.getTabletLayoutOn())
+					if (mDataManager.getTabletLayoutOn())
 					{
-						animateFragmentReplace(R.id.containerOverview, fragmentOverview,true);
+						animateFragmentReplace(R.id.containerOverview, fragmentOverview, true);
 					}
 					else
 					{
-						animateFragmentReplace(R.id.container, fragmentOverview,true);
-					}					
+						animateFragmentReplace(R.id.container, fragmentOverview, true);
+					}
 				}
-			} catch (Exception ex)
+			}
+			catch (Exception ex)
 			{
 				Log.e("nics", ex.toString());
 			}
-			
+
 			// Have to wait for view to exist before populating data
-			if(position == NavigationOptions.USERINFO.getValue())
+			if (position == NavigationOptions.USERINFO.getValue())
 			{
 				final Handler handler = new Handler();
-				handler.postDelayed(new Runnable() {
-				  @Override
-				  public void run() {
-					  UserData data = new UserData(mDataManager.getUserPayload());
-					  mUserInfoFragment.populate(data.toJsonString(), false);
-				  }
+				handler.postDelayed(new Runnable()
+				{
+					@Override
+					public void run ()
+					{
+						UserData data = new UserData(mDataManager.getUserPayload());
+						mUserInfoFragment.populate(data.toJsonString(), false);
+					}
 				}, 200);
 			}
-			
-			if(position != NavigationOptions.MAPCOLLABORATION.getValue())
+
+			if (position != NavigationOptions.MAPCOLLABORATION.getValue())
 			{
 				mDataManager.stopPollingMarkup();
 			}
-	
-			if(position != mLastPosition && !mIsBackKey )
+
+			if (position != mLastPosition && !mIsBackKey)
 			{
 				mBackStack.push(mLastPosition);
 				mLastPosition = position;
-			} else
+			}
+			else
 			{
 				mIsBackKey = false;
 				mLastPosition = position;
 			}
 
 			//Set the view title depending on what view we are in
-			if(mBreadcrumbTextView != null)
+			if (mBreadcrumbTextView != null)
 			{
 				if (position == NavigationOptions.OVERVIEW.getValue())
 				{
@@ -1013,12 +1148,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				}
 				else
 				{
-					if(viewTitle != null)
+					if (viewTitle != null)
 					{
 						setViewTitle(viewTitle);
 					}
 
-					if(showIncidentName)
+					if (showIncidentName)
 					{
 						mDataManager.setCurrentNavigationView(NavigationOptions.values()[position].toString());
 					}
@@ -1027,186 +1162,246 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		}
 		return true;
 	}
-	
-	void animateFragmentReplace(int container, Fragment frag, boolean stateLose){
+
+	void animateFragmentReplace (int container, Fragment frag, boolean stateLose)
+	{
 		FragmentTransaction transaction = mFragmentManager.beginTransaction();
 		transaction.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out);
 		transaction.replace(container, frag);
-		if(stateLose){
+		if (stateLose)
+		{
 			transaction.commitAllowingStateLoss();
-		}else{
+		}
+		else
+		{
 			transaction.commit();
 		}
 	}
-	
-	void animateFragmentRemove(Fragment frag, boolean stateLose){
+
+	void animateFragmentRemove (Fragment frag, boolean stateLose)
+	{
 		FragmentTransaction transaction = mFragmentManager.beginTransaction();
 		transaction.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out);
 		transaction.remove(frag);
-		if(stateLose){
+		if (stateLose)
+		{
 			transaction.commitAllowingStateLoss();
-		}else{
+		}
+		else
+		{
 			transaction.commit();
 		}
 	}
-	
+
 	@Override
-	public void onAttachFragment(Fragment fragment) {
+	public void onAttachFragment (Fragment fragment)
+	{
 		super.onAttachFragment(fragment);
-		if(fragment.getTag() != null) {
-			try {
+		if (fragment.getTag() != null)
+		{
+			try
+			{
 				mLastPosition = Integer.valueOf(fragment.getTag());
-			} catch(NumberFormatException e) {
+			}
+			catch (NumberFormatException e)
+			{
 			}
 		}
 	}
-	
+
 	@Override
-	public void onBackPressed() {
-		
-		if(mDataManager.getTabletLayoutOn()){
+	public void onBackPressed ()
+	{
+
+		if (mDataManager.getTabletLayoutOn())
+		{
 			tabletBackButtonPressed();
 			return;
 		}
-		
+
 		mIsBackKey = true;
-		if(mViewMapLocationPicker){
+		if (mViewMapLocationPicker)
+		{
 			mMapMarkupLocationPickerFragment.BackButtonPressed();
-		}else if(mEditSimpleReport || mViewSimpleReport) {
+		}
+		else if (mEditSimpleReport || mViewSimpleReport)
+		{
 			mViewSimpleReport = false;
 			mOpenedSimpleReportPayload = null;
 			mOpenedSimpleReportId = -1;
-			if( mReportOpenedFromMap) {
+			if (mReportOpenedFromMap)
+			{
 				mReportOpenedFromMap = false;
 				mBackStack.pop();
 				onNavigationItemSelected(NavigationOptions.MAPCOLLABORATION.getValue(), -1);
-			} else {
+			}
+			else
+			{
 				onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), NavigationOptions.GENERALMESSAGE.getValue());
 			}
-		} else if(mBackStack.size() > 0) {
+		}
+
+		//OES828 TODO - handle if we're backing out of a ROC form ( go back to the Action Menu)
+
+		else if (mBackStack.size() > 0)
+		{
 			onNavigationItemSelected(mBackStack.pop(), -1);
-		} else {
-			if(mDataManager.isLoggedIn()) {
+		}
+		else
+		{
+			if (mDataManager.isLoggedIn())
+			{
 				mLastPosition = NavigationOptions.OVERVIEW.getValue();
-			} else {
+			}
+			else
+			{
 				mLastPosition = NavigationOptions.LOGOUT.getValue();
 			}
 			mIsBackKey = false;
 			moveTaskToBack(true);
 		}
 	}
-	
-	void tabletBackButtonPressed(){
+
+	void tabletBackButtonPressed ()
+	{
 		Fragment currentFragment2 = mFragmentManager.findFragmentById(R.id.container2);
-	
-		if(currentFragment2 == mSimpleReportFragment)
+
+		if (currentFragment2 == mSimpleReportFragment)
 		{
 			mViewSimpleReport = false;
 			mOpenedSimpleReportPayload = null;
 			onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -1);
 		}
 	}
-	
-	void checkForOpenReportsAndSwapContainer()
+
+	// Used for Tablet views only
+	// This is in charge of opening reports for viewing
+	void checkForOpenReportsAndSwapContainer ()
 	{
 		Fragment currentFragment = mFragmentManager.findFragmentById(R.id.container);
 		Fragment currentFragment2 = mFragmentManager.findFragmentById(R.id.container2);
-		
-		if(mSimpleReportFragment == currentFragment2 && currentFragment2 != null){
-			
-			animateFragmentRemove(currentFragment2,false);
+
+		if (currentFragment2 == mSimpleReportFragment && currentFragment2 != null)
+		{
+			animateFragmentRemove(currentFragment2, false);
 			mFragmentManager.executePendingTransactions();
-			
-			animateFragmentReplace(R.id.container2, mSimpleReportListFragment,false);
+
+			animateFragmentReplace(R.id.container2, mSimpleReportListFragment, false);
 			SimpleReportPayload payload = mSimpleReportFragment.getPayload();
-			if(payload == null){
+			if (payload == null)
+			{
 				payload = mDataManager.getLastSimpleReportPayload();
 			}
-			openSimpleReport(payload,mEditSimpleReport);	
-		}else if(mSimpleReportListFragment == currentFragment2 && currentFragment2 != null){
-			
-			if(mSimpleReportFragment == null){
+			openSimpleReport(payload, mEditSimpleReport);
+		}
+		else if (currentFragment2 == mSimpleReportListFragment && currentFragment2 != null)
+		{
+			if (mSimpleReportFragment == null)
+			{
 				mSimpleReportFragment = new GeneralMessageFragment();
 			}
-			
+
 			SimpleReportPayload payload = mSimpleReportFragment.getPayload();
-			if(payload == null){
+			if (payload == null)
+			{
 				payload = mDataManager.getLastSimpleReportPayload();
 			}
-			openSimpleReport(payload,mEditSimpleReport);
+			openSimpleReport(payload, mEditSimpleReport);
 		}
-		else{
-			if(currentFragment == mMapMarkupFragment){
-				animateFragmentRemove(currentFragment,false);
+		//OES828 TODO - check if currentFragment is ROC action window and ROC viewer
+		else
+		{
+			if (currentFragment == mMapMarkupFragment)
+			{
+				animateFragmentRemove(currentFragment, false);
 				mFragmentManager.executePendingTransactions();
 			}
 		}
 	}
 
 
-	public void openSimpleReport(SimpleReportPayload simpleReportPayload, boolean editable) {
-		if(mSimpleReportFragment == null) {
+	// Populates the Simple Report fragment details with our current Simple Report data
+	public void openSimpleReport (SimpleReportPayload simpleReportPayload, boolean editable)
+	{
+		if (mSimpleReportFragment == null)
+		{
 			mSimpleReportFragment = new GeneralMessageFragment();
 		}
-		
-		if(!mDataManager.getTabletLayoutOn() || !mMapMarkupOpenTablet){
-			if(mSimpleReportFragment != mFragmentManager.findFragmentById(R.id.container)){
-				animateFragmentReplace(R.id.container, mSimpleReportFragment,false);
+
+		if (!mDataManager.getTabletLayoutOn() || !mMapMarkupOpenTablet)
+		{
+			if (mSimpleReportFragment != mFragmentManager.findFragmentById(R.id.container))
+			{
+				animateFragmentReplace(R.id.container, mSimpleReportFragment, false);
 				mFragmentManager.executePendingTransactions();
 			}
-		}else{
-			animateFragmentReplace(R.id.container2, mSimpleReportFragment,false);
+		}
+		else
+		{
+			animateFragmentReplace(R.id.container2, mSimpleReportFragment, false);
 			mFragmentManager.executePendingTransactions();
 		}
 
 		simpleReportPayload.setDraft(editable);
 		mOpenedSimpleReportPayload = simpleReportPayload.toJsonString();
 		mSimpleReportFragment.setPayload(simpleReportPayload, editable);
-		
-		if(editable) {
+
+		if (editable)
+		{
 			mEditSimpleReport = true;
 			mViewSimpleReport = false;
-		} else {
+		}
+		else
+		{
 			mEditSimpleReport = false;
 			mViewSimpleReport = true;
 		}
 	}
 
+	//OES828 TODO - need a function to populate the ROC Viewer fragment and ROC Action Fragment with the current data / state
+
 	@Override
-	protected void onPause() {
+	protected void onPause ()
+	{
 		super.onPause();
 
-		if(invalidSessionIDHandler != null)
+		if (invalidSessionIDHandler != null)
+		{
 			invalidSessionIDHandler.removeCallbacks(invalidSessionIDRunnable);
+		}
 	}
-	
+
 	@Override
-	protected void onDestroy() {
+	protected void onDestroy ()
+	{
 		super.onDestroy();
 
 		mDataManager.stopPollingAlarms();
 	}
 
-	public void showLRFError(String name) {
+	public void showLRFError (String name)
+	{
 		final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 		alertDialog.setTitle(getString(R.string.disconnected_device, name));
 		alertDialog.setMessage(getString(R.string.disconnected_device_desc));
-		alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.ok), new DialogInterface.OnClickListener() {
-			
+		alertDialog.setButton(DialogInterface.BUTTON_NEUTRAL, getString(R.string.ok), new DialogInterface.OnClickListener()
+		{
+
 			@Override
-			public void onClick(DialogInterface dialog, int which) {
+			public void onClick (DialogInterface dialog, int which)
+			{
 				alertDialog.dismiss();
 			}
 		});
 		alertDialog.show();
 	}
 
-	public boolean isEditReport()
+	public boolean isEditReport ()
 	{
 		return mEditSimpleReport;
 	}
 
-	public boolean isViewReport()
+	public boolean isViewReport ()
 	{
 		return mViewSimpleReport;
 	}
@@ -1228,23 +1423,26 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 //		System.exit(1);
 //
 //	}
-	
-	public void setBreadcrumbText(CharSequence charSequence) {
+
+	public void setBreadcrumbText (CharSequence charSequence)
+	{
 		mBreadcrumbTextView.setText(charSequence);
 	}
 
 
-	public void showInvalidSessionIDDialog(boolean FRMessage) {
-
+	public void showInvalidSessionIDDialog (boolean FRMessage)
+	{
 		Context context = this;
-		Log.v("USIDDEFECT","showInvalidSessionIDDialog invoked");
+		Log.v("USIDDEFECT", "showInvalidSessionIDDialog invoked");
 		//Showing a failure dialog
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
 		String title = mContext.getString(R.string.invalid_session_title);
 
 		String message = mContext.getString(R.string.invalid_session_body);
-		if(FRMessage)
+		if (FRMessage)
+		{
 			message = mContext.getString(R.string.invalid_session_body_FR);
+		}
 
 		builder.setTitle(title);
 		builder.setMessage(message);
@@ -1252,7 +1450,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		builder.setPositiveButton(mContext.getString(R.string.invalid_session_relogin),
 				new DialogInterface.OnClickListener()
 				{
-					public void onClick(DialogInterface dialog, int id)
+					public void onClick (DialogInterface dialog, int id)
 					{
 						dialog.dismiss();
 
@@ -1261,7 +1459,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 						DataManager.CustomCommand cmd = new DataManager.CustomCommand()
 						{
 							@Override
-							public void performAction()
+							public void performAction ()
 							{
 								// Need to call this AFTER we have successfully logged in.
 								RestClient.setSendingSimpleReports(false);
@@ -1278,7 +1476,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		builder.setNegativeButton(mContext.getString(R.string.invalid_session_okay),
 				new DialogInterface.OnClickListener()
 				{
-					public void onClick(DialogInterface dialog, int id)
+					public void onClick (DialogInterface dialog, int id)
 					{
 						dialog.dismiss();
 						// Must fully close the application, just calling finish() is insufficient as MainActivity won't be
@@ -1295,7 +1493,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		alertdialog.setOnShowListener(new DialogInterface.OnShowListener()
 		{
 			@Override
-			public void onShow(DialogInterface dialog)
+			public void onShow (DialogInterface dialog)
 			{
 				Button btnPositive = alertdialog.getButton(Dialog.BUTTON_POSITIVE);
 				btnPositive.setTextSize(13);
@@ -1309,5 +1507,5 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 		alertdialog.show();
 	}
-	
+
 }

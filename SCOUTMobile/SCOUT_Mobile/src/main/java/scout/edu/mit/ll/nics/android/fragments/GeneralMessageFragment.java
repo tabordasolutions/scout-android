@@ -62,7 +62,8 @@ import scout.edu.mit.ll.nics.android.utils.Constants.NavigationOptions;
 import scout.edu.mit.ll.nics.android.utils.FormType;
 import scout.edu.mit.ll.nics.android.utils.Intents;
 
-public class GeneralMessageFragment extends Fragment {
+public class GeneralMessageFragment extends Fragment
+{
 
 	private FormFragment mFormFragment;
 	private LinearLayout mFormButtons;
@@ -76,7 +77,7 @@ public class GeneralMessageFragment extends Fragment {
 	private DataManager mDataManager;
 	private boolean isDraft = true;
 	private long mReportId;
-	
+
 	private SimpleReportPayload mCurrentPayload;
 	private SimpleReportData mCurrentData;
 	private Menu mMenu;
@@ -86,21 +87,23 @@ public class GeneralMessageFragment extends Fragment {
 	private boolean receiverRegistered = false;
 	private IntentFilter mIncidentSwitchedReceiverFilter;
 //	private IntentFilter mGeneralMessageProgressReceiverFilter;
-	
+
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate (Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 
 		mContext = (MainActivity) getActivity();
 
 		mReportId = -1;
-		isDraft  = true;
+		isDraft = true;
 		setHasOptionsMenu(true);
-		
+
 		mIncidentSwitchedReceiverFilter = new IntentFilter(Intents.nics_INCIDENT_SWITCHED);
 //		mGeneralMessageProgressReceiverFilter = new IntentFilter(Intents.nics_SIMPLE_REPORT_PROGRESS);
-		
-		if (!receiverRegistered) {
+
+		if (!receiverRegistered)
+		{
 			mContext.registerReceiver(incidentChangedReceiver, mIncidentSwitchedReceiverFilter);
 //			mContext.registerReceiver(incidentChangedReceiver, mGeneralMessageProgressReceiverFilter);
 			receiverRegistered = true;
@@ -108,35 +111,44 @@ public class GeneralMessageFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView (LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
 		super.onCreateView(inflater, container, savedInstanceState);
 
 		mFormFragment = (FormFragment) getFragmentManager().findFragmentById(R.id.generalMessageFragment);
 
-		if (mFormFragment == null) {
+		if (mFormFragment == null)
+		{
 			int id = -1;
-			if (savedInstanceState != null) {
+			if (savedInstanceState != null)
+			{
 				id = savedInstanceState.getInt("fragmentId", -1);
 			}
 
-			if (id == -1) {
+			if (id == -1)
+			{
 				mRootView = inflater.inflate(R.layout.fragment_generalmessage, container, false);
-			} else {
+			}
+			else
+			{
 				mFormFragment = (FormFragment) getFragmentManager().findFragmentById(id);
 
-				if (mFormFragment != null) {
+				if (mFormFragment != null)
+				{
 					mRootView = container.findViewById(R.id.generalMessageFragment);
 				}
 			}
-		} else if(mRootView == null) {
+		}
+		else if (mRootView == null)
+		{
 			mRootView = container.findViewById(R.id.generalMessageFragment);
 		}
-		
+
 		mSaveDraftButton = (Button) mRootView.findViewById(R.id.generalMessageSaveButton);
 		mSubmitButton = (Button) mRootView.findViewById(R.id.generalMessageSubmitButton);
 		//mClearAllButton = (Button) mRootView.findViewById(R.id.generalMessageClearButton);
 		mCancelButton = (Button) mRootView.findViewById(R.id.generalMessageCancelButton);
-		
+
 		mFormButtons = (LinearLayout) mRootView.findViewById(R.id.generalMessageButtons);
 
 		mSaveDraftButton.setOnClickListener(onActionButtonClick);
@@ -149,99 +161,120 @@ public class GeneralMessageFragment extends Fragment {
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume ()
+	{
 		super.onResume();
-		if (mFormFragment == null) {
+		if (mFormFragment == null)
+		{
 			mFormFragment = (FormFragment) getFragmentManager().findFragmentById(R.id.generalMessageFragment);
 		}
-		
-		if (!receiverRegistered) {
+
+		if (!receiverRegistered)
+		{
 			mContext.registerReceiver(incidentChangedReceiver, mIncidentSwitchedReceiverFilter);
 			receiverRegistered = true;
 		}
 	}
 
 	@Override
-	public void onSaveInstanceState(Bundle outState) {
+	public void onSaveInstanceState (Bundle outState)
+	{
 		super.onSaveInstanceState(outState);
 
 		// Save the ID of the existing MapFragment so it can properly be restored when app resumes
-		if (mFormFragment != null) {
+		if (mFormFragment != null)
+		{
 			outState.putInt("fragmentId", mFormFragment.getId());
 		}
 	}
 
-	public void removeAssignmentFragment() {
-		if (mFormFragment != null) {
+	public void removeAssignmentFragment ()
+	{
+		if (mFormFragment != null)
+		{
 			getFragmentManager().beginTransaction().remove(mFormFragment).commit();
 			mFormFragment = null;
 		}
 	}
 
-	public void populate(String incidentInfoJson, long id, boolean editable) {
-		if (mFormFragment == null) {
+	public void populate (String incidentInfoJson, long id, boolean editable)
+	{
+		if (mFormFragment == null)
+		{
 			mFormFragment = (FormFragment) getFragmentManager().findFragmentById(R.id.generalMessageFragment);
 		}
-		
+
 		mFormFragment.populate(incidentInfoJson, editable);
 		mReportId = id;
 
-		if(!editable) {
+		if (!editable)
+		{
 			mFormButtons.setVisibility(View.GONE);
 			mHideCopy = false;
 			getActivity().supportInvalidateOptionsMenu();
 
-		} else {
+		}
+		else
+		{
 			mFormButtons.setVisibility(View.VISIBLE);
 			mHideCopy = true;
 			getActivity().supportInvalidateOptionsMenu();
 		}
 	}
-	
-	public void hideCopy(boolean hide) {
+
+	public void hideCopy (boolean hide)
+	{
 		mHideCopy = hide;
 		getActivity().supportInvalidateOptionsMenu();
 	}
-	
+
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+	public void onCreateOptionsMenu (Menu menu, MenuInflater inflater)
+	{
 		super.onCreateOptionsMenu(menu, inflater);
 
 		inflater.inflate(R.menu.generalmessage_copy, menu);
-		
+
 		mMenu = menu;
-		
+
 		MenuItem item = mMenu.findItem(R.id.copyGeneralMessageOption);
-		if(mHideCopy) {
+		if (mHideCopy)
+		{
 			item.setVisible(false);
-		} else {
+		}
+		else
+		{
 			item.setVisible(true);
 		}
-		
+
 	}
 
 	@Override
-	public void onDestroyView() {
+	public void onDestroyView ()
+	{
 		super.onDestroyView();
 
-		if (receiverRegistered) {
+		if (receiverRegistered)
+		{
 			mContext.unregisterReceiver(incidentChangedReceiver);
 			receiverRegistered = false;
 		}
-		
+
 		((ViewGroup) mRootView.getParent()).removeView(mRootView);
 	}
 
 	// Saves the current General Message to draft
-	public void saveDraft() {
+	public void saveDraft ()
+	{
 		isDraft = true;
 
-		if(isDraft) {
+		if (isDraft)
+		{
 			mDataManager.deleteSimpleReportStoreAndForward(mReportId);
 		}
 		SimpleReportData messageData;
 		SimpleReportPayload payload;
-		long currentTime = System.currentTimeMillis ();
+		long currentTime = System.currentTimeMillis();
 
 		messageData = new SimpleReportData((new Gson().fromJson(mFormFragment.save().toString(), SimpleReportFormData.class)));
 		messageData.setUser(mDataManager.getUsername());
@@ -265,55 +298,59 @@ public class GeneralMessageFragment extends Fragment {
 	}
 
 
-	private OnClickListener onActionButtonClick = new OnClickListener() {
+	private OnClickListener onActionButtonClick = new OnClickListener()
+	{
 
 		private AlertDialog mAlertDialog;
 
 		@Override
-		public void onClick(View v) {
+		public void onClick (View v)
+		{
 			SimpleReportPayload payload;
 			SimpleReportData messageData;
-	    	long currentTime = System.currentTimeMillis ();
-			
-	    	switch (v.getId()) {
+			long currentTime = System.currentTimeMillis();
+
+			switch (v.getId())
+			{
 				case R.id.generalMessageSaveButton:
 					saveDraft();
 					mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
 
 					break;
-	
+
 				case R.id.generalMessageSubmitButton:
 					messageData = new SimpleReportData((new Gson().fromJson(mFormFragment.save().toString(), SimpleReportFormData.class)));
 					messageData.setUser(mDataManager.getUsername());
 					messageData.setUserFull(mDataManager.getUserNickname());
-					
-//					if(messageData.getFullpath() != null && !messageData.getFullpath().isEmpty()) {
-						if(isDraft) {
-							mDataManager.deleteSimpleReportStoreAndForward(mReportId);
-							isDraft = false;
-						}
-						
-						payload = new SimpleReportPayload();
-	
-						payload.setId(mReportId);
-						payload.setDraft(isDraft);
-						payload.setIncidentId(mDataManager.getActiveIncidentId());
-						payload.setIncidentName(mDataManager.getActiveIncidentName());
-						payload.setFormTypeId(FormType.SR.ordinal());
-//						payload.setSenderUserId(mDataManager.getUserId());
-						payload.setUserSessionId(mDataManager.getUserSessionId());
-						Log.e("USIDDEFECT","FR submission has begun, usersessionId is: " + mDataManager.getUserSessionId());
 
-						payload.setMessageData(messageData);
+//					if(messageData.getFullpath() != null && !messageData.getFullpath().isEmpty()) {
+					if (isDraft)
+					{
+						mDataManager.deleteSimpleReportStoreAndForward(mReportId);
+						isDraft = false;
+					}
+
+					payload = new SimpleReportPayload();
+
+					payload.setId(mReportId);
+					payload.setDraft(isDraft);
+					payload.setIncidentId(mDataManager.getActiveIncidentId());
+					payload.setIncidentName(mDataManager.getActiveIncidentName());
+					payload.setFormTypeId(FormType.SR.ordinal());
+//						payload.setSenderUserId(mDataManager.getUserId());
+					payload.setUserSessionId(mDataManager.getUserSessionId());
+					Log.e("USIDDEFECT", "FR submission has begun, usersessionId is: " + mDataManager.getUserSessionId());
+
+					payload.setMessageData(messageData);
 //						payload.setCreatedUTC(currentTime);
 //						payload.setLastUpdatedUTC(currentTime);
-						payload.setSeqTime(currentTime);
-					Log.e("USIDDEFECT","about to add SR to store & forward");
-						mDataManager.addSimpleReportToStoreAndForward(payload);
-					Log.e("USIDDEFECT","about to send simple reports");
-						mDataManager.sendSimpleReports();
-					Log.e("USIDDEFECT","finished sending SRs");
-						mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
+					payload.setSeqTime(currentTime);
+					Log.e("USIDDEFECT", "about to add SR to store & forward");
+					mDataManager.addSimpleReportToStoreAndForward(payload);
+					Log.e("USIDDEFECT", "about to send simple reports");
+					mDataManager.sendSimpleReports();
+					Log.e("USIDDEFECT", "finished sending SRs");
+					mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
 					break;
 //					} else {
 //						AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
@@ -341,7 +378,7 @@ public class GeneralMessageFragment extends Fragment {
 	};
 
 	//Prompts a user asking if they want to cancel
-	public void confirmCancelDialog()
+	public void confirmCancelDialog ()
 	{
 		String title = getString(R.string.exit_report_draft_dialog_title);
 		String message = getString(R.string.exit_report_draft_dialog_msg);
@@ -354,15 +391,17 @@ public class GeneralMessageFragment extends Fragment {
 		builder.setNeutralButton(R.string.exit_report_draft_dialog_ok,
 				new DialogInterface.OnClickListener()
 				{
-					public void onClick(DialogInterface dialog, int id)
+					public void onClick (DialogInterface dialog, int id)
 					{
 						mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
 					}
 				});
 
 		// Save draft and close button
-		builder.setPositiveButton(R.string.exit_report_draft_dialog_save, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
+		builder.setPositiveButton(R.string.exit_report_draft_dialog_save, new DialogInterface.OnClickListener()
+		{
+			public void onClick (DialogInterface dialog, int id)
+			{
 				saveDraft();
 				mContext.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -2);
 
@@ -370,9 +409,11 @@ public class GeneralMessageFragment extends Fragment {
 		});
 
 		// Continue editing button
-		builder.setNegativeButton(R.string.exit_report_draft_dialog_cancel, new DialogInterface.OnClickListener() {
+		builder.setNegativeButton(R.string.exit_report_draft_dialog_cancel, new DialogInterface.OnClickListener()
+		{
 
-			public void onClick(DialogInterface dialog, int id) {
+			public void onClick (DialogInterface dialog, int id)
+			{
 				dialog.dismiss();
 			}
 		});
@@ -383,7 +424,7 @@ public class GeneralMessageFragment extends Fragment {
 		alertdialog.setOnShowListener(new DialogInterface.OnShowListener()
 		{
 			@Override
-			public void onShow(DialogInterface dialog)
+			public void onShow (DialogInterface dialog)
 			{
 				Button btnPositive = alertdialog.getButton(Dialog.BUTTON_POSITIVE);
 				btnPositive.setTextSize(13);
@@ -401,35 +442,41 @@ public class GeneralMessageFragment extends Fragment {
 	}
 
 
-	public String toJson() {
+	public String toJson ()
+	{
 		return mFormFragment.save().toString();
 	}
 
-	public long getReportId() {
+	public long getReportId ()
+	{
 		return mReportId;
 	}
 
-	public void setPayload(SimpleReportPayload simpleReportPayload, boolean editable) {
+	public void setPayload (SimpleReportPayload simpleReportPayload, boolean editable)
+	{
 		this.isDraft = simpleReportPayload.isDraft();
 		mReportId = simpleReportPayload.getId();
-		
+
 		simpleReportPayload.parse();
 		SimpleReportData data = simpleReportPayload.getMessageData();
-		
+
 		mCurrentPayload = simpleReportPayload;
 		mCurrentData = data;
-		
+
 		populate(new SimpleReportFormData(data).toJsonString(), mReportId, editable);
 	}
-	
-	public String getFormString() {
+
+	public String getFormString ()
+	{
 		return new SimpleReportFormData(mCurrentData).toJsonString();
 	}
 
-	public SimpleReportPayload getPayload() {
-    	long currentTime = System.currentTimeMillis ();
-    	
-		if(mCurrentPayload != null) {
+	public SimpleReportPayload getPayload ()
+	{
+		long currentTime = System.currentTimeMillis();
+
+		if (mCurrentPayload != null)
+		{
 			mCurrentPayload.setId(mReportId);
 			mCurrentPayload.setDraft(isDraft);
 //			mCurrentPayload.setSenderUserId(mDataManager.getUserId());
@@ -437,37 +484,45 @@ public class GeneralMessageFragment extends Fragment {
 //			mCurrentPayload.setCreatedUTC(currentTime);
 //			mCurrentPayload.setLastUpdatedUTC(currentTime);
 			mCurrentPayload.setSeqTime(currentTime);
-			
+
 			mCurrentData = new SimpleReportData(new Gson().fromJson(mFormFragment.save().toString(), SimpleReportFormData.class));
 			mCurrentData.setUser(mDataManager.getUsername());
 			mCurrentData.setUserFull(mDataManager.getUserNickname());
-			
+
 			mCurrentPayload.setMessageData(mCurrentData);
-		} else {
+		}
+		else
+		{
 			mCurrentPayload = new SimpleReportPayload();
 			mCurrentData = new SimpleReportData();
 			mCurrentPayload.setMessageData(mCurrentData);
 		}
-		
+
 		return mCurrentPayload;
 	}
-	
+
 	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	public void onActivityResult (int requestCode, int resultCode, Intent data)
+	{
 		super.onActivityResult(requestCode, resultCode, data);
-		
+
 		mFormFragment.onActivityResult(requestCode, resultCode, data);
 	}
-	
-	private BroadcastReceiver incidentChangedReceiver = new BroadcastReceiver() {
+
+	private BroadcastReceiver incidentChangedReceiver = new BroadcastReceiver()
+	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {
-			
+		public void onReceive (Context context, Intent intent)
+		{
+
 			SimpleReportPayload payload = mDataManager.getLastSimpleReportPayload();
-			if(payload != null){
-				setPayload(payload,payload.isDraft());
-			}else{
+			if (payload != null)
+			{
+				setPayload(payload, payload.isDraft());
+			}
+			else
+			{
 				mContext.addSimpleReportToDetailView(false);
 			}
 		}

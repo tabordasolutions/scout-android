@@ -35,45 +35,54 @@ import org.json.JSONObject;
 
 import com.google.gson.Gson;
 
+import scout.edu.mit.ll.nics.android.api.DataManager;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportCategoryType;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportData;
-import scout.edu.mit.ll.nics.android.api.DataManager;
 
-public class SimpleReportPayload extends ReportPayload {
-    private transient SimpleReportData messageData;
-    
-	public SimpleReportData getMessageData() {
+public class SimpleReportPayload extends ReportPayload
+{
+	private transient SimpleReportData messageData;
+
+	public SimpleReportData getMessageData()
+	{
 		return messageData;
 	}
-	
-	public void setMessageData(SimpleReportData messageData) {
+
+	public void setMessageData(SimpleReportData messageData)
+	{
 		this.messageData = messageData;
 	}
-	
-    public void parse() {
-    	messageData = new Gson().fromJson(getMessage().replace("NaN", "0.0"), SimpleReportData.class);
-    	
-    	try {
+
+	public void parse()
+	{
+		messageData = new Gson().fromJson(getMessage().replace("NaN", "0.0"), SimpleReportData.class);
+
+		try
+		{
 			JSONObject object = new JSONObject(getMessage());
-			if(object.has("cat")){
+			if(object.has("cat"))
+			{
 				Object category = object.get("cat");
 				String categoryString = category.toString();
-				
+
 				String reverseLanguageResults = DataManager.getInstance().reverseLanguageLookup(categoryString);
 				SimpleReportCategoryType categoryType = SimpleReportCategoryType.lookUp(reverseLanguageResults);
-				
+
 				messageData.setCategory(categoryType);
 			}
-		 
-		} catch (JSONException e) {
+
+		}
+		catch (JSONException e)
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-    
-    public String toJsonString() {
-    	setMessage(new Gson().toJson(getMessageData()));
-    	
-    	return new Gson().toJson(this);
-    }
+
+	public String toJsonString()
+	{
+		setMessage(new Gson().toJson(getMessageData()));
+
+		return new Gson().toJson(this);
+	}
 }
