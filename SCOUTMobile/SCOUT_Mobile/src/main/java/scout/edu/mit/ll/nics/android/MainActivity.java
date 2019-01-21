@@ -908,8 +908,76 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 					break;
 
+				case ROCACTIONFORM:
+					//OES828 TODO - finish this section
+					// TODO - if we're already on the destination page, don't do anything
+					//--------------------------------------------------------------------
+					// if the destination page fragment is null, create it
+					//--------------------------------------------------------------------
+					if (mReportOnConditionActionFragment == null)
+					{
+						mReportOnConditionActionFragment = new ReportOnConditionActionFragment();
+					}
+					//--------------------------------------------------------------------
+
+					//--------------------------------------------------------------------
+					// Set the view title
+					//--------------------------------------------------------------------
+					viewTitle = "Report On Condition";
+					//--------------------------------------------------------------------
+
+					//--------------------------------------------------------------------
+					// Assign fragment to the destination page fragment
+					//--------------------------------------------------------------------
+					fragment = mReportOnConditionActionFragment;
+					//--------------------------------------------------------------------
+
+					//--------------------------------------------------------------------
+					// Assign any data we need to set up the fragment (like fragment2, etc...)
+					//--------------------------------------------------------------------
+					// nothing for now
+					//--------------------------------------------------------------------
+					break;
+
+
 				case ROCFORM:
-					//OES828 TODO - if ROC fragment is not null, store the ROC payload and ROC ID
+					//OES828 TODO - finish this section
+					// TODO - if we're already on the destination page, don't do anything
+					// TODO - if the destination page fragment is null, create it
+					// TODO - Set the view title
+					// TODO - assign fragment to the destination page fragment
+					// TODO - assign any data we need to set up the fragment (like fragment2, etc...)
+
+					// TODO - if we're already on the destination page, don't do anything
+					//--------------------------------------------------------------------
+					// if the destination page fragment is null, create it
+					//--------------------------------------------------------------------
+					if(mReportOnConditionViewFragment == null)
+					{
+						mReportOnConditionViewFragment = new ReportOnConditionViewFragment();
+					}
+					//--------------------------------------------------------------------
+
+					//--------------------------------------------------------------------
+					// Set the view title
+					//--------------------------------------------------------------------
+					viewTitle = "Report On Condition";
+					//--------------------------------------------------------------------
+
+					//--------------------------------------------------------------------
+					// assign fragment to the destination page fragment
+					//--------------------------------------------------------------------
+					fragment = mReportOnConditionViewFragment;
+					//--------------------------------------------------------------------
+
+					//--------------------------------------------------------------------
+					// assign any data we need to set up the fragment (like fragment2, etc...)
+					//--------------------------------------------------------------------
+					// nothing for now
+					//--------------------------------------------------------------------
+					break;
+
+					/*//OES828 TODO - if ROC fragment is not null, store the ROC payload and ROC ID
 					//TODO create the ROC form fragment
 					if (currentFragment != null && currentFragment2 != null)
 					{
@@ -929,7 +997,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 					//if using tablet view and map is closed
 					//set detail view on left side
-					fragment = mReportOnConditionActionFragment;
+					fragment = mReportOnConditionActionFragment;*/
 					/*if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet)
 					{
 
@@ -969,7 +1037,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					//TODO - dataManager request roc forms
 					//mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), false);
 					//showIncidentName = true;
-					break;
+				//	break;
+
 				case MAPCOLLABORATION:
 					if (mMapMarkupFragment == null)
 					{

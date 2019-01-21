@@ -44,5 +44,12 @@
         "id": "3",
         "priority": "3",
         "hint": "sr_message_hint"
+    },
+    "hullo": {
+        "display_name":"sr_categorytype_logistics_section",
+        "type": "string",
+        "id": "4",
+        "priority": "4",
+        "hint": "sr_categorytype_logistics_section"
     }
 }

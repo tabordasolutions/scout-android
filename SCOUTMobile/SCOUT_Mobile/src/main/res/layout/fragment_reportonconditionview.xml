@@ -36,185 +36,179 @@
     android:id="@+id/reportOnConditionActionFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/reportOnConditionViewIncidentInfo"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-
-        <!-- Report Type Field -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView android:text="Report Type:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-            <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
-        </LinearLayout>
-
-        <!-- ROC Display Name Field -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView android:text="ROC Display Name*:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-            <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
-        </LinearLayout>
-
-        <!-- Incident Name Fields -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView android:text="Incident Name*:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-            <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
-        </LinearLayout>
-        <!-- Incident Number Field -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView android:text="Incident Number*:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-            <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
-            <Button android:text="Edit Incident" android:layout_width="wrap_content" android:layout_height="12pt" android:textSize="4pt"/>
-        </LinearLayout>
-
-        <!-- Incident Location Layout -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-            <TextView android:text="Location:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-
-            <!-- Latitude Field -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:text="Latitude*:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-                <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
-            </LinearLayout>
-
-            <!-- Longitude Field -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:text="Longitude*:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-                <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
-                <!-- Locate -->
-                <Button android:text="Locate" android:layout_width="wrap_content" android:layout_height="12pt" android:textSize="4pt"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- County Field -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView android:text="County*:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-            <Spinner android:text="test" android:layout_width="wrap_content" android:layout_height="12pt" android:textSize="4pt"/>
-        </LinearLayout>
-
-        <!-- State / Province / Region Field -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView android:text="State / Province / Region*:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-            <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
-        </LinearLayout>
-
-        <!-- Description Field -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView android:text="Description:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-            <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-            android:id="@+id/reportOnConditionViewROCDetails"
+        android:layout_height="wrap_content">
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginStart="0dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:orientation="vertical"
+            >
+            <!-- ======================================================================================================================================================================== -->
+            <!-- Incident Info Group -->
+            <!-- ======================================================================================================================================================================== -->
+            <LinearLayout
+                android:id="@+id/incidentInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-        <!-- Incident Info Fields -->
-        <LinearLayout android:id="@+id/reportOnConditionViewROCIncidentInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-            <!-- Incident Name Fields -->
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:text="Incident Name*:" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textSize="4pt"/>
-                <EditText android:layout_width="40pt" android:layout_height="10pt" android:textSize="4pt"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:text="Report Type:"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:textSize="8pt"/>
+
+                    <EditText
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
+                        android:layout_height="16pt"
+                        android:textSize="8pt"/>
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:background="@color/black"/>
+
+                <TextView
+                    android:text="Report Type:"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20sp"
+                    android:textSize="8pt"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="40sp"
+                    android:hint="hint text"
+
+                    android:ems="10"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"/>
             </LinearLayout>
-        </LinearLayout>
-        <!-- Incident Scope Fields -->
-        <LinearLayout android:id="@+id/reportOnConditionViewROCIncidentScope" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-        </LinearLayout>
-        <!-- Weather Info Fields -->
-        <LinearLayout android:id="@+id/reportOnConditionViewROCWeatherInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-        </LinearLayout>
-        <!-- Threats & Evacuations Fields -->
-        <LinearLayout android:id="@+id/reportOnConditionViewROCThreatsEvacuations" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-        </LinearLayout>
-        <!-- Resources Committed Fields -->
-        <LinearLayout android:id="@+id/reportOnConditionViewROCResourcesCommitted" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-        </LinearLayout>
-        <!-- Email Fields -->
-        <LinearLayout android:id="@+id/reportOnConditionViewROCEmail" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-        </LinearLayout>
 
-        <!--Incident Info
-                Report Type: NEW/UPDATE/FINAL
-                ROC Display Name*
-                Incident Name*:     Incident Number*:       [Edit Incident]
-                Incident Location: Latitude*: Longitude*: [Locate]
-                County*:        [Dropdown with all counties]
-                State / Province / Region*: CA
-                Description:
-            ROC Details
-                Incident Info
-                    Incident Type*:
-                    Incident Cause:
-                    Location*:
-                    Jurisdiction*:
-                    DPA*:
-                    SRA*:
-                    Date*:
-                    Start Time*:
-                Incident Scope
-                    Size / Scope of Incident*:
-                    Rate of Spread*:
-                    Fuel Type(s)*: checkboxes: Grass, Brush, Timber, Oak Woodland
-                    Potential:
-                    % Contained*: %
-                    Estimated Containment:
-                    Estimated Control:
-                Weather Info
-                    Temperature*: deg F
-                    Relative Humidity*: %
-                    Wind Speed*: mph
-                    Wind Direction*: dropdown
-                    Gusts*: mph
-                    Predicted Weather Conditions*:
-                Threats & Evacuations
-                    Evacuations*:
-                    Structures Threat*:
-                    Infrastructures Structures Thread*:
-                    ICP Location*:
-                Resources Committed
-                    Aircraft
-                        Air Attack:
-                        Air Tankers:
-                        Helicopters:
-                    Overhead:
-                    Type I Engine:
-                    Type II Engine:
-                    Type III Engine:
-                    Water Tender:
-                    Dozers:
-                    Handcrews:
-                    Com Unit:
-                Email
-                    Email (comma-separated):
-                    Simplified Email checkbox
-                    General Comments:
-                    Report By:
-                -->
+
+            <TextView
+                android:id="@+id/rocSection1Header"
+                android:text="Incident Details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#202020"
+                android:textSize="20sp"
+                android:drawableRight="@drawable/down_arrow"
+                android:drawableEnd="@drawable/down_arrow"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp">
+
+            </TextView>
+
+            <LinearLayout
+                android:id="@+id/rocSection1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:background="#111111"
+                >
+                <TextView
+                    android:text="Section 1 text 1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20sp"
+                    android:textSize="8pt"/>
+                <TextView
+                    android:text="Section 1 text 2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20sp"
+                    android:textSize="8pt"/>
+                <AutoCompleteTextView
+                    android:id="@+id/testAutoComplete"
+                    android:hint="Section 1 text 3"
+                    android:completionThreshold="1"
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+                    android:textSize="8pt"/>
+                <TextView
+                    android:text="Threats:"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="8pt"/>
+
+                <!-- We programmatically add AutoCompleteTextViews to this sections -->
+                <LinearLayout
+                    android:id="@+id/rocThreatsSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="#050505">
+
+                    </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="right"
+                    android:background="#050505">
+                    <ImageButton
+                        android:id="@+id/rocThreatNewSection"
+                        android:src="@drawable/first_aid"
+                        android:layout_width="38dp"
+                        android:layout_height="34dp"
+                        android:layout_weight="0"
+                        android:adjustViewBounds="true"
+                        android:contentDescription="@string/markup_AddSymbolButton"
+                        android:maxHeight="32dp"
+                        android:maxWidth="32dp"
+                        android:minHeight="32dip"
+                        android:minWidth="32dip"
+                        android:focusable="true"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <!--<View
+                android:layout_width="match_parent"
+                android:layout_height="500sp"
+                android:background="@color/black"/>-->
+            <TextView
+                android:text="End of ROC Layout 1"
+                android:layout_width="wrap_content"
+                android:layout_height="20sp"
+                android:textSize="8pt"/>
+            <TextView
+                android:text="End of ROC Layout 2"
+                android:layout_width="wrap_content"
+                android:layout_height="20sp"
+                android:textSize="8pt"/>
+
+
 
         </LinearLayout>
-
-        <!--<Button
-            android:id="@+id/reportOnConditionFinalButton"
-            android:layout_width="80pt"
-            android:layout_height="0pt"
-            android:layout_weight=".25"
-            android:text="@string/roc_final"
-            style="?android:attr/buttonBarButtonStyle" />-->
-
-    <!-- TODO - a fragment that has submit buttons -->
-   <!-- <fragment
-        android:id="@+id/generalMessageFragment"
-        android:name="scout.edu.mit.ll.nics.android.fragments.FormFragment"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_weight="1"
-        android:label="@string/schema_generalmessage"/>-->
+    </ScrollView>
+    <!-- Adding an empty focusable layout to assign the view focus to in case the currently focused layout is removed -->
+    <LinearLayout
+        android:id="@+id/rocEmptyFocusableLayout"
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"/>
 </LinearLayout>

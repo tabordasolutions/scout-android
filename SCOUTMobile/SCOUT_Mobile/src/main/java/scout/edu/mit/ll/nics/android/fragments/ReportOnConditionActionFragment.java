@@ -163,6 +163,8 @@ public class ReportOnConditionActionFragment extends Fragment
 			{
 				case R.id.reportOnConditionViewButton:
 					//TODO: navigate to ROC viewer
+					//FIXME - the -2 value was implied, I'm not sure what it should be
+					mContext.onNavigationItemSelected(NavigationOptions.ROCFORM.getValue(), -2);
 					//mContext.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -2);
 					break;
 				case R.id.reportOnConditionNewButton:

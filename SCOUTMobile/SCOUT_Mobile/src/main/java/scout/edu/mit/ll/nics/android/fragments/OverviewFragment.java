@@ -328,7 +328,6 @@ public class OverviewFragment extends Fragment
 
 		if (activeIncident != null)
 		{
-
 			mDataManager.requestCollabrooms(activeIncident.getIncidentId(), activeIncident.getIncidentName());
 
 			ArrayList<CollabroomPayload> incidentRooms = activeIncident.getCollabrooms();
@@ -427,7 +426,8 @@ public class OverviewFragment extends Fragment
 				mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), true);
 				mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), true);
 			}
-		} else
+		}
+		else
 		{
 
 			mJoinRoomButton.setClickable(false);
@@ -594,7 +594,17 @@ public class OverviewFragment extends Fragment
 			incidentArray = new String[incidentsMap.size()];
 			incidentsMap.keySet().toArray(incidentArray);
 			Arrays.sort(incidentArray);
-			mDialogBuilder.setItems(incidentArray, incidentSelected);
+
+			// Adding "none" to the beginning of the incident's list to leave an incident
+			String[] incidentOptionsArray = new String[incidentArray.length + 1];
+			incidentOptionsArray[0] = "none";
+			// Copying the incidentArray to incidentOptionsArray
+			for(int i = 0; i < incidentArray.length; i++)
+			{
+				incidentOptionsArray[i+1] = incidentArray[i];
+			}
+
+			mDialogBuilder.setItems(incidentOptionsArray, incidentSelected);
 			mIncidentPopupMenu = mDialogBuilder.create();
 			mIncidentPopupMenu.show();
 		}
@@ -606,8 +616,59 @@ public class OverviewFragment extends Fragment
 		@Override
 		public void onClick(DialogInterface dialog, int which)
 		{
-
 			mDataManager.clearCollabRoomList();
+
+			// Getting the incident index of the select option
+			// Recall we added "none" at index 0, so all indices are offset by 1
+			int incidentIndex = which - 1;
+			// "none" now corresponds to an index of -1
+			// If the user has selected "none" no incident
+			if(incidentIndex == -1)
+			{
+				// Update the UI buttons
+				if (mIncidentFrameButtonLayout != null)
+				{
+					mIncidentFrameButtonLayout.setAlpha(0.3f);
+				} else
+				{
+					mGeneralMessageButtonLayout.setAlpha(0.3f);
+					mReportButtonLayout.setAlpha(0.3f);
+				}
+
+				if (mRoomFrameLayout != null)
+				{
+					mRoomFrameLayout.setAlpha(0.3f);
+				}
+				if (mRoomFrameButtonLayout != null)
+				{
+					mRoomFrameButtonLayout.setAlpha(1f);
+				}
+				mGeneralMessageButton.setClickable(false);
+				mReportButton.setClickable(false);
+				mChatButton.setClickable(false);
+				mChatButtonLayout.setAlpha(0.3f);
+				// Update the labels
+				mJoinIncidentButton.setText(getString(R.string.incident_join));
+				mJoinRoomButton.setText(getString(R.string.room_join));
+
+
+				// Notify mDataManager that we're no longer in an incident
+				mDataManager.setCurrentIncidentData(null, -1, "");
+				mDataManager.setSelectedCollabRoom(null);
+
+				// Stop retrieving data
+				mDataManager.stopPollingAssignment();
+				mDataManager.stopPollingChat();
+				mDataManager.stopPollingMarkup();
+
+				// Informing dataManager that we have switched incident
+				Intent intent = new Intent();
+				intent.setAction(Intents.nics_INCIDENT_SWITCHED);
+				mDataManager.getContext().sendBroadcast(intent);
+
+				return;
+			}
+
 			mGeneralMessageButton.setClickable(true);
 			mReportButton.setClickable(true);
 
@@ -627,7 +688,7 @@ public class OverviewFragment extends Fragment
 //			mJoinRoomButton.setAlpha(1f);
 			mJoinRoomButton.setClickable(true);
 
-			IncidentPayload currentIncident = mDataManager.getIncidents().get(incidentArray[which]);
+			IncidentPayload currentIncident = mDataManager.getIncidents().get(incidentArray[incidentIndex]);
 
 			mDataManager.requestCollabrooms(currentIncident.getIncidentId(), currentIncident.getIncidentName());
 
@@ -666,6 +727,7 @@ public class OverviewFragment extends Fragment
 			mDataManager.stopPollingChat();
 			mDataManager.stopPollingMarkup();
 			mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), true);
+			//OES-828 TODO: request roc forms
 
 			mJoinIncidentButton.setText(getString(R.string.incident_active, mDataManager.getActiveIncidentName()));
 			mJoinRoomButton.setText(getString(R.string.room_join));
@@ -741,8 +803,8 @@ public class OverviewFragment extends Fragment
 			if (activeReports.get(which).equals(resources.getString(R.string.ROCFORM)))
 			{
 				Log.e("tag", "hullo - ROC option selected!");
-				//SALAD - todo, need to add the appropriate navigation functionality for getting us to the ROC form
-				mMainActivity.onNavigationItemSelected(NavigationOptions.ROCFORM.getValue(), -1);
+				//OES-828 - todo, need to add the appropriate navigation functionality for getting us to the ROC form
+				mMainActivity.onNavigationItemSelected(NavigationOptions.ROCACTIONFORM.getValue(), -1);
 			}
 			mNewReportImageView.setVisibility(View.INVISIBLE);
 		}

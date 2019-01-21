@@ -119,7 +119,8 @@ public class Constants {
 	public static final String CUSTOM_COOKIE_DOMAIN = "CUSTOM_COOKIE_DOMAIN";
 	
 	public static final String nics_TIME_FORMAT = "MM/dd kk:mm:ss";
-	
+
+	// NOTE - if you add or remove entries in NavigationOptions, ensure the "value" field is the correct index
 	public enum NavigationOptions {
 		SELECTINCIDENT(0),
 		OVERVIEW(1),
@@ -127,16 +128,17 @@ public class Constants {
 		//FIELDREPORT(3),
 		//RESOURCEREQUEST(4),
 		//WEATHERREPORT(5),
-		MAPCOLLABORATION(6),
-		CHATLOG(7),
+		MAPCOLLABORATION(3),
+		CHATLOG(4),
 		//GAR(8),
-		USERINFO(9),
-		LOGOUT(10),
+		USERINFO(5),
+		LOGOUT(6),
 		//DAMAGESURVEY(11),
 		//CATANREQUEST(12),
 		//UXOREPORT(13),
 		//UXOFILTER(14),
-		ROCFORM(15);
+		ROCFORM(7),
+		ROCACTIONFORM(8);
 		
 		private final int value;
 		
