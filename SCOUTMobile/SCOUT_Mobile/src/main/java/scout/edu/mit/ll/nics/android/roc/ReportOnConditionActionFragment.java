@@ -28,7 +28,7 @@
 /**
  *
  */
-package scout.edu.mit.ll.nics.android.fragments;
+package scout.edu.mit.ll.nics.android.roc;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
@@ -61,22 +61,13 @@ import scout.edu.mit.ll.nics.android.utils.Intents;
 
 public class ReportOnConditionActionFragment extends Fragment
 {
-
 	//private FormFragment mFormFragment;
-	private LinearLayout mFormButtons;
-	private Button mViewROCButton;
-	private Button mNewROCButton;
-	private Button mUpdateROCButton;
-	private Button mFinalROCButton;
+	private Button mViewRocButton;
+	private Button mCreateRocButton;
 
 	private View mRootView;
 	private DataManager mDataManager;
-	//private long mReportId;
 
-	//private DamageReportPayload mCurrentPayload;
-	//private DamageReportData mCurrentData;
-	//private Menu mMenu;
-	//private boolean mHideCopy;
 	private MainActivity mContext;
 
 	@Override
@@ -85,8 +76,6 @@ public class ReportOnConditionActionFragment extends Fragment
 		super.onCreate(savedInstanceState);
 
 		mContext = (MainActivity) getActivity();
-		//mReportId = -1;
-		//isDraft  = true;
 		setHasOptionsMenu(true);
 
 	}
@@ -100,25 +89,19 @@ public class ReportOnConditionActionFragment extends Fragment
 			return null;
 		}
 
-		Log.e("tag", "hullo - " + container);
+		mDataManager = DataManager.getInstance(getActivity());
+
 
 		mRootView = inflater.inflate(R.layout.fragment_reportonconditionaction, container, false);
 		//mRootView = container.findViewById(R.id.reportOnConditionActionFragment);
 
-		mViewROCButton = (Button) mRootView.findViewById(R.id.reportOnConditionViewButton);
-		mNewROCButton = (Button) mRootView.findViewById(R.id.reportOnConditionNewButton);
-		mUpdateROCButton = (Button) mRootView.findViewById(R.id.reportOnConditionUpdateButton);
-		mFinalROCButton = (Button) mRootView.findViewById(R.id.reportOnConditionFinalButton);
+		mViewRocButton = (Button) mRootView.findViewById(R.id.reportOnConditionViewButton);
+		mCreateRocButton = (Button) mRootView.findViewById(R.id.reportOnConditionCreateButton);
 
+		mViewRocButton.setOnClickListener(onActionButtonClick);
+		mCreateRocButton.setOnClickListener(onActionButtonClick);
 
-		mFormButtons = (LinearLayout) mRootView.findViewById(R.id.reportOnConditionActionButtons);
-
-		mViewROCButton.setOnClickListener(onActionButtonClick);
-		mNewROCButton.setOnClickListener(onActionButtonClick);
-		mUpdateROCButton.setOnClickListener(onActionButtonClick);
-		mFinalROCButton.setOnClickListener(onActionButtonClick);
-
-		mDataManager = DataManager.getInstance(getActivity());
+		// TODO - need to get disable / enable certain ROC buttons based on incident status
 
 		return mRootView;
 	}
@@ -147,7 +130,6 @@ public class ReportOnConditionActionFragment extends Fragment
 	public void onDestroyView()
 	{
 		super.onDestroyView();
-
 		((ViewGroup) mRootView.getParent()).removeView(mRootView);
 	}
 
@@ -167,17 +149,10 @@ public class ReportOnConditionActionFragment extends Fragment
 					mContext.onNavigationItemSelected(NavigationOptions.ROCFORM.getValue(), -2);
 					//mContext.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -2);
 					break;
-				case R.id.reportOnConditionNewButton:
+				case R.id.reportOnConditionCreateButton:
 					//TODO: navigate to ROC viewer
 					//mContext.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -2);
-					break;
-				case R.id.reportOnConditionUpdateButton:
-					//TODO: navigate to ROC viewer
-					//mContext.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -2);
-					break;
-				case R.id.reportOnConditionFinalButton:
-					//TODO: navigate to ROC viewer
-					//mContext.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -2);
+					mContext.onNavigationItemSelected(NavigationOptions.ROCFORM.getValue(), -2);
 					break;
 			}
 		}

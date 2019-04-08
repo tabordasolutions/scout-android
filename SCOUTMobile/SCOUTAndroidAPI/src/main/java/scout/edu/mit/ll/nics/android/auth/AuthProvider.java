@@ -29,8 +29,10 @@ package scout.edu.mit.ll.nics.android.auth;
 
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.http.HttpResponse;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.util.Log;
 import android.content.Context;
@@ -47,11 +49,15 @@ public abstract class AuthProvider {
 	protected DataManager mDataManager;
 	protected String mPassword;
 	protected CountDownLatch mLatch;
+	protected DefaultHttpClient mSyncClient;
 
 	public AuthProvider() {
 		mClient = new AsyncHttpClient();//true,80,443);
     	mClient.setTimeout(60 * 1000);
 		mDataManager = DataManager.getInstance();
+
+		// A Synchronous HTTP client (used for synchronous HTTP requests)
+		mSyncClient = new DefaultHttpClient();
 	}
 	
 	public AsyncHttpClient getClient() {
@@ -70,7 +76,7 @@ public abstract class AuthProvider {
     	Log.w("nicsRest", "URL: " + serverUrl + relativeUrl.replace(" ", "%20"));
         return serverUrl + relativeUrl.replace(" ", "%20");
     }
-    
+
     public abstract void get(String url, final AsyncHttpResponseHandler responseHandler);
     
     public abstract void getWithoutCredentials(Context context, String url, final AsyncHttpResponseHandler responseHandler);
@@ -88,6 +94,6 @@ public abstract class AuthProvider {
 		return mLatch;
 	}
 
-    
-    
+	// Performs a synchronous HTTP get request and returns the result
+	public abstract HttpResponse syncGet(String url);
 }

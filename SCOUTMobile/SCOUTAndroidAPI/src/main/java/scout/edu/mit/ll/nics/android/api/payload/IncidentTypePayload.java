@@ -28,70 +28,92 @@
 /**
  *
  */
-package scout.edu.mit.ll.nics.android.api.payload.forms;
+package scout.edu.mit.ll.nics.android.api.payload;
 
-import com.google.gson.Gson;
+import java.util.ArrayList;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import scout.edu.mit.ll.nics.android.api.DataManager;
-import scout.edu.mit.ll.nics.android.api.data.ReportOnConditionData;
-
-public class ReportOnConditionPayload extends ReportPayload
+public class IncidentTypePayload
 {
-	//OES-828 TODO Need to properly implement this.
+	private long incidentIncidenttypeid;
+	private String incident;
+	private IncidentTypeIncidentTypePayload incidentType;
+	private long incidenttypeid;
+	private long incidentId;
 
-	private transient ReportOnConditionData messageData;
-
-	public ReportOnConditionData getMessageData()
+	public static class IncidentTypeIncidentTypePayload
 	{
-		return messageData;
-	}
+		private long incidentTypeId;
+		private String incidentTypeName;
 
-	public void setMessageData(ReportOnConditionData messageData)
-	{
-		this.messageData = messageData;
-	}
-
-	public void parse() {
-    	messageData = new Gson().fromJson(getMessage().replace("NaN", "0.0"), ReportOnConditionData.class);
-
-    	/*try
-    	{
-			JSONObject object = new JSONObject(getMessage());
-
-
-
-			if(object.has("cat")){
-				Object category = object.get("cat");
-				String categoryString = category.toString();
-
-
-
-				String reverseLanguageResults = DataManager.getInstance().reverseLanguageLookup(categoryString);
-
-
-
-
-				SimpleReportCategoryType categoryType = SimpleReportCategoryType.lookUp(reverseLanguageResults);
-
-				messageData.setCategory(categoryType);
-			}
-
-		}
-		catch (JSONException e)
+		public void setIncidentTypeId (long incidentTypeId)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+			this.incidentTypeId = incidentTypeId;
+		}
+
+		public String getIncidentTypeName ()
+		{
+			return incidentTypeName;
+		}
+
+		public void setIncidentTypeName (String incidentTypeName)
+		{
+			this.incidentTypeName = incidentTypeName;
+		}
+
+		public long getIncidentTypeId()
+		{
+			return incidentTypeId;
+		}
 
 	}
 
-	public String toJsonString()
+	public long getIncidentIncidenttypeid ()
 	{
-		setMessage(new Gson().toJson(getMessageData()));
+		return incidentIncidenttypeid;
+	}
 
-		return new Gson().toJson(this);
+	public void setIncidentIncidenttypeid (long incidentIncidenttypeid)
+	{
+		this.incidentIncidenttypeid = incidentIncidenttypeid;
+	}
+
+	public String getIncident ()
+	{
+		return incident;
+	}
+
+	public void setIncident (String incident)
+	{
+		this.incident = incident;
+	}
+
+	public IncidentTypeIncidentTypePayload getIncidentType ()
+	{
+		return incidentType;
+	}
+
+	public void setIncidentType (IncidentTypeIncidentTypePayload incidentType)
+	{
+		this.incidentType = incidentType;
+	}
+
+	public long getIncidenttypeid ()
+	{
+		return incidenttypeid;
+	}
+
+	public void setIncidenttypeid (long incidenttypeid)
+	{
+		this.incidenttypeid = incidenttypeid;
+	}
+
+	public long getIncidentId ()
+	{
+		return incidentId;
+	}
+
+	public void setIncidentId (long incidentId)
+	{
+		this.incidentId = incidentId;
 	}
 }

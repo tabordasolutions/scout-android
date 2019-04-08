@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- The default EditText wasn't showing fading when the field state was set to disabled -->
+<!-- Added this custom drawable resource to manually define the EditText's disabled color -->
+    <item android:state_enabled="false" android:color="#4c4c4c"/>
+    <item android:state_enabled="true" android:color="#bebebe" />
+</selector>

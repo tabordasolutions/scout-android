@@ -41,6 +41,7 @@ import scout.edu.mit.ll.nics.android.api.DataManager;
 import scout.edu.mit.ll.nics.android.api.RestClient;
 import scout.edu.mit.ll.nics.android.api.data.ReportSendStatus;
 import scout.edu.mit.ll.nics.android.api.payload.forms.ReportOnConditionPayload;
+import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
 import scout.edu.mit.ll.nics.android.utils.Intents;
 import scout.edu.mit.ll.nics.android.utils.NotificationsHandler;
 
@@ -63,16 +64,16 @@ public class ParseReportOnConditionsTask extends AsyncTask<ArrayList<ReportOnCon
 	@Override
 	protected Integer doInBackground(@SuppressWarnings("unchecked") ArrayList<ReportOnConditionPayload>... rocPayloads)
 	{
-/*		Integer numParsed = 0;
-		for(SimpleReportPayload payload : srPayloads[0])
+		Integer numParsed = 0;
+		for(ReportOnConditionPayload payload : rocPayloads[0])
 		{
 			if(payload.getIncidentId() == mDataManager.getActiveIncidentId())
 			{
 				payload.parse();
 				payload.setSendStatus(ReportSendStatus.SENT);
 				payload.setNew(true);
-				mDataManager.addSimpleReportToHistory(payload);
-				
+				mDataManager.addReportOnConditionToHistory(payload);
+
 		        Intent intent = new Intent();
 		        intent.setAction(Intents.nics_NEW_SIMPLE_REPORT_RECEIVED);
 		        intent.putExtra("payload", payload.toJsonString());
@@ -85,27 +86,22 @@ public class ParseReportOnConditionsTask extends AsyncTask<ArrayList<ReportOnCon
 		if(numParsed > 0)
 		{
 			
-			ArrayList<SimpleReportPayload> reports = mDataManager.getAllSimpleReportStoreAndForwardHasSent();
+			ArrayList<ReportOnConditionPayload> reports = mDataManager.getAllReportOnConditionStoreAndForwardHasSent();
 			for(int i = 0; i < reports.size(); i++)
 			{
-				mDataManager.deleteSimpleReportStoreAndForward(reports.get(i).getId());
-				Log.d("ParseSimpleReport","deleted sent simple report: " + reports.get(i).getId());
+				mDataManager.deleteReportOnConditionStoreAndForward(reports.get(i).getId());
+				Log.d("ParseReportOnCondition","deleted sent report on condition: " + reports.get(i).getId());
 				Intent intent = new Intent();
-			    intent.setAction(Intents.nics_SENT_SIMPLE_REPORTS_CLEARED);
+			    intent.setAction(Intents.nics_SENT_REPORT_ON_CONDITION_CLEARED);
 				intent.putExtra("reportId", reports.get(i).getFormId());
 		        mContext.sendBroadcast (intent);
 			}
 			
-			if(!mDataManager.isPushNotificationsDisabled())
-			{
-				mNotificationHandler.createSimpleReportNotification(srPayloads[0], mDataManager.getActiveIncidentId());
-			}
-	        mDataManager.addPersonalHistory("Successfully received " + numParsed + " simple reports from " + mDataManager.getActiveIncidentName());
-	        mDataManager.setNewGeneralMessageAvailable(true);
+	        mDataManager.addPersonalHistory("Successfully received " + numParsed + " report on conditions from " + mDataManager.getActiveIncidentName());
+	        //mDataManager.setNewGeneralMessageAvailable(true);
 		}
 
-		return numParsed;*/
-		return 0;
+		return numParsed;
 	}
 	
 	@Override

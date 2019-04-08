@@ -32,139 +32,334 @@ package scout.edu.mit.ll.nics.android.api.data;
 
 public class ReportOnConditionData
 {
-	//OES-828 TODO - properly implement this
-/*    private String assign;
-    private String user;
-	private String userfull;
-    private String status;
-    private String desc;
-    private SimpleReportCategoryType cat;
-    private String image;
-    private String fullpath;
-    private double lat;
-    private double lon;
+	private long incidentid;
+	private String incidentname;
+	private ReportOnConditionMessageData message;
 
-	public ReportOnConditionData () {
-		cat = SimpleReportCategoryType.BLANK;
+	public long getIncidentid ()
+	{
+		return incidentid;
 	}
 
-	public ReportOnConditionData (SimpleReportFormData messageData) {
-		
-		user = messageData.getUser();
-		userfull = messageData.getUserFull();
-		status = messageData.getStatus();
-		desc = messageData.getMessage();
-		cat = SimpleReportCategoryType.lookUp(messageData.getCategory());
-		
-		fullpath = messageData.getFullpath();
-		
-		if(messageData.getLatitude() != null) {
+	public void setIncidentid (long incidentid)
+	{
+		this.incidentid = incidentid;
+	}
 
-			try
-			{
-				lat = Double.valueOf(messageData.getLatitude());
-			}
-			catch(Exception e)
-			{
-				lat = 0;
-			}
-		}
-		
-		if(messageData.getLongitude() != null) {
-			try
-			{
-				lon = Double.valueOf(messageData.getLongitude());
-			}
-			catch(Exception e)
-			{
-				lon = 0;
-			}
+	public String getIncidentname ()
+	{
+		return incidentname;
+	}
+
+	public void setIncidentname (String incidentname)
+	{
+		this.incidentname = incidentname;
+	}
+
+	public ReportOnConditionMessageData getMessage ()
+	{
+		return message;
+	}
+
+	public void setMessage (ReportOnConditionMessageData message)
+	{
+		this.message = message;
+	}
+
+	static class ReportOnConditionMessageData
+	{
+		private String datecreated;
+		private ReportOnConditionMessageReportData report;
+
+		public String getDatecreated ()
+		{
+			return datecreated;
 		}
 
-		//Make sure lat / long are valid numbers
-		if(lat < -90 || lat > 90)
-			lat = 0;
-		if(lon > 180 || lon < -180)
-			lon = 0;
-	}
-    
-	public String getAssign() {
-		return assign;
+		public void setDatecreated (String datecreated)
+		{
+			this.datecreated = datecreated;
+		}
+
+		public ReportOnConditionMessageReportData getReport ()
+		{
+			return report;
+		}
+
+		public void setReport (ReportOnConditionMessageReportData report)
+		{
+			this.report = report;
+		}
+
+		static class ReportOnConditionMessageReportData
+		{
+			private String reportType;
+			private String date;
+			private String starttime;
+			private long formTypeId;
+			private String reportBy;
+			private String email;
+			private String rocDisplayName;
+			private String location;
+			private String jurisdiction;
+			private String incidentType;
+			private long scope;
+			private String 	spreadRate;
+			private double percentContained;
+			private double temperature;
+			private double relHumidity;
+			private double windSpeed;
+			//FIXME - this should be changed to a double (degrees from north)
+			private String windDirection;
+			private String predictedWeather;
+			private String evacuations;
+			private String structuresThreat;
+			private String infrastructuresThreat;
+			private String county;
+			private Boolean simplifiedEmail;
+			private String comments;
+
+			public String getReportType ()
+			{
+				return reportType;
+			}
+
+			public void setReportType (String reportType)
+			{
+				this.reportType = reportType;
+			}
+
+			public String getDate ()
+			{
+				return date;
+			}
+
+			public void setDate (String date)
+			{
+				this.date = date;
+			}
+
+			public String getStarttime ()
+			{
+				return starttime;
+			}
+
+			public void setStarttime (String starttime)
+			{
+				this.starttime = starttime;
+			}
+
+			public long getFormTypeId ()
+			{
+				return formTypeId;
+			}
+
+			public void setFormTypeId (long formTypeId)
+			{
+				this.formTypeId = formTypeId;
+			}
+
+			public String getReportBy ()
+			{
+				return reportBy;
+			}
+
+			public void setReportBy (String reportBy)
+			{
+				this.reportBy = reportBy;
+			}
+
+			public String getEmail ()
+			{
+				return email;
+			}
+
+			public void setEmail (String email)
+			{
+				this.email = email;
+			}
+
+			public String getRocDisplayName ()
+			{
+				return rocDisplayName;
+			}
+
+			public void setRocDisplayName (String rocDisplayName)
+			{
+				this.rocDisplayName = rocDisplayName;
+			}
+
+			public String getLocation ()
+			{
+				return location;
+			}
+
+			public void setLocation (String location)
+			{
+				this.location = location;
+			}
+
+			public String getJurisdiction ()
+			{
+				return jurisdiction;
+			}
+
+			public void setJurisdiction (String jurisdiction)
+			{
+				this.jurisdiction = jurisdiction;
+			}
+
+			public String getIncidentType ()
+			{
+				return incidentType;
+			}
+
+			public void setIncidentType (String incidentType)
+			{
+				this.incidentType = incidentType;
+			}
+
+			public long getScope ()
+			{
+				return scope;
+			}
+
+			public void setScope (long scope)
+			{
+				this.scope = scope;
+			}
+
+			public String getSpreadRate ()
+			{
+				return spreadRate;
+			}
+
+			public void setSpreadRate (String spreadRate)
+			{
+				this.spreadRate = spreadRate;
+			}
+
+			public double getPercentContained ()
+			{
+				return percentContained;
+			}
+
+			public void setPercentContained (double percentContained)
+			{
+				this.percentContained = percentContained;
+			}
+
+			public double getTemperature ()
+			{
+				return temperature;
+			}
+
+			public void setTemperature (double temperature)
+			{
+				this.temperature = temperature;
+			}
+
+			public double getRelHumidity ()
+			{
+				return relHumidity;
+			}
+
+			public void setRelHumidity (double relHumidity)
+			{
+				this.relHumidity = relHumidity;
+			}
+
+			public double getWindSpeed ()
+			{
+				return windSpeed;
+			}
+
+			public void setWindSpeed (double windSpeed)
+			{
+				this.windSpeed = windSpeed;
+			}
+
+			public String getWindDirection ()
+			{
+				return windDirection;
+			}
+
+			public void setWindDirection (String windDirection)
+			{
+				this.windDirection = windDirection;
+			}
+
+			public String getPredictedWeather ()
+			{
+				return predictedWeather;
+			}
+
+			public void setPredictedWeather (String predictedWeather)
+			{
+				this.predictedWeather = predictedWeather;
+			}
+
+			public String getEvacuations ()
+			{
+				return evacuations;
+			}
+
+			public void setEvacuations (String evacuations)
+			{
+				this.evacuations = evacuations;
+			}
+
+			public String getStructuresThreat ()
+			{
+				return structuresThreat;
+			}
+
+			public void setStructuresThreat (String structuresThreat)
+			{
+				this.structuresThreat = structuresThreat;
+			}
+
+			public String getInfrastructuresThreat ()
+			{
+				return infrastructuresThreat;
+			}
+
+			public void setInfrastructuresThreat (String infrastructuresThreat)
+			{
+				this.infrastructuresThreat = infrastructuresThreat;
+			}
+
+			public String getCounty ()
+			{
+				return county;
+			}
+
+			public void setCounty (String county)
+			{
+				this.county = county;
+			}
+
+			public Boolean getSimplifiedEmail ()
+			{
+				return simplifiedEmail;
+			}
+
+			public void setSimplifiedEmail (Boolean simplifiedEmail)
+			{
+				this.simplifiedEmail = simplifiedEmail;
+			}
+
+			public String getComments ()
+			{
+				return comments;
+			}
+
+			public void setComments (String comments)
+			{
+				this.comments = comments;
+			}
+		}
 	}
 
-	public void setAssign(String assign) {
-		this.assign = assign;
-	}
 
-	public String getUser() {
-		return user;
-	}
-	
-	public void setUser(String user) {
-		this.user = user;
-	}
-	
-	public String getUserFull() {
-		return userfull;
-	}
-	
-	public void setUserFull(String userfull) {
-		this.userfull = userfull;
-	}
-	
-	public String getStatus(){
-		return status;
-	}
-	
-	public void setStatus(String status){
-		this.status = status;
-	}
-	
-	public String getDescription() {
-		return desc;
-	}
-	
-	public void setDescription(String description) {
-		this.desc = description;
-	}
-	
-	public SimpleReportCategoryType getCategory() {
-		return cat;
-	}
-	
-	public void setCategory(SimpleReportCategoryType _category) {
-		this.cat = _category;
-	}
-	
-	public String getImage() {
-		return image;
-	}
-	
-	public void setImage(String image) {
-		this.image = image;
-	}
-	
-	public String getFullpath() {
-		return fullpath;
-	}
-	
-	public void setFullpath(String fullpath) {
-		this.fullpath = fullpath;
-	}
-	
-	public double getLatitude() {
-		return lat;
-	}
-	
-	public void setLatitude(double latitude) {
-		this.lat = latitude;
-	}
-	
-	public double getLongitude() {
-		return lon;
-	}
-	
-	public void setLongitude(double longitude) {
-		this.lon = longitude;
-	}*/
 }

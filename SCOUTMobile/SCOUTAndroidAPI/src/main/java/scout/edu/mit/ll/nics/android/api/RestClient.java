@@ -40,8 +40,13 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -755,6 +760,10 @@ public class RestClient
 			{
 				String content = (responseBody != null) ? new String(responseBody) : "error";
 
+
+				Log.e("hullo","-------------");
+				Log.e("hullo", content);
+				Log.e("hullo","-------------");
 				IncidentMessage message = mBuilder.create().fromJson(content, IncidentMessage.class);
 				//FIXME: insert incidents in whatever order they were given to us by server
 				HashMap<String, IncidentPayload> incidents = new HashMap<String, IncidentPayload>();
@@ -1022,7 +1031,7 @@ public class RestClient
 	{
 		if (!mFetchingReportOnConditions && mParseReportOnConditionsTask == null && incidentId != -1)
 		{
-			String url = "reports/" + mDataManager.getActiveIncidentId() + "/SR?sortOrder=desc&fromDate=" + (mDataManager.getLastSimpleReportTimestamp() + 1);
+			String url = "reports/" + mDataManager.getActiveIncidentId() + "/ROC?sortOrder=desc&fromDate=" + (mDataManager.getLastSimpleReportTimestamp() + 1);
 
 			mFetchingReportOnConditions = true;
 
@@ -1032,6 +1041,9 @@ public class RestClient
 				public void onSuccess (int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody)
 				{
 					String content = (responseBody != null) ? new String(responseBody) : "error";
+
+					Log.e("ROC","ROC got content: " + content);
+
 					ReportOnConditionMessage message = mBuilder.create().fromJson(content, ReportOnConditionMessage.class);
 
 					if (message != null)
@@ -1580,6 +1592,55 @@ public class RestClient
 				}
 			}
 		}
+	}
+
+	// Requests the roc location data for a specific lat/long coord
+	public static JSONObject getROCLocationDataForLocation(double latitude, double longitude)
+	{
+		if(mDataManager.isOnline() && mDataManager.isLoggedIn())
+		{
+			String url = "reports/1/locationBasedData?longitude=" + longitude + "&latitude=" + latitude + "&CRS=EPSG:4326&searchRangeInMiles=10";
+
+
+			Log.e("ROC","RestClient - Making request to ROC for location: lat:" + latitude + ", long:" + longitude);
+
+			HttpResponse response = mAuthManager.getClient().syncGet(url);
+
+			try
+			{
+				// If the status code is not 200, return null
+				if(response.getStatusLine().getStatusCode() != 200)
+				{
+					Log.w("RestClient","getROCLocationDataForLocation got response code: " + response.getStatusLine().getStatusCode() + ", for URL: " + url);
+					return null;
+				}
+
+Log.e("ROC","RestClient - Got back the following data: " + response + ", ent: \"" + response.getEntity() + "\"" + ", Status Line: \"" + response.getStatusLine() + "\"" + "Code: " + response.getStatusLine().getStatusCode());
+
+				// Parse the response content into a JSONObject
+				JSONObject results = new JSONObject(EntityUtils.toString(response.getEntity()));
+
+
+				// The response content has an embedded status code
+				// This should ALSO be 200 before acknowledging it as a successful request
+				if(results.getInt("status") != 200)
+				{
+					Log.w("RestClient","getROCLocationDataForLocation got internal response code: " + results.getInt("status") + ", for URL: " + url);
+					return null;
+				}
+
+				// Otherwise, return the JSON object:
+				return results;
+			}
+			catch(Exception e)
+			{
+
+				Log.e("ROC","RestClient - Exception: " + e);
+			}
+
+
+		}
+		return null;
 	}
 
 	public static void getGoogleMapsLegalInfo (AsyncHttpResponseHandler responseHandler)

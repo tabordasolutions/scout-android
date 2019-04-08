@@ -60,6 +60,7 @@ public class Intents {
 	public static final String nics_NEW_WEATHER_REPORT_RECEIVED = "nics_NEW_WEATHER_REPORT_RECEIVED";
 		
 	public static final String nics_SENT_SIMPLE_REPORTS_CLEARED = "nics_SENT_SIMPLE_REPORTS_CLEARED";
+	public static final String nics_SENT_REPORT_ON_CONDITION_CLEARED = "nics_SENT_REPORT_ON_CONDITION_CLEARED";
 	public static final String nics_SENT_DAMAGE_REPORTS_CLEARED = "nics_SENT_DAMAGE_REPORTS_CLEARED";
 	public static final String nics_SENT_FIELD_REPORTS_CLEARED = "nics_SENT_FIELD_REPORTS_CLEARED";
 	public static final String nics_SENT_RESOURCE_REQUESTS_CLEARED = "nics_SENT_RESOURCE_REQUESTS_CLEARED";

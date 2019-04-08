@@ -72,12 +72,12 @@ import scout.edu.mit.ll.nics.android.api.payload.OrganizationPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
 import scout.edu.mit.ll.nics.android.fragments.ChatListFragment;
 import scout.edu.mit.ll.nics.android.fragments.MapMarkupLocationPickerFragment;
-import scout.edu.mit.ll.nics.android.fragments.ReportOnConditionActionFragment;
+import scout.edu.mit.ll.nics.android.roc.ReportOnConditionActionFragment;
 import scout.edu.mit.ll.nics.android.fragments.FormFragment;
 import scout.edu.mit.ll.nics.android.fragments.GeneralMessageFragment;
 import scout.edu.mit.ll.nics.android.fragments.MapMarkupFragment;
 import scout.edu.mit.ll.nics.android.fragments.OverviewFragment;
-import scout.edu.mit.ll.nics.android.fragments.ReportOnConditionViewFragment;
+import scout.edu.mit.ll.nics.android.roc.ReportOnConditionFragment;
 import scout.edu.mit.ll.nics.android.fragments.SimpleReportListFragment;
 import scout.edu.mit.ll.nics.android.utils.Constants;
 import scout.edu.mit.ll.nics.android.utils.Constants.NavigationOptions;
@@ -108,7 +108,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	public GeneralMessageFragment mSimpleReportFragment;
 
 	private ReportOnConditionActionFragment mReportOnConditionActionFragment;
-	private ReportOnConditionViewFragment mReportOnConditionViewFragment;
+	private ReportOnConditionFragment mReportOnConditionFragment;
 	//OES828 TODO - Add ReportOnConditionActionFragment
 
 	//	private ChatFragment mChatFragment;
@@ -439,14 +439,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		mBreadcrumbTextView.setText(mCurBreadcrumbText);
 	}
 
-	public void setViewTitle (String title)
+	public void setViewTitle (String title, boolean requiresRoom)
 	{
 		if (mBreadcrumbTextView != null)
 		{
 			CollabroomPayload collabRoom = mDataManager.getSelectedCollabRoom();
 
 			// IF we haven't selected a room
-			if (collabRoom.getName().equals(getString(R.string.no_selection)))
+			if (collabRoom.getName().equals(getString(R.string.no_selection)) && requiresRoom)
 			{
 				mCurBreadcrumbText = "No Room Selected";
 			}
@@ -831,12 +831,18 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), false);
 			mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), false);
 			mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), false);
+			mDataManager.requestReportOnConditionRepeating(mDataManager.getIncidentDataRate(), false);
 
 			//OES828 TODO - request ROC reports repeating (use getIncidentDataRate() as update frequency)
 
 			boolean showIncidentName = false;
 
 			String viewTitle = null;
+			// Whether or not a user must be in a room to access the full functionality of the current view
+			// If so, the view title will display "No Room Selected" indicating that the user should select a room and
+			// then come back to the current view
+			// However, not all views require a room, so this boolean is used to denote which views require a room
+			boolean requiresRoom = false;
 
 			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "New view is: " + navDropdownOptions[position]);
 
@@ -923,7 +929,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					//--------------------------------------------------------------------
 					// Set the view title
 					//--------------------------------------------------------------------
-					viewTitle = "Report On Condition";
+					viewTitle = "Report on Condition";
 					//--------------------------------------------------------------------
 
 					//--------------------------------------------------------------------
@@ -952,28 +958,31 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					//--------------------------------------------------------------------
 					// if the destination page fragment is null, create it
 					//--------------------------------------------------------------------
-					if(mReportOnConditionViewFragment == null)
+					if(mReportOnConditionFragment == null)
 					{
-						mReportOnConditionViewFragment = new ReportOnConditionViewFragment();
+						mReportOnConditionFragment = new ReportOnConditionFragment();
 					}
 					//--------------------------------------------------------------------
 
 					//--------------------------------------------------------------------
 					// Set the view title
 					//--------------------------------------------------------------------
-					viewTitle = "Report On Condition";
+					viewTitle = "Report on Condition";
 					//--------------------------------------------------------------------
 
 					//--------------------------------------------------------------------
 					// assign fragment to the destination page fragment
 					//--------------------------------------------------------------------
-					fragment = mReportOnConditionViewFragment;
+					fragment = mReportOnConditionFragment;
 					//--------------------------------------------------------------------
 
 					//--------------------------------------------------------------------
 					// assign any data we need to set up the fragment (like fragment2, etc...)
 					//--------------------------------------------------------------------
 					// nothing for now
+					// TODO - check if we are going to VIEW, or create a NEW, UPDATE, or FINAL ROC
+					// TODO - Set the mReportOnConditionFragment's payload
+					// that'll update it internally.
 					//--------------------------------------------------------------------
 					break;
 
@@ -1051,7 +1060,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					{
 						mMapMarkupOpenTablet = !mMapMarkupOpenTablet;
 					}
-
+					requiresRoom = true;
 					break;
 				case USERINFO:
 					if (mUserInfoFragment == null)
@@ -1089,6 +1098,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 							mFragmentManager.executePendingTransactions();
 						}
 					}
+					requiresRoom = true;
 
 					break;
 
@@ -1219,7 +1229,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				{
 					if (viewTitle != null)
 					{
-						setViewTitle(viewTitle);
+						setViewTitle(viewTitle, requiresRoom);
 					}
 
 					if (showIncidentName)

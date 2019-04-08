@@ -28,7 +28,10 @@
 package scout.edu.mit.ll.nics.android.auth.providers;
 
 import cz.msebera.android.httpclient.Header;
+
+import org.apache.http.HttpResponse;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 
@@ -87,4 +90,22 @@ public class BasicAuthProvider extends AuthProvider {
     public void delete(String url, AsyncHttpResponseHandler responseHandler) {
     	mClient.delete(null, getAbsoluteUrl(url), mAuthHeader, responseHandler);
     }
+
+	// Performs a synchronous HTTP get request and returns the result
+	public HttpResponse syncGet(String url)
+	{
+		HttpGet request = new HttpGet(getAbsoluteUrl(url));
+
+		HttpResponse response = null;
+		try
+		{
+			response = mSyncClient.execute(request);
+		}
+		catch(Exception e)
+		{
+
+		}
+
+		return response;
+	}
 }

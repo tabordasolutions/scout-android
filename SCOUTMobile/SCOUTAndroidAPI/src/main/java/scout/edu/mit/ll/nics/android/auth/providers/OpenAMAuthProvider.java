@@ -35,7 +35,10 @@ import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.concurrent.CountDownLatch;
 
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpResponseException;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 
@@ -48,6 +51,7 @@ import android.util.Log;
 import android.content.Context;
 
 import com.google.gson.GsonBuilder;
+import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
@@ -67,7 +71,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 	private GsonBuilder mBuilder;
 
 	private Context mContext;
-	
+
 	private boolean debugIgnoreOpenAmAuth = false;
 	
 	public OpenAMAuthProvider( Context context) {
@@ -109,8 +113,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 	}
 	
 	public void requestAuthToken(final String username, final String password) {
-
-		mClient.removeAllHeaders();
+		//mClient.removeAllHeaders();
 		mClient.addHeader("X-OpenAM-Username", username);
 		mClient.addHeader("X-OpenAM-Password", password);
 		mClient.addHeader("Content-Type", "application/json");
@@ -294,6 +297,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 						mLatch.await();
 					}
 
+
 					mClient.addHeader("AMAuthCookie", mToken);
 					mClient.addHeader("iPlanetDirectoryPro", mToken);
 					mClient.addHeader("CUSTOM-uid",mDataManager.getUsername());
@@ -336,8 +340,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 
 
 					if(mTokenIsValid) {
-
-						mClient.removeAllHeaders();
+						//mClient.removeAllHeaders();
 						mClient.addHeader("AMAuthCookie", mToken);
 						String cookie = "iPlanetDirectoryPro=" + mToken + ";AMAuthCookie=" + mToken;
 						mClient.addHeader("Cookie",cookie);
@@ -421,7 +424,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 							mClient.delete(null, getAbsoluteUrl(url), null, new OpenAMAuthResponseHandler(responseHandler, Looper.myLooper()));
 			    	}
 		    	} catch(InterruptedException e) {
-		    		
+
 		    	}
 
 				Looper.loop();
@@ -429,6 +432,25 @@ public class OpenAMAuthProvider extends AuthProvider {
 		}).start();
     }
 
+	// Performs a synchronous HTTP get request and returns the result
+	public HttpResponse syncGet(String url)
+	{
+		Log.e("ROC","OpenAMAuthProvider - About to make a get request to: \"" + getAbsoluteUrl(url) + "\"");
+		HttpGet request = new HttpGet(getAbsoluteUrl(url));
+
+		HttpResponse response = null;
+		try
+		{
+			response = mSyncClient.execute(request);
+		}
+		catch(Exception e)
+		{
+			Log.e("ROC","OpenAMAuthProvider - Exception occured: " + e);
+		}
+		Log.e("ROC","OpenAMAuthProvider - Response object: \"" + response + "\"");
+
+		return response;
+	}
 
 
 

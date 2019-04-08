@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ======================================================================================================================================================================== -->
+    <!-- Incident Info Section -->
+    <!-- ======================================================================================================================================================================== -->
+    <string-array name="roc_incident_type_checkbox_options">
+        <item>Aircraft Accident</item>
+        <item>Blizzard</item>
+        <item>Civil Unrest</item>
+        <item>Earthquake</item>
+        <item>Fire (Structure)</item>
+        <item>Fire (Vegetation)</item>
+        <item>Flood</item>
+        <item>Hazardous Materials</item>
+        <item>Hurricane</item>
+        <item>Mass Casualty</item>
+        <item>Nuclear Accident</item>
+        <item>Oil Spill</item>
+        <item>Planned Event</item>
+        <item>Public Health / Medical Emergency</item>
+        <item>Search and Rescue</item>
+        <item>Terrorist Threat / Attack</item>
+        <item>Tornado</item>
+        <item>Tropical Storm</item>
+        <item>Tsunami</item>
+    </string-array>
+    <string-array name="roc_incident_state_autocomplete_options">
+        <item>AL</item>
+        <item>AK</item>
+        <item>AZ</item>
+        <item>AR</item>
+        <item>CA</item>
+        <item>CO</item>
+        <item>CT</item>
+        <item>DE</item>
+        <item>FL</item>
+        <item>GA</item>
+        <item>HI</item>
+        <item>ID</item>
+        <item>IL</item>
+        <item>IN</item>
+        <item>IA</item>
+        <item>KS</item>
+        <item>KY</item>
+        <item>LA</item>
+        <item>ME</item>
+        <item>MD</item>
+        <item>MA</item>
+        <item>MI</item>
+        <item>MN</item>
+        <item>MS</item>
+        <item>MO</item>
+        <item>MT</item>
+        <item>NE</item>
+        <item>NV</item>
+        <item>NH</item>
+        <item>NJ</item>
+        <item>NM</item>
+        <item>NY</item>
+        <item>NC</item>
+        <item>ND</item>
+        <item>OH</item>
+        <item>OK</item>
+        <item>OR</item>
+        <item>PA</item>
+        <item>RI</item>
+        <item>SC</item>
+        <item>SD</item>
+        <item>TN</item>
+        <item>TX</item>
+        <item>UT</item>
+        <item>VT</item>
+        <item>VA</item>
+        <item>WA</item>
+        <item>WV</item>
+        <item>WI</item>
+        <item>WY</item>
+    </string-array>
+    <string-array name="roc_incident_initial_county_spinner_options">
+        <item>Choose an option (required)</item>
+        <item>Alameda</item>
+        <item>Alpine</item>
+        <item>Amador</item>
+        <item>Butte</item>
+        <item>Calaveras</item>
+        <item>Colusa</item>
+        <item>Contra Costa</item>
+        <item>Del Norte</item>
+        <item>El Dorado</item>
+        <item>Fresno</item>
+        <item>Glenn</item>
+        <item>Humboldt</item>
+        <item>Imperial</item>
+        <item>Inyo</item>
+        <item>Kern</item>
+        <item>Kings</item>
+        <item>Lake</item>
+        <item>Lassen</item>
+        <item>Los Angeles</item>
+        <item>Madera</item>
+        <item>Marin</item>
+        <item>Mariposa</item>
+        <item>Mendocino</item>
+        <item>Merced</item>
+        <item>Modoc</item>
+        <item>Mono</item>
+        <item>Monterey</item>
+        <item>Napa</item>
+        <item>Nevada</item>
+        <item>Orange</item>
+        <item>Placer</item>
+        <item>Plumas</item>
+        <item>Riverside</item>
+        <item>Sacramento</item>
+        <item>San Benito</item>
+        <item>San Bernardino</item>
+        <item>San Diego</item>
+        <item>San Francisco</item>
+        <item>San Joaquin</item>
+        <item>San Luis Obispo</item>
+        <item>San Mateo</item>
+        <item>Santa Barbara</item>
+        <item>Santa Clara</item>
+        <item>Santa Cruz</item>
+        <item>Shasta</item>
+        <item>Sierra</item>
+        <item>Siskiyou</item>
+        <item>Solano</item>
+        <item>Sonoma</item>
+        <item>Stanislaus</item>
+        <item>Sutter</item>
+        <item>Tehama</item>
+        <item>Trinity</item>
+        <item>Tulare</item>
+        <item>Tuolumne</item>
+        <item>Ventura</item>
+        <item>Yolo</item>
+        <item>Yuba</item>
+    </string-array>
+    <!-- ======================================================================================================================================================================== -->
+    <!-- ROC Incident Info Section -->
+    <!-- ======================================================================================================================================================================== -->
+    <string-array name="roc_dpa_spinner_options">
+        <item>Choose an option</item>
+        <item>State</item>
+        <item>Federal</item>
+        <item>Local</item>
+        <item>State/Federal</item>
+        <item>State/Local</item>
+        <item>State/Federal/Local</item>
+    </string-array>
+    <string-array name="roc_responsibility_spinner_options">
+        <item>Choose an option (required)</item>
+        <item>SRA</item>
+        <item>FRA</item>
+        <item>LRA</item>
+        <item>FRA / SRA</item>
+        <item>FRA / LRA</item>
+        <item>SRA / LRA</item>
+        <item>SRA / FRA</item>
+        <item>LRA / SRA</item>
+        <item>LRA / FRA</item>
+        <item>DOD</item>
+    </string-array>
+    <!-- ======================================================================================================================================================================== -->
+    <!-- Vegetation Fire Incident Scope Section -->
+    <!-- ======================================================================================================================================================================== -->
+
+    <string-array name="roc_rate_of_spread_spinner_options">
+        <item>Choose an option</item>
+        <item>Low rate of spread</item>
+        <item>Moderate rate of spread</item>
+        <item>Dangerous rate of spread</item>
+        <item>Critical rate of spread</item>
+        <item>Forward spread has been stopped</item>
+    </string-array>
+
+
+    <!-- ======================================================================================================================================================================== -->
+    <!-- Weather Information Section -->
+    <!-- ======================================================================================================================================================================== -->
+    <string-array name="roc_weather_wind_direction_spinner_options">
+        <item>Choose an option</item>
+        <item>North</item>
+        <item>Northeast</item>
+        <item>East</item>
+        <item>Southeast</item>
+        <item>South</item>
+        <item>Southwest</item>
+        <item>West</item>
+        <item>Northwest</item>
+    </string-array>
+
+    <!-- ======================================================================================================================================================================== -->
+    <!-- Threats & Evacuations Section -->
+    <!-- ======================================================================================================================================================================== -->
+    <string-array name="roc_threats_evacs_spinner_options">
+        <item>Choose an option (required)</item>
+        <item>Yes</item>
+        <item>No</item>
+        <item>Mitigated</item>
+    </string-array>
+
+
+    <!-- ___________________ Evacuations ____________________ -->
+
+
+    <!-- ___________________ Structures Threat ____________________ -->
+
+
+    <!-- ___________________ Infrastructures Threat ____________________ -->
+
+    <!-- ___________________ Other Threats & Evacuations ____________________ -->
+
+    <!-- ======================================================================================================================================================================== -->
+    <!-- CAL FIRE Resources Commitment Section -->
+    <!-- ======================================================================================================================================================================== -->
+    <string-array name="roc_cal_fire_incident_spinner_options">
+        <item>Choose an option (required)</item>
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
+    <!-- ======================================================================================================================================================================== -->
+    <!-- Email Section -->
+    <!-- ======================================================================================================================================================================== -->
+
+</resources>

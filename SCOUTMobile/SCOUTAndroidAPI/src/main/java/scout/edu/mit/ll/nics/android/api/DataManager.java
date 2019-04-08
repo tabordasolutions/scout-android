@@ -79,6 +79,7 @@ import scout.edu.mit.ll.nics.android.api.payload.OrganizationPayload;
 import scout.edu.mit.ll.nics.android.api.payload.TrackingLayerPayload;
 import scout.edu.mit.ll.nics.android.api.payload.UserPayload;
 import scout.edu.mit.ll.nics.android.api.payload.WeatherPayload;
+import scout.edu.mit.ll.nics.android.api.payload.forms.ReportOnConditionPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
 import scout.edu.mit.ll.nics.android.utils.Constants;
 import scout.edu.mit.ll.nics.android.utils.EncryptedPreferences;
@@ -141,6 +142,8 @@ public class DataManager
 
 	// Set to true to point to app to STAGING instead of PRODUCTION
 	private final boolean STAGING = false;
+	// Set to true to point the app to a local DEV environment instead of PRODUCTION
+	private final boolean DEV = true;
 
 	private CustomCommand invalidSessionIDCommand;
 	private CustomCommand invalidSRSessionIDCommand;
@@ -342,6 +345,7 @@ public class DataManager
 	}
 
 	// Simple Report Functions
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	public ArrayList<SimpleReportPayload> getSimpleReportHistoryForIncident (long incidentId)
 	{
@@ -407,6 +411,66 @@ public class DataManager
 	{
 		return mDatabaseManager.getLastSimpleReportPayload(getActiveIncidentId());
 	}
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	// Report on Condition Functions
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	public ArrayList<ReportOnConditionPayload> getReportOnConditionHistoryForIncident (long incidentId)
+	{
+		return mDatabaseManager.getReportOnConditionHistoryForIncident(incidentId);
+	}
+	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionHistory ()
+	{
+		return mDatabaseManager.getAllReportOnConditionHistory();
+	}
+	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardReadyToSend ()
+	{
+		return mDatabaseManager.getAllReportOnConditionStoreAndForwardReadyToSend();
+	}
+	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardReadyToSend (long incidentId)
+	{
+		return mDatabaseManager.getAllReportOnConditionStoreAndForwardReadyToSend(incidentId);
+	}
+	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardHasSent ()
+	{
+		return mDatabaseManager.getAllReportOnConditionStoreAndForwardHasSent();
+	}
+	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardHasSent (long incidentId)
+	{
+		return mDatabaseManager.getAllReportOnConditionStoreAndForwardHasSent(incidentId);
+	}
+	public void addReportOnConditionToHistory (ReportOnConditionPayload payload)
+	{
+		mDatabaseManager.addReportOnConditionHistory(payload);
+	}
+	public boolean deleteReportOnConditionFromHistory (long mReportId)
+	{
+		return mDatabaseManager.deleteReportOnConditionHistory(mReportId);
+	}
+	public boolean deleteReportOnConditionFromHistoryByIncident (long incidentId)
+	{
+		return mDatabaseManager.deleteReportOnConditionHistoryByIncident(incidentId);
+	}
+	public boolean deleteReportOnConditionStoreAndForward (long mReportId)
+	{
+		return mDatabaseManager.deleteReportOnConditionStoreAndForward(mReportId);
+	}
+	public boolean addReportOnConditionToStoreAndForward (ReportOnConditionPayload payload)
+	{
+		return mDatabaseManager.addReportOnConditionToStoreAndForward(payload);
+	}
+	public long getLastReportOnConditionTimestamp ()
+	{
+		return mDatabaseManager.getLastReportOnConditionTimestamp(getActiveIncidentId());
+	}
+	public ReportOnConditionPayload getLastReportOnConditionPayload ()
+	{
+		return mDatabaseManager.getLastReportOnConditionPayload(getActiveIncidentId());
+	}
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 
 	public cz.msebera.android.httpclient.Header[] getAuthData ()
@@ -1195,6 +1259,25 @@ public class DataManager
 		return mSharedPreferences.getPreferenceLong(Constants.INCIDENT_ID);
 	}
 
+	public IncidentPayload getActiveIncident()
+	{
+		return mIncidents.get(getActiveIncidentName());
+	}
+
+	public String[] getAllIncidentNames()
+	{
+		Object[] nameObjArray = mIncidents.keySet().toArray();
+
+		String[] nameArray = new String[nameObjArray.length];
+
+		for(int i = 0; i < nameObjArray.length; i++)
+		{
+			nameArray[i] = (String) nameObjArray[i];
+		}
+
+		return nameArray;
+	}
+
 	public long getPreviousIncidentId ()
 	{
 		return mSharedPreferences.getPreferenceLong(Constants.PREVIOUS_INCIDENT_ID);
@@ -1404,6 +1487,10 @@ public class DataManager
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mGlobalPreferences.getString("server_list", getContext().getResources().getString(R.string.config_server_default));
+		if (DEV)
+		{
+			return getContext().getResources().getString(R.string.config_server_dev);
+		}
 		if (STAGING)
 		{
 			return getContext().getResources().getString(R.string.config_server_staging);
@@ -1425,6 +1512,10 @@ public class DataManager
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mSharedPreferences.getPreferenceString(Constants.IPLANET_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default));
+		if (DEV)
+		{
+			return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_dev);
+		}
 		if (STAGING)
 		{
 			return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_staging);
@@ -1445,10 +1536,13 @@ public class DataManager
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mSharedPreferences.getPreferenceString(Constants.AMAUTH_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_amauth_cookie_domain_default));
+		if (DEV)
+		{
+			return getContext().getResources().getString(R.string.config_amauth_cookie_domain_dev);
+		}
 		if (STAGING)
 		{
 			return getContext().getResources().getString(R.string.config_amauth_cookie_domain_staging);
-
 		}
 		return getContext().getResources().getString(R.string.config_amauth_cookie_domain_default);
 	}
@@ -1560,6 +1654,10 @@ public class DataManager
 		//	return mGlobalPreferences.getString("custom_geo_server_url", getContext().getResources().getString(R.string.config_geo_server_default));
 		//}
 		//return mGlobalPreferences.getString("geo_server_list", getContext().getResources().getString(R.string.config_geo_server_default));
+		if (DEV)
+		{
+			return getContext().getResources().getString(R.string.config_geo_server_dev);
+		}
 		if (STAGING)
 		{
 			return getContext().getResources().getString(R.string.config_geo_server_staging);
@@ -1574,6 +1672,10 @@ public class DataManager
 		//	return mGlobalPreferences.getString("custom_auth_server_url", getContext().getResources().getString(R.string.config_auth_server_default));
 		//}
 		//return mGlobalPreferences.getString("auth_server_list", getContext().getResources().getString(R.string.config_auth_server_default));
+		if (DEV)
+		{
+			return getContext().getResources().getString(R.string.config_auth_server_dev);
+		}
 		if (STAGING)
 		{
 			return getContext().getResources().getString(R.string.config_auth_server_staging);
@@ -1614,6 +1716,7 @@ public class DataManager
 
 		//refresh rates
 		requestSimpleReportRepeating(getIncidentDataRate(), false);
+		requestReportOnConditionRepeating(getIncidentDataRate(), false);
 		requestMarkupRepeating(getCollabroomDataRate(), false);
 		requestChatMessagesRepeating(getCollabroomDataRate(), false);
 	}
@@ -1902,4 +2005,65 @@ public class DataManager
 		}
 		return false;
 	}
+
+
+	// Retrieves the ROC location-based data for lat/long coords as defined by locationData
+	// if locationData is null, retrieve the user's current lat/long (based on GPS) and return the current data for that.
+	public JSONObject getROCLocationInfo(JSONObject locationData)
+	{
+		JSONObject result;
+
+
+		boolean hasLatLong = false;
+		double latitude = 0;
+		double longitude = 0;
+
+
+		// If we were given a hashmap, attempt to read the lat/long from there.
+		if(locationData != null)
+		{
+			try
+			{
+				// Read the lat/long from the hashmap
+				latitude = locationData.getDouble("latitude");
+				longitude = locationData.getDouble("longitude");
+
+				hasLatLong = true;
+			}
+			catch(Exception e)
+			{
+			}
+		}
+
+		// If we were unable to read the latlong, use the phone's current GPS coords
+		if(!hasLatLong)
+		{
+			latitude = getMDTLatitude();
+			longitude = getMDTLongitude();
+		}
+
+
+		Log.e("ROC","About to make request to ROC for location: lat:" + latitude + ", long:" + longitude);
+
+
+		result = RestClient.getROCLocationDataForLocation(latitude,longitude);
+
+		// Parse out the "data" object from the response:
+		try
+		{
+			JSONObject data = result.getJSONObject("data");
+
+			// Append the lat / long so the UI knows what location this data pertains to:
+			data.put("latitude",latitude);
+			data.put("longitude",longitude);
+			return data;
+		}
+		catch(Exception e)
+		{
+			Log.w("DataManager","getROCLocationInfo Exception occurred when trying to extract \"data\" field of \"" + result + "\"");
+		}
+
+		return null;
+	}
+
 }

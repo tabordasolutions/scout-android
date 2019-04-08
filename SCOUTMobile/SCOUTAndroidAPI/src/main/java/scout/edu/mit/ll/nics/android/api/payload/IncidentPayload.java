@@ -30,6 +30,7 @@
  */
 package scout.edu.mit.ll.nics.android.api.payload;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class IncidentPayload {
@@ -45,6 +46,7 @@ public class IncidentPayload {
 	private String description;
 	private long workspaceid;
 	private ArrayList<CollabroomPayload> collabrooms;
+	private ArrayList<IncidentTypePayload> incidentIncidenttypes;
 	
 	public long getCreated() {
 		return created;
@@ -124,5 +126,15 @@ public class IncidentPayload {
 			}
 		}
 		return false;
+	}
+
+	public ArrayList<IncidentTypePayload> getIncidentIncidenttypes ()
+	{
+		return incidentIncidenttypes;
+	}
+
+	public void setIncidentIncidenttypes (ArrayList<IncidentTypePayload> incidentIncidenttypes)
+	{
+		this.incidentIncidenttypes = incidentIncidenttypes;
 	}
 }

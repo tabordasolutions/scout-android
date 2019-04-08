@@ -48,32 +48,18 @@
 
             <Button
                 android:id="@+id/reportOnConditionViewButton"
-                android:layout_width="80pt"
+                android:layout_width="120pt"
                 android:layout_height="0pt"
                 android:layout_weight=".25"
                 android:text="@string/roc_view"
                 style="?android:attr/buttonBarButtonStyle" />
 
             <Button
-                android:id="@+id/reportOnConditionNewButton"
-                android:layout_width="80pt"
+                android:id="@+id/reportOnConditionCreateButton"
+                android:layout_width="120pt"
                 android:layout_height="0pt"
                 android:layout_weight=".25"
-                android:text="@string/roc_new"
-                style="?android:attr/buttonBarButtonStyle" />
-            <Button
-                android:id="@+id/reportOnConditionUpdateButton"
-                android:layout_width="80pt"
-                android:layout_height="0pt"
-                android:layout_weight=".25"
-                android:text="@string/roc_update"
-                style="?android:attr/buttonBarButtonStyle" />
-            <Button
-                android:id="@+id/reportOnConditionFinalButton"
-                android:layout_width="80pt"
-                android:layout_height="0pt"
-                android:layout_weight=".25"
-                android:text="@string/roc_final"
+                android:text="@string/roc_create"
                 style="?android:attr/buttonBarButtonStyle" />
         </LinearLayout>
 </LinearLayout>

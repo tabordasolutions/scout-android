@@ -34,6 +34,6 @@
 -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:nics="http://schemas.android.com/apk/res-auto">
  
-	<item android:id="@+id/copyGeneralMessageOption" android:orderInCategory="20" nics:showAsAction="always" android:showAsAction="always" android:title="@string/copy_as_new_report"/>
- 
+	<item android:id="@+id/copyGeneralMessageOption" android:orderInCategory="20" nics:showAsAction="always" android:showAsAction="always" android:title=""/>
+
 </menu>

@@ -246,7 +246,6 @@ public class GeneralMessageFragment extends Fragment
 		{
 			item.setVisible(true);
 		}
-
 	}
 
 	@Override

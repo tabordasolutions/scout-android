@@ -311,9 +311,7 @@ Press Okay to close the application"</string>
 	<string name="about_legal_section_icons_display_name">Legal Notice - Icons</string>
 	<string name="about_icons_display_name"></string>
 	<!-- SECTION: ROC -->
-	<string name="roc_view">View</string>
-	<string name="roc_new">New</string>
-	<string name="roc_update">Update</string>
-	<string name="roc_final">Final</string>
+	<string name="roc_view">View ROC</string>
+	<string name="roc_create">Create ROC</string>
 
 </resources>

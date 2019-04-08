@@ -31,6 +31,7 @@
 -keep class scout.edu.mit.ll.nics.android.SettingsActivity$SyncPreferenceFragment
 -keep class scout.edu.mit.ll.nics.android.SettingsActivity$OtherPreferenceFragment
 
+
 -keepclassmembers enum * {
  public static **[] values();
  public static ** valueOf(java.lang.String);

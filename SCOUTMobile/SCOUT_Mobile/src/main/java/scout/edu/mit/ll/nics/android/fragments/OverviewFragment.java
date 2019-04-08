@@ -252,14 +252,12 @@ public class OverviewFragment extends Fragment
 
 		if (mDataManager.getActiveIncidentName().equals(getString(R.string.no_selection)))
 		{
-			if (mIncidentFrameButtonLayout != null)
-			{
-				mIncidentFrameButtonLayout.setAlpha(0.3f);
-			} else
-			{
-				mGeneralMessageButtonLayout.setAlpha(0.3f);
-				mReportButtonLayout.setAlpha(0.3f);
-			}
+			mGeneralMessageButtonLayout.setAlpha(0.3f);
+			// Disabled this line to keep the report button clickable if not in incident
+			// (ROC form can be created when not in incident)
+			// mReportButtonLayout.setAlpha(0.3f);
+			// Make sure the button is fully opaque:
+			mReportButtonLayout.setAlpha(1.0f);
 
 			if (mRoomFrameLayout != null)
 			{
@@ -271,7 +269,9 @@ public class OverviewFragment extends Fragment
 			}
 
 			mGeneralMessageButton.setClickable(false);
-			mReportButton.setClickable(false);
+			// Disabled this line to keep the report button clickable if not in incident
+			// (ROC form can be created when not in incident)
+			// mReportButton.setClickable(false);
 
 			mChatButton.setClickable(false);
 			mChatButtonLayout.setAlpha(0.3f);
@@ -300,6 +300,7 @@ public class OverviewFragment extends Fragment
 						mDataManager.addCollabroom(room);
 					}
 					mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), true);
+					mDataManager.requestReportOnConditionRepeating(mDataManager.getIncidentDataRate(), true);
 
 				} else
 				{
@@ -625,15 +626,12 @@ public class OverviewFragment extends Fragment
 			// If the user has selected "none" no incident
 			if(incidentIndex == -1)
 			{
-				// Update the UI buttons
-				if (mIncidentFrameButtonLayout != null)
-				{
-					mIncidentFrameButtonLayout.setAlpha(0.3f);
-				} else
-				{
-					mGeneralMessageButtonLayout.setAlpha(0.3f);
-					mReportButtonLayout.setAlpha(0.3f);
-				}
+				mGeneralMessageButtonLayout.setAlpha(0.3f);
+				// Disabled this line to keep the report button clickable if not in incident
+				// (ROC form can be created when not in incident)
+				// mReportButtonLayout.setAlpha(0.3f);
+				// Ensure the reports button remains fully opaque
+				mReportButtonLayout.setAlpha(1.0f);
 
 				if (mRoomFrameLayout != null)
 				{
@@ -644,7 +642,13 @@ public class OverviewFragment extends Fragment
 					mRoomFrameButtonLayout.setAlpha(1f);
 				}
 				mGeneralMessageButton.setClickable(false);
-				mReportButton.setClickable(false);
+
+				// Disabled this line to keep the report button clickable if not in incident
+				// (ROC form can be created when not in incident)
+				// mReportButton.setClickable(false);
+				// Make the button still clickable:
+				mReportButton.setClickable(true);
+
 				mChatButton.setClickable(false);
 				mChatButtonLayout.setAlpha(0.3f);
 				// Update the labels
@@ -655,6 +659,8 @@ public class OverviewFragment extends Fragment
 				// Notify mDataManager that we're no longer in an incident
 				mDataManager.setCurrentIncidentData(null, -1, "");
 				mDataManager.setSelectedCollabRoom(null);
+
+
 
 				// Stop retrieving data
 				mDataManager.stopPollingAssignment();
@@ -676,14 +682,10 @@ public class OverviewFragment extends Fragment
 			{
 				mIncidentFrameLayout.setAlpha(1f);
 			}
-			if (mIncidentFrameButtonLayout != null)
-			{
-				mIncidentFrameButtonLayout.setAlpha(1f);
-			} else
-			{
-				mGeneralMessageButtonLayout.setAlpha(1f);
-				mReportButtonLayout.setAlpha(1f);
-			}
+
+			mGeneralMessageButtonLayout.setAlpha(1f);
+			mReportButtonLayout.setAlpha(1f);
+
 			mJoinRoomButtonLayout.setAlpha(1f);
 //			mJoinRoomButton.setAlpha(1f);
 			mJoinRoomButton.setClickable(true);
@@ -727,7 +729,7 @@ public class OverviewFragment extends Fragment
 			mDataManager.stopPollingChat();
 			mDataManager.stopPollingMarkup();
 			mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), true);
-			//OES-828 TODO: request roc forms
+			mDataManager.requestReportOnConditionRepeating(mDataManager.getIncidentDataRate(), true);
 
 			mJoinIncidentButton.setText(getString(R.string.incident_active, mDataManager.getActiveIncidentName()));
 			mJoinRoomButton.setText(getString(R.string.room_join));
