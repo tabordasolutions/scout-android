@@ -65,7 +65,7 @@ public class SimpleReportTable extends DatabaseTable <SimpleReportPayload> {
 		{
 		    put("id",				"integer primary key autoincrement");
 		    put("isDraft",			"integer");
-		    put("isForNewIncident",			"integer");
+		    put("isNew",			"integer");
 //		    put("createdUTC",		"integer");
 //		    put("lastUpdatedUTC",	"integer");
 		    put("seqtime",			"integer");
@@ -111,7 +111,7 @@ public class SimpleReportTable extends DatabaseTable <SimpleReportPayload> {
                 ContentValues contentValues = new ContentValues ();
                 
                 contentValues.put("isDraft",		data.isDraft());
-                contentValues.put("isForNewIncident",		data.isNew());
+                contentValues.put("isNew",		data.isNew());
 //                contentValues.put("createdUTC",		data.getCreatedUTC());
 //                contentValues.put("lastUpdatedUTC",	data.getLastUpdatedUTC());
                 contentValues.put("incidentId",		data.getIncidentId());
@@ -207,7 +207,7 @@ public class SimpleReportTable extends DatabaseTable <SimpleReportPayload> {
                         dataItem.setId(cursor.getLong(cursor.getColumnIndex("id")));
                         dataItem.setSendStatus(ReportSendStatus.lookUp(cursor.getInt(cursor.getColumnIndex("sendStatus"))));
                         dataItem.setDraft(cursor.getInt(cursor.getColumnIndex("isDraft")) > 0 ? true : false);
-                        dataItem.setNew(cursor.getInt(cursor.getColumnIndex("isForNewIncident")) > 0 ? true : false);
+                        dataItem.setNew(cursor.getInt(cursor.getColumnIndex("isNew")) > 0 ? true : false);
                         dataItem.parse();
                         
                         dataList.add(dataItem);
