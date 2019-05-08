@@ -108,6 +108,59 @@ public class OpenAMAuthProvider extends AuthProvider {
 		mClient.setURLEncodingEnabled(false);
 		mClient.setMaxRetriesAndTimeout(2, 1000);
 
+		// If we are using the staging or dev server, trust whatever SSL certificate is in use by the server.
+		// (otherwise, self-signed certificates won't work)
+		if(DataManager.ENVIRONMENT == DataManager.STAGING || DataManager.ENVIRONMENT == DataManager.DEV)
+		{
+			try
+			{
+				// Creating the certificate and loading it from the strings config file
+				CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+
+				Certificate certificate;
+
+				// Loading the certificate
+				String certificateString = DataManager.getInstance().getContext().getResources().getString(R.string.config_staging_self_signed_cert);
+				InputStream is = new ByteArrayInputStream(certificateString.getBytes(Charset.forName("UTF-8")));
+				certificate = certificateFactory.generateCertificate(is);
+
+				// Creating a keystore containing our trusted certificate
+				String keyStoreType = KeyStore.getDefaultType();
+				KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+				keyStore.load(null, null);
+				keyStore.setCertificateEntry("ca", certificate);
+
+				//-------------------------------------------------
+				// Adding the self-signed cert to the async mClient
+				//-------------------------------------------------
+
+				// Set the async client's socket factory to one that uses the keystore containing the self-signed certificate
+				mClient.setSSLSocketFactory(new cz.msebera.android.httpclient.conn.ssl.SSLSocketFactory(keyStore));
+
+
+				//-------------------------------------------------
+				// Adding the self-signed cert to the mSyncClient
+				//-------------------------------------------------
+
+				SchemeRegistry schemeRegistry = new SchemeRegistry();
+				schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+				schemeRegistry.register(new Scheme("https", new SSLSocketFactory(keyStore), 443));
+				org.apache.http.params.HttpParams params = new BasicHttpParams();
+				org.apache.http.conn.ClientConnectionManager connectionManager = new SingleClientConnManager(params, schemeRegistry);
+
+				// Re-allocating the syncClient with a new connection manager that is set up to accept self-signed certificate
+				mSyncClient = new DefaultHttpClient(connectionManager, params);
+
+			}
+			catch(Exception e)
+			{
+				Log.e("CERT","There was an error trusting the self-signed certificate for staging or dev environment.");
+			}
+		}
+
+
+
+
 	}
 
 	@Override
