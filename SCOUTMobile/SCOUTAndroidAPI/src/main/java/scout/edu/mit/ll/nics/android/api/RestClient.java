@@ -33,36 +33,24 @@ package scout.edu.mit.ll.nics.android.api;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
 import android.provider.Settings.Secure;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.View;
-import android.widget.Button;
 
 import com.google.gson.GsonBuilder;
 import com.loopj.android.http.AsyncHttpClient;
@@ -70,13 +58,14 @@ import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpEntity;
 import scout.edu.mit.ll.nics.android.api.data.MarkupFeature;
 import scout.edu.mit.ll.nics.android.api.data.OperationalUnit;
 import scout.edu.mit.ll.nics.android.api.data.OrgCapabilities;
+import scout.edu.mit.ll.nics.android.api.data.ReportOnConditionData;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportCategoryType;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportData;
 import scout.edu.mit.ll.nics.android.api.handlers.ChatResponseHandler;
+import scout.edu.mit.ll.nics.android.api.handlers.ReportOnConditionResponseHandler;
 import scout.edu.mit.ll.nics.android.api.handlers.SimpleReportNoImageResponseHandler;
 import scout.edu.mit.ll.nics.android.api.handlers.MDTResponseHandler;
 import scout.edu.mit.ll.nics.android.api.handlers.MarkupResponseHandler;
@@ -90,7 +79,6 @@ import scout.edu.mit.ll.nics.android.api.messages.LoginMessage;
 import scout.edu.mit.ll.nics.android.api.messages.MarkupMessage;
 import scout.edu.mit.ll.nics.android.api.messages.OrganizationMessage;
 import scout.edu.mit.ll.nics.android.api.messages.SimpleReportMessage;
-import scout.edu.mit.ll.nics.android.api.messages.ReportOnConditionMessage;
 import scout.edu.mit.ll.nics.android.api.messages.UserMessage;
 import scout.edu.mit.ll.nics.android.api.payload.AssignmentPayload;
 import scout.edu.mit.ll.nics.android.api.payload.ChatPayload;
@@ -103,7 +91,6 @@ import scout.edu.mit.ll.nics.android.api.payload.TrackingLayerPayload;
 import scout.edu.mit.ll.nics.android.api.payload.TrackingTokenPayload;
 import scout.edu.mit.ll.nics.android.api.payload.WeatherPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.ReportOnConditionPayload;
 import scout.edu.mit.ll.nics.android.api.tasks.ParseChatMessagesTask;
 import scout.edu.mit.ll.nics.android.api.tasks.ParseMarkupFeaturesTask;
 import scout.edu.mit.ll.nics.android.api.tasks.ParseSimpleReportsTask;
@@ -126,7 +113,7 @@ public class RestClient
 	private static AsyncTask<ArrayList<ChatPayload>, Object, Integer> mParseChatMessagesTask;
 	private static AsyncTask<ArrayList<SimpleReportPayload>, Object, Integer> mParseSimpleReportsTask;
 	private static AsyncTask<MarkupPayload, Object, Integer> mParseMarkupFeaturesTask;
-	private static AsyncTask<ArrayList<ReportOnConditionPayload>, Object, Integer> mParseReportOnConditionsTask;
+	private static AsyncTask<ArrayList<ReportOnConditionData>, Object, Integer> mParseReportOnConditionsTask;
 
 	private static SparseArray<SimpleReportResponseHandler> mSimpleReportResponseHandlers;
 
@@ -141,6 +128,8 @@ public class RestClient
 	private static boolean mSendingWeatherReports;
 	private static boolean mSendingChatMessages;
 	private static boolean mSendingMarkupFeatures;
+	private static boolean mSendingReportOnConditions;
+
 
 	private static boolean mFetchingSimpleReports;
 	private static boolean mFetchingFieldReports;
@@ -999,23 +988,30 @@ public class RestClient
 				public void onSuccess (int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody)
 				{
 					String content = (responseBody != null) ? new String(responseBody) : "error";
-					SimpleReportMessage message = mBuilder.create().fromJson(content, SimpleReportMessage.class);
-
-					if (message != null)
+					try
 					{
-						ArrayList<SimpleReportPayload> srPayloads = message.getReports();
+						SimpleReportMessage message = mBuilder.create().fromJson(content, SimpleReportMessage.class);
 
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+						if (message != null)
 						{
-							mParseSimpleReportsTask = new ParseSimpleReportsTask(mContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, srPayloads);
+							ArrayList<SimpleReportPayload> srPayloads = message.getReports();
+
+							if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+							{
+								mParseSimpleReportsTask = new ParseSimpleReportsTask(mContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, srPayloads);
+							}
+							else
+							{
+								mParseSimpleReportsTask = new ParseSimpleReportsTask(mContext).execute(srPayloads);
+							}
+							Log.i("nicsRest", "Successfully received simple report information.");
 						}
-						else
-						{
-							mParseSimpleReportsTask = new ParseSimpleReportsTask(mContext).execute(srPayloads);
-						}
-						Log.i("nicsRest", "Successfully received simple report information.");
+						mFetchingSimpleReports = false;
 					}
-					mFetchingSimpleReports = false;
+					catch(Exception e)
+					{
+						Log.e("SR","An exception occurred while attempting to parse simple reports from server: " + e);
+					}
 				}
 
 				@Override
@@ -1029,9 +1025,14 @@ public class RestClient
 
 	public static void getReportOnConditions (final long incidentId)
 	{
+		Log.e("ROC","getReportOnConditions called");
+
 		if (!mFetchingReportOnConditions && mParseReportOnConditionsTask == null && incidentId != -1)
 		{
-			String url = "reports/" + mDataManager.getActiveIncidentId() + "/ROC?sortOrder=desc&fromDate=" + (mDataManager.getLastSimpleReportTimestamp() + 1);
+			Log.e("ROC","not fetching, and current task is null, and incidentid is " + incidentId);
+
+
+			String url = "reports/" + incidentId + "/ROC?sortOrder=desc&fromDate=" + (mDataManager.getLastSimpleReportTimestamp() + 1);
 
 			mFetchingReportOnConditions = true;
 
@@ -1040,25 +1041,48 @@ public class RestClient
 				@Override
 				public void onSuccess (int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody)
 				{
-					String content = (responseBody != null) ? new String(responseBody) : "error";
-
-					Log.e("ROC","ROC got content: " + content);
-
-					ReportOnConditionMessage message = mBuilder.create().fromJson(content, ReportOnConditionMessage.class);
-
-					if (message != null)
+					if(responseBody != null)
 					{
-						ArrayList<ReportOnConditionPayload> rocPayloads = message.getReports();
+						String content = new String(responseBody);
 
-						if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+						Log.e("ROC","ROC got content: " + content);
+
+						try
 						{
-							mParseReportOnConditionsTask = new ParseReportOnConditionsTask(mContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, rocPayloads);
+							JSONObject jsonObject = new JSONObject(content);
+
+							// Verify that response message is "ok"
+							if(jsonObject.getString("message").equals("ok"))
+							{
+								Log.e("ROC","ROC Payload message is \"ok\"");
+
+								// Create a list of ReportOnConditionData and populate it
+								ArrayList<ReportOnConditionData> rocPayloads = ReportOnConditionData.multipleFromServerPayload(jsonObject);
+
+								// if rocPaylods is not empty
+								if(rocPayloads.size() >= 1)
+								{
+									Log.e("ROC","Parsed " + rocPayloads.size() + " roc payloads");
+
+									// Insert them into the database
+									if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+									{
+										mParseReportOnConditionsTask = new ParseReportOnConditionsTask(mContext).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, rocPayloads);
+									}
+									else
+									{
+										mParseReportOnConditionsTask = new ParseReportOnConditionsTask(mContext).execute(rocPayloads);
+									}
+									Log.i("nicsRest", "Successfully received simple report information.");
+								}
+							}
+
+
 						}
-						else
+						catch(Exception e)
 						{
-							mParseReportOnConditionsTask = new ParseReportOnConditionsTask(mContext).execute(rocPayloads);
+							Log.w("ROC","Unable to parse response to JSONObject. Exception: " + e);
 						}
-						Log.i("nicsRest", "Successfully received simple report information.");
 					}
 
 					mFetchingReportOnConditions = false;
@@ -1067,10 +1091,95 @@ public class RestClient
 				@Override
 				public void onFailure (int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error)
 				{
+					Log.e("ROC","ROC got error: " + ((responseBody != null) ? new String(responseBody) : "null"));
 					mFetchingReportOnConditions = false;
 				}
 			});
 		}
+	}
+
+
+	public static void postReportOnConditions()
+	{
+		ArrayList<ReportOnConditionData> rocs = mDataManager.getAllReportOnConditionStoreAndForwardReadyToSend();
+
+		Log.e("ROC","RestClient - postReportOnConditions - posting " + rocs.size() + " reports.");
+
+
+		if (mSimpleReportResponseHandlers == null)
+		{
+			mSimpleReportResponseHandlers = new SparseArray<SimpleReportResponseHandler>();
+		}
+
+
+		// Don't attempt to send simpleReports if AuthManager is null
+		if (mAuthManager == null || mAuthManager.getClient() == null)
+		{
+			Log.e("ROC","RestClient - auth is null, aborting");
+			return;
+		}
+
+		for (ReportOnConditionData roc: rocs)
+		{
+			Log.e("ROC","RestClient - postReportOnConditions - posting roc with incident id: " + roc.incidentid + ", name: " + roc.incidentname);
+
+			// TODO - none of these seem to apply to ROCs (for now)
+			//if (!report.isDraft() && mSimpleReportResponseHandlers != null && mSimpleReportResponseHandlers.indexOfKey((int) report.getId()) < 0 && !mSendingSimpleReports)
+			if(!mSendingReportOnConditions)
+			{
+				Log.w("nics_POST", "Adding ROC " + roc.incidentname + ", " + roc.datecreated + " to send queue.");
+
+
+				// TODO - pass this to the roc to make a server payload.
+				long userSessionId = mDataManager.getUserSessionId();
+				ReportOnConditionResponseHandler responseHandler = new ReportOnConditionResponseHandler(mContext, mDataManager, roc.incidentname, roc.datecreated.getTime(), userSessionId);
+				String payload = roc.toServerPayload(userSessionId).toString();
+
+
+				Log.e("ROCPOST","ROC Server payload: " + payload);
+
+				try
+				{
+					cz.msebera.android.httpclient.entity.StringEntity entity = new cz.msebera.android.httpclient.entity.StringEntity(payload);
+
+					String url;
+
+					if(!roc.isForNewIncident)
+					{
+						long incidentId = roc.incidentid;
+
+						url = "reports/" + incidentId + "/ROC";
+					}
+					else
+					{
+						int orgId = mDataManager.getCurrentOrganziation().getOrgid();
+
+						url = "reports/" + orgId + "/IncidentAndROC";
+					}
+
+					mAuthManager.getClient().post( url, entity, responseHandler);
+					mSendingSimpleReports = true;
+				}
+				catch(Exception e)
+				{
+					Log.e("ROC","Exception was raised while trying to send ROC payload. Exception: " + e);
+				}
+			}
+		}
+	}
+
+	public static boolean isCurrentlyFetchingReportOnConditions()
+	{
+		// mFetchingReportOnConditions is true when there is a request in transit
+		if(mFetchingReportOnConditions)
+			return true;
+
+		// mParseReportOnConditionsTask is not null when there is a job in process to parse the ROCs
+		if(mParseReportOnConditionsTask != null)
+			return true;
+
+		// Otherwise, we are not fetching ROCs
+		return false;
 	}
 
 	public static void getChatHistory (final long incidentId, final long collabRoomId)
@@ -1509,6 +1618,7 @@ public class RestClient
 		mSimpleReportResponseHandlers.remove((int) reportId);
 	}
 
+
 	public static void postChatMessages ()
 	{
 		if (!mSendingChatMessages)
@@ -1606,6 +1716,14 @@ public class RestClient
 
 			HttpResponse response = mAuthManager.getClient().syncGet(url);
 
+			if(response == null)
+			{
+				Log.w("RestClient","getROCLocationDataForLocation response is null.");
+				return null;
+			}
+
+			JSONObject results = null;
+
 			try
 			{
 				// If the status code is not 200, return null
@@ -1617,27 +1735,46 @@ public class RestClient
 
 Log.e("ROC","RestClient - Got back the following data: " + response + ", ent: \"" + response.getEntity() + "\"" + ", Status Line: \"" + response.getStatusLine() + "\"" + "Code: " + response.getStatusLine().getStatusCode());
 
-				// Parse the response content into a JSONObject
-				JSONObject results = new JSONObject(EntityUtils.toString(response.getEntity()));
+				String responseString = EntityUtils.toString(response.getEntity());
 
+				Log.e("ROC","RestClient - Data Entity contents: \"" + responseString + "\"");
+
+
+				// Parse the response content into a JSONObject
+				results = new JSONObject(responseString);
 
 				// The response content has an embedded status code
 				// This should ALSO be 200 before acknowledging it as a successful request
 				if(results.getInt("status") != 200)
 				{
 					Log.w("RestClient","getROCLocationDataForLocation got internal response code: " + results.getInt("status") + ", for URL: " + url);
-					return null;
+					results = null;
 				}
 
-				// Otherwise, return the JSON object:
-				return results;
+				// TODO - Verify what other status reports we need to check.
 			}
 			catch(Exception e)
 			{
-
-				Log.e("ROC","RestClient - Exception: " + e);
+				Log.e("ROC","RestClient - Unable to parse Location Based Data - Exception: " + e);
+			}
+			finally
+			{
+				try
+				{
+					// Consume the response object to release the connection
+					if (response != null && response.getEntity() != null)
+					{
+						Log.e("ROC", "RestClient - Consuming Content");
+						response.getEntity().consumeContent();
+					}
+				}
+				catch (Exception e)
+				{
+					Log.e("ROC", "RestClient - Unable to release connection - Exception: " + e);
+				}
 			}
 
+			return results;
 
 		}
 		return null;
@@ -1665,6 +1802,17 @@ Log.e("ROC","RestClient - Got back the following data: " + response + ", ent: \"
 			postSimpleReports();
 		}
 	}
+
+	public static void setSendingReportOnConditions(boolean isSending)
+	{
+		mSendingReportOnConditions = isSending;
+		if (mDataManager.isOnline())
+		{
+			postReportOnConditions();
+		}
+	}
+
+
 
 	public static void setSendingChatMessages (boolean isSending)
 	{

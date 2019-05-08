@@ -31,7 +31,6 @@
 package scout.edu.mit.ll.nics.android.api.tasks;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -39,14 +38,12 @@ import java.util.ArrayList;
 
 import scout.edu.mit.ll.nics.android.api.DataManager;
 import scout.edu.mit.ll.nics.android.api.RestClient;
+import scout.edu.mit.ll.nics.android.api.data.ReportOnConditionData;
 import scout.edu.mit.ll.nics.android.api.data.ReportSendStatus;
-import scout.edu.mit.ll.nics.android.api.payload.forms.ReportOnConditionPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
-import scout.edu.mit.ll.nics.android.utils.Intents;
 import scout.edu.mit.ll.nics.android.utils.NotificationsHandler;
 
 
-public class ParseReportOnConditionsTask extends AsyncTask<ArrayList<ReportOnConditionPayload>, Object, Integer>
+public class ParseReportOnConditionsTask extends AsyncTask<ArrayList<ReportOnConditionData>, Object, Integer>
 {
 	//OES-828
 	//TODO - Update this
@@ -62,43 +59,52 @@ public class ParseReportOnConditionsTask extends AsyncTask<ArrayList<ReportOnCon
 	}
 
 	@Override
-	protected Integer doInBackground(@SuppressWarnings("unchecked") ArrayList<ReportOnConditionPayload>... rocPayloads)
+	protected Integer doInBackground(@SuppressWarnings("unchecked") ArrayList<ReportOnConditionData>... rocData)
 	{
 		Integer numParsed = 0;
-		for(ReportOnConditionPayload payload : rocPayloads[0])
-		{
-			if(payload.getIncidentId() == mDataManager.getActiveIncidentId())
-			{
-				payload.parse();
-				payload.setSendStatus(ReportSendStatus.SENT);
-				payload.setNew(true);
-				mDataManager.addReportOnConditionToHistory(payload);
 
-		        Intent intent = new Intent();
-		        intent.setAction(Intents.nics_NEW_SIMPLE_REPORT_RECEIVED);
-		        intent.putExtra("payload", payload.toJsonString());
-		        intent.putExtra("sendStatus", ReportSendStatus.SENT.getId());
-		        mContext.sendBroadcast (intent);
-		        numParsed++;
-			}
+		// Iterate through each ROC data
+		for(ReportOnConditionData data : rocData[0])
+		{
+			if(data == null)
+				continue;
+			data.sendStatus = ReportSendStatus.SENT;
+			data.isForNewIncident = true;
+
+			Log.e("ROC","Adding ROC data to table.");
+			mDataManager.addReportOnConditionToHistory(data);
+
+
+			// Broadcast that we've received a new report
+			// These broadcasts are used for UI changes based on having received a new report
+			// currently, nothing uses these broadcasts.
+			//Intent intent = new Intent();
+			//intent.setAction(Intents.nics_NEW_REPORT_ON_CONDITION_RECEIVED);
+			// NOTE - must somehow insert the object data
+			//intent.putExtra("payload", data);
+			//intent.putExtra("sendStatus", ReportSendStatus.SENT.getId());
+			//mContext.sendBroadcast(intent);
+			numParsed++;
 		}
 
+		// Check if we have any ROCs that have successfully been sent in our store and forward table
+		// if so, remove them
 		if(numParsed > 0)
 		{
-			
-			ArrayList<ReportOnConditionPayload> reports = mDataManager.getAllReportOnConditionStoreAndForwardHasSent();
+			ArrayList<ReportOnConditionData> reports = mDataManager.getAllReportOnConditionStoreAndForwardHasSent();
+
 			for(int i = 0; i < reports.size(); i++)
 			{
-				mDataManager.deleteReportOnConditionStoreAndForward(reports.get(i).getId());
-				Log.d("ParseReportOnCondition","deleted sent report on condition: " + reports.get(i).getId());
-				Intent intent = new Intent();
-			    intent.setAction(Intents.nics_SENT_REPORT_ON_CONDITION_CLEARED);
-				intent.putExtra("reportId", reports.get(i).getFormId());
-		        mContext.sendBroadcast (intent);
+				mDataManager.deleteReportOnConditionStoreAndForward(reports.get(i).incidentname, reports.get(i).datecreated.getTime());
+
+				// Broadcast that we've removed a report from the send table
+				// Currently there is nothing to be done for this broadcast, but I'll leave it here in case future functionality could use this broadcast
+				//Intent intent = new Intent();
+				//intent.setAction(Intents.nics_SENT_REPORT_ON_CONDITION_CLEARED);
+				//intent.putExtra("reportId", reports.get(i).id);
+				//mContext.sendBroadcast (intent);
+
 			}
-			
-	        mDataManager.addPersonalHistory("Successfully received " + numParsed + " report on conditions from " + mDataManager.getActiveIncidentName());
-	        //mDataManager.setNewGeneralMessageAvailable(true);
 		}
 
 		return numParsed;

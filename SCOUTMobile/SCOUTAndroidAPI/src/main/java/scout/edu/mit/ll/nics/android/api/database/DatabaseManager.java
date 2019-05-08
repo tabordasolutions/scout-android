@@ -50,6 +50,7 @@ import android.os.Build;
 import android.util.Log;
 
 import scout.edu.mit.ll.nics.android.api.data.MarkupFeature;
+import scout.edu.mit.ll.nics.android.api.data.ReportOnConditionData;
 import scout.edu.mit.ll.nics.android.api.database.tables.ChatTable;
 import scout.edu.mit.ll.nics.android.api.database.tables.MarkupTable;
 import scout.edu.mit.ll.nics.android.api.database.tables.MobileDeviceTrackingTable;
@@ -60,7 +61,6 @@ import scout.edu.mit.ll.nics.android.api.payload.MobileDeviceTrackingPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
 import scout.edu.mit.ll.nics.android.utils.AesCbcWithIntegrity;
 import scout.edu.mit.ll.nics.android.utils.Constants;
-import scout.edu.mit.ll.nics.android.api.payload.forms.ReportOnConditionPayload;
 
 
 /**
@@ -1173,22 +1173,22 @@ public class DatabaseManager extends SQLiteOpenHelper
 		return retValue;
 	}
 
-	public ReportOnConditionPayload getLastReportOnConditionPayload(long incidentId)
+	public ReportOnConditionData getLastReportOnConditionData(long incidentId)
 	{
-		ReportOnConditionPayload retValue = null;
+		ReportOnConditionData retValue = null;
 		SQLiteDatabase database = getDatabase();
 
 		if (database != null)
 		{
-			retValue = reportOnConditionReceiveTable.getLastDataForIncidentId(incidentId, database);
+			retValue = reportOnConditionReceiveTable.getLastDataForIncident(incidentId, database);
 		}
 
 		return retValue;
 	}
 
-	public ArrayList<ReportOnConditionPayload> getReportOnConditionHistoryForIncident(long incidentId)
+	public ArrayList<ReportOnConditionData> getReportOnConditionHistoryForIncident(long incidentId)
 	{
-		ArrayList<ReportOnConditionPayload> retValue = null;
+		ArrayList<ReportOnConditionData> retValue = null;
 		SQLiteDatabase database = getDatabase();
 
 		if (database != null)
@@ -1204,9 +1204,9 @@ public class DatabaseManager extends SQLiteOpenHelper
 	 *
 	 * @return All the report on conditions that are ready to send in the store and forward table.
 	 */
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardReadyToSend()
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionStoreAndForwardReadyToSend()
 	{
-		ArrayList<ReportOnConditionPayload> retValue = null;
+		ArrayList<ReportOnConditionData> retValue = null;
 
 		SQLiteDatabase database = getDatabase();
 
@@ -1218,14 +1218,57 @@ public class DatabaseManager extends SQLiteOpenHelper
 		return retValue;
 	}
 
+	// Returns the report on condition with given incidentName and creationDate
+	public ReportOnConditionData getReportOnConditionStoreAndForward(String incidentName, long creationDate)
+	{
+		SQLiteDatabase database = getDatabase();
+
+		ReportOnConditionData retValue = null;
+
+		if (database != null)
+		{
+			retValue = reportOnConditionSendTable.getDataByIncidentAndTime(incidentName,creationDate,null, database);
+		}
+
+
+		return retValue;
+	}
+
+	// Deletes the report on condition entry from the store and forward table:
+	/**
+	 * Deletes an entry from the report on condition store and forward table.
+	 *
+	 * @param incidentName - The name of the incident
+	 * @param creationDate - the UTC time (seconds) at which the report was created
+	 * @return True if the operation was successful, otherwise false.
+	 */
+
+	public boolean deleteReportOnConditionStoreAndForward(String incidentName, long creationDate)
+	{
+		SQLiteDatabase database = getDatabase();
+
+		boolean retValue = false;
+
+		if (database != null)
+		{
+			if(reportOnConditionSendTable.deleteData(incidentName, creationDate, database) > 0)
+			{
+				retValue = true;
+			}
+		}
+
+		return retValue;
+	}
+
+
 	/**
 	 * Gets all the report on conditions that are ready to send in the store and forward table.
 	 *
 	 * @return All the report on conditions that are ready to send in the store and forward table.
 	 */
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardReadyToSend(long incidentId)
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionStoreAndForwardReadyToSend(long incidentId)
 	{
-		ArrayList<ReportOnConditionPayload> retValue = null;
+		ArrayList<ReportOnConditionData> retValue = null;
 
 		SQLiteDatabase database = getDatabase();
 
@@ -1242,9 +1285,9 @@ public class DatabaseManager extends SQLiteOpenHelper
 	 *
 	 * @return All the report on conditions that are ready to send in the store and forward table.
 	 */
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardHasSent()
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionStoreAndForwardHasSent()
 	{
-		ArrayList<ReportOnConditionPayload> retValue = null;
+		ArrayList<ReportOnConditionData> retValue = null;
 
 		SQLiteDatabase database = getDatabase();
 
@@ -1261,29 +1304,15 @@ public class DatabaseManager extends SQLiteOpenHelper
 	 *
 	 * @return All the report on conditions that are ready to send in the store and forward table.
 	 */
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardHasSent(long incidentId)
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionStoreAndForwardHasSent(long incidentId)
 	{
-		ArrayList<ReportOnConditionPayload> retValue = null;
+		ArrayList<ReportOnConditionData> retValue = null;
 
 		SQLiteDatabase database = getDatabase();
 
 		if (database != null)
 		{
 			retValue = reportOnConditionSendTable.getAllDataHasSent(incidentId, database);
-		}
-
-		return retValue;
-	}
-
-	public ArrayList<ReportOnConditionPayload> getReportOnConditionFromStoreAndForward(int reportId)
-	{
-		ArrayList<ReportOnConditionPayload> retValue = null;
-
-		SQLiteDatabase database = getDatabase();
-
-		if (database != null)
-		{
-			retValue = reportOnConditionSendTable.getDataByReportId(reportId, database);
 		}
 
 		return retValue;
@@ -1335,37 +1364,16 @@ public class DatabaseManager extends SQLiteOpenHelper
 		return retValue;
 	}
 
-	/**
-	 * Deletes an entry from the report on condition store and forward table.
-	 *
-	 * @param id The index into the table to delete.
-	 * @return True if the operation was successful, otherwise false.
-	 */
-	public boolean deleteReportOnConditionStoreAndForward(long id)
-	{
-		boolean retValue = false;
 
-		SQLiteDatabase database = getDatabase();
-
-		if (database != null)
-		{
-			if (reportOnConditionSendTable.deleteData(id, database) > 0)
-			{
-				retValue = true;
-			}
-		}
-
-		return retValue;
-	}
 
 	/**
 	 * Gets all the report on conditions received from the server.
 	 *
 	 * @return All the report on conditions received from the server.
 	 */
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionHistory()
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionHistory()
 	{
-		ArrayList<ReportOnConditionPayload> retValue = null;
+		ArrayList<ReportOnConditionData> retValue = null;
 
 		SQLiteDatabase database = getDatabase();
 
@@ -1384,7 +1392,7 @@ public class DatabaseManager extends SQLiteOpenHelper
 	 * @param data Report on Condition to add.
 	 * @return True if the operation was successful, otherwise false.
 	 */
-	public boolean addReportOnConditionHistory(ReportOnConditionPayload data)
+	public boolean addReportOnConditionHistory(ReportOnConditionData data)
 	{
 		return (reportOnConditionReceiveTable.addData(data, getDatabase()) > 0);
 	}
@@ -1395,7 +1403,7 @@ public class DatabaseManager extends SQLiteOpenHelper
 	 * @param data The report on condition to add to the store and forward database table.
 	 * @return True if the operation was successful, otherwise false.
 	 */
-	public boolean addReportOnConditionToStoreAndForward(ReportOnConditionPayload data)
+	public boolean addReportOnConditionToStoreAndForward(ReportOnConditionData data)
 	{
 		return (reportOnConditionSendTable.addData(data, getDatabase()) > 0);
 	}

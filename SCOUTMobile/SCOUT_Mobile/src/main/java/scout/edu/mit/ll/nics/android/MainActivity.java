@@ -269,9 +269,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				public void run ()
 				{
 					invalidSessionIDCounter++;
-					// Only check against the server every 5 times
+					// Only check against the server every 30 times (every 30 seconds)
 					// This is meant to reduce the amount of network requests
-					if (!invalidSessionID && invalidSessionIDCounter >= 5)
+					if (!invalidSessionID && invalidSessionIDCounter >= 30)
 					{
 						invalidSessionIDCounter = 0;
 						RestClient.validateSessionID();

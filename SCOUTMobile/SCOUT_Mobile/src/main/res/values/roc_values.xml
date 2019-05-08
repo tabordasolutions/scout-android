@@ -141,7 +141,7 @@
     <!-- ROC Incident Info Section -->
     <!-- ======================================================================================================================================================================== -->
     <string-array name="roc_dpa_spinner_options">
-        <item>Choose an option</item>
+        <item>Choose an option (required)</item>
         <item>State</item>
         <item>Federal</item>
         <item>Local</item>
@@ -168,10 +168,15 @@
 
     <string-array name="roc_rate_of_spread_spinner_options">
         <item>Choose an option</item>
-        <item>Low rate of spread</item>
+        <item>Slow rate of spread</item>
         <item>Moderate rate of spread</item>
         <item>Dangerous rate of spread</item>
         <item>Critical rate of spread</item>
+        <item>Forward spread has been stopped</item>
+    </string-array>
+
+    <string-array name="roc_rate_of_spread_spinner_options_final">
+        <item>Choose an option</item>
         <item>Forward spread has been stopped</item>
     </string-array>
 
@@ -181,14 +186,22 @@
     <!-- ======================================================================================================================================================================== -->
     <string-array name="roc_weather_wind_direction_spinner_options">
         <item>Choose an option</item>
-        <item>North</item>
-        <item>Northeast</item>
-        <item>East</item>
-        <item>Southeast</item>
-        <item>South</item>
-        <item>Southwest</item>
-        <item>West</item>
-        <item>Northwest</item>
+        <item>N</item>
+        <item>NNE</item>
+        <item>NE</item>
+        <item>ENE</item>
+        <item>E</item>
+        <item>ESE</item>
+        <item>SE</item>
+        <item>SSE</item>
+        <item>S</item>
+        <item>SSW</item>
+        <item>SW</item>
+        <item>WSW</item>
+        <item>W</item>
+        <item>WNW</item>
+        <item>NW</item>
+        <item>NNW</item>
     </string-array>
 
     <!-- ======================================================================================================================================================================== -->

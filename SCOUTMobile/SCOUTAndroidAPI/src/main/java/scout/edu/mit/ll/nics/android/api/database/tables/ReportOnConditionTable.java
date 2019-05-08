@@ -45,7 +45,6 @@ import java.util.Map;
 
 import scout.edu.mit.ll.nics.android.api.data.ReportSendStatus;
 import scout.edu.mit.ll.nics.android.api.data.ReportOnConditionData;
-import scout.edu.mit.ll.nics.android.api.payload.forms.ReportOnConditionPayload;
 import scout.edu.mit.ll.nics.android.utils.Constants;
 
 /**
@@ -54,7 +53,7 @@ import scout.edu.mit.ll.nics.android.utils.Constants;
  *         This class contains all the items necessary for creating and accessing a report on condition table in the
  *         nics database.
  */
-public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPayload>
+public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionData>
 {
 	/**
 	 * Defines the columns and its SQLite data type.
@@ -64,24 +63,28 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 		private static final long serialVersionUID = 4292279082677888054L;
 
 		{
-			put("id", "integer primary key autoincrement");
-			//TODO - populate with final ROC data fields
-//		    put("isDraft",			"integer");
-//		    put("isNew",			"integer");
-//		    put("createdUTC",		"integer");
-//		    put("lastUpdatedUTC",	"integer");
-//		    put("seqtime",			"integer");
-//		    put("seqnum",			"integer");
-//		    put("incidentId",		"integer");
-//		    put("user",				"text");
-//		    put("latitude",			"real");
-//		    put("longitude",		"real");
-//		    put("description",		"text");
-//		    put("category",			"integer");
-//		    put("imagePath",		"text");
-//		    put("status",			"text");
-//		    put("sendStatus",		"integer");
-//		    put("json",				"text");
+			//------------------------------------------
+			// Metadata
+			//------------------------------------------
+			// Which ones should be marked as new?
+			// FIXME - If the primary key works, remove this:
+			//put("id",				"integer primary key autoincrement");
+			put("sendStatus",		"integer");
+
+
+			// Placing this to sort by creation date
+			put("datecreated",		"integer");
+
+			// Adding this as its own row to query against it (as UTC)
+			put("incidentid",		"integer");
+			put("incidentname",		"text");
+
+			// The serialized object
+			put("json",				"text");
+
+			// Specify the compound primary key
+			//put("(incidentid, incidentname)", "primary key");
+			// This doesn't work, because TABLE_COLUMNS_MAP is used for retrieving the data, not just the create table
 		}
 	};
 
@@ -103,8 +106,9 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 	}
 
 	@Override
-	public long addData (final ReportOnConditionPayload data, SQLiteDatabase database)
+	public long addData (final ReportOnConditionData data, SQLiteDatabase database)
 	{
+		Log.e("ROC","ReportOnConditionTable.addData executed.");
 		long row = 0L;
 
 		if (database != null)
@@ -113,28 +117,23 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 			{
 				ContentValues contentValues = new ContentValues();
 
+				// If we add draft functionality, add this:
+				//contentValues.put("isDraft", data.isDraft());
+				// Storing metadata:
+				contentValues.put("sendStatus", data.sendStatus != null ? data.sendStatus.getId() : 0);
 
-//                contentValues.put("isDraft",		data.isDraft());
-//                contentValues.put("isNew",		data.isNew());
-//                contentValues.put("createdUTC",		data.getCreatedUTC());
-//                contentValues.put("lastUpdatedUTC",	data.getLastUpdatedUTC());
-//                contentValues.put("incidentId",		data.getIncidentId());
-//                contentValues.put("seqtime",		data.getSeqTime());
-//                contentValues.put("seqnum",		data.getSeqNum());
+				// Store incidentid as its own column for faster retrieval
+				contentValues.put("incidentid", data.incidentid);
+				contentValues.put("incidentname", data.incidentname);
 
-				ReportOnConditionData messageData = data.getMessageData();
-//                contentValues.put("user",			messageData.getUser());
-//                contentValues.put("latitude",		messageData.getLatitude() );
-//                contentValues.put("longitude",		messageData.getLongitude() );
-//                contentValues.put("description",	messageData.getDescription () );
-//                contentValues.put("category",		messageData.getCategory() != null ? messageData.getCategory().getId () : 0 );
-//                contentValues.put("imagePath",		messageData.getFullpath());
-//                contentValues.put("status",			messageData.getStatus());
-//                contentValues.put("sendStatus",		data.getSendStatus() != null ? data.getSendStatus().getId () : 0);
-//                contentValues.put("json",			data.toJsonString());
+				// Inserting the time at which it was created (storing as UTC)
+				contentValues.put("datecreated",		data.datecreated.getTime());
 
+				// Store the actual object info
+				contentValues.put("json",		data.toJSON().toString());
+
+				// Insert the db row
 				row = database.insert(tableName, null, contentValues);
-
 			}
 			catch (Exception ex)
 			{
@@ -150,16 +149,16 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 	}
 
 
-	public ArrayList<ReportOnConditionPayload> getAllDataReadyToSend (long collaborationRoomId, SQLiteDatabase database)
+	public ArrayList<ReportOnConditionData> getAllDataReadyToSend (long collaborationRoomId, SQLiteDatabase database)
 	{
-		String orderBy = "seqtime DESC";
-		String sqlSelection = "sendStatus==? AND incidentId==?";
+		String orderBy = "datecreated DESC";
+		String sqlSelection = "sendStatus==? AND incidentid==?";
 		String[] sqlSelectionArguments = {String.valueOf(ReportSendStatus.WAITING_TO_SEND.getId()), String.valueOf(collaborationRoomId)};
 
 		return getData(sqlSelection, sqlSelectionArguments, orderBy, NO_LIMIT, database);
 	}
 
-	public ArrayList<ReportOnConditionPayload> getAllDataReadyToSend (String orderBy, SQLiteDatabase database)
+	public ArrayList<ReportOnConditionData> getAllDataReadyToSend (String orderBy, SQLiteDatabase database)
 	{
 		String sqlSelection = "sendStatus==?";
 		String[] sqlSelectionArguments = {String.valueOf(ReportSendStatus.WAITING_TO_SEND.getId())};
@@ -167,16 +166,16 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 		return getData(sqlSelection, sqlSelectionArguments, orderBy, NO_LIMIT, database);
 	}
 
-	public ArrayList<ReportOnConditionPayload> getAllDataHasSent (long collaborationRoomId, SQLiteDatabase database)
+	public ArrayList<ReportOnConditionData> getAllDataHasSent (long collaborationRoomId, SQLiteDatabase database)
 	{
-		String orderBy = "seqtime DESC";
-		String sqlSelection = "sendStatus==? AND incidentId==?";
+		String orderBy = "datecreated DESC";
+		String sqlSelection = "sendStatus==? AND incidentid==?";
 		String[] sqlSelectionArguments = {String.valueOf(ReportSendStatus.SENT.getId()), String.valueOf(collaborationRoomId)};
 
 		return getData(sqlSelection, sqlSelectionArguments, orderBy, NO_LIMIT, database);
 	}
 
-	public ArrayList<ReportOnConditionPayload> getAllDataHasSent (String orderBy, SQLiteDatabase database)
+	public ArrayList<ReportOnConditionData> getAllDataHasSent (String orderBy, SQLiteDatabase database)
 	{
 		String sqlSelection = "sendStatus==?";
 		String[] sqlSelectionArguments = {String.valueOf(ReportSendStatus.SENT.getId())};
@@ -184,10 +183,67 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 		return getData(sqlSelection, sqlSelectionArguments, orderBy, NO_LIMIT, database);
 	}
 
-	@Override
-	protected ArrayList<ReportOnConditionPayload> getData (String sqlSelection, String[] sqlSelectionArguments, String orderBy, String limit, SQLiteDatabase database)
+
+	/**
+	 * Deletes a row in the database where the incidentname column is equal to the provided incidentname,
+	 * and datecreated is equal to the provided creation date
+	 *
+	 * @param incidentName value of the row to delete.
+	 * @param creationDate value of the row to delte.
+	 * @param database The database.
+	 * @return The number of rows affected by this call. -1 indicates that there was an error in performing this operation.
+	 */
+	public long deleteData(final String incidentName, final long creationDate, SQLiteDatabase database) {
+		long rows = 0L;
+
+		if (database != null) {
+			String whereClause = "incidentname==? AND datecreated==?";
+			String[] whereArguments = {incidentName, String.valueOf(creationDate)};
+
+			try
+			{
+				rows = database.delete(tableName, whereClause, whereArguments); // SQL where clause arguments.
+			}
+			catch (Exception ex)
+			{
+				Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Exception occurred while trying to delete data from table: \"" + tableName + "\"", ex);
+			}
+		}
+		else
+		{
+			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Could not get database to delete data from table: \"" + tableName + "\"");
+		}
+		return rows;
+	}
+
+
+
+	public ReportOnConditionData getDataByIncidentAndTime(String incidentName, long creationDate, String orderBy, SQLiteDatabase database)
 	{
-		ArrayList<ReportOnConditionPayload> dataList = new ArrayList<ReportOnConditionPayload>();
+		// These make up a primary key
+		// NOTE: We can't just use incidentid, as ROCs that created an incident have not been assigned an incidentid, but they have a unique incident name!
+		String sqlSelection = "incidentname==? AND datecreated==?";
+		String[] sqlSelectionArguments = {incidentName, String.valueOf(creationDate)};
+
+		ArrayList<ReportOnConditionData> data = getData(sqlSelection, sqlSelectionArguments, orderBy, NO_LIMIT, database);
+
+		// Return the first element:
+		if(data.size() > 0)
+		{
+			return data.get(0);
+		}
+
+  		return null;
+	}
+
+
+
+
+
+	@Override
+	protected ArrayList<ReportOnConditionData> getData (String sqlSelection, String[] sqlSelectionArguments, String orderBy, String limit, SQLiteDatabase database)
+	{
+		ArrayList<ReportOnConditionData> dataList = new ArrayList<ReportOnConditionData>();
 
 		if (database != null)
 		{
@@ -223,14 +279,17 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 					{
 						// Unfortunately, the use of having things simplified in the table constructor leaves us having
 						// to make 2 calls for every data element retrieved.  However, the code is easier to follow.
-						ReportOnConditionPayload dataItem = new Gson().fromJson(cursor.getString(cursor.getColumnIndex("json")), ReportOnConditionPayload.class);
-						dataItem.setId(cursor.getLong(cursor.getColumnIndex("id")));
-						dataItem.setSendStatus(ReportSendStatus.lookUp(cursor.getInt(cursor.getColumnIndex("sendStatus"))));
-						dataItem.setDraft(cursor.getInt(cursor.getColumnIndex("isDraft")) > 0 ? true : false);
-						dataItem.setNew(cursor.getInt(cursor.getColumnIndex("isNew")) > 0 ? true : false);
-						dataItem.parse();
 
-						dataList.add(dataItem);
+
+						ReportOnConditionData dataItem = ReportOnConditionData.fromJSON(cursor.getString(cursor.getColumnIndex("json")));
+
+						// If the dataItem was successfully converted from JSON
+						if(dataItem != null)
+						{
+							// Update the dataItem fields that may have been modified while it is in the db:
+							dataItem.sendStatus = ReportSendStatus.lookUp(cursor.getInt(cursor.getColumnIndex("sendStatus")));
+							dataList.add(dataItem);
+						}
 
 						cursor.moveToNext();
 					}
@@ -240,15 +299,12 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 			}
 			catch (Exception ex)
 			{
-				Log.w(Constants.nics_DEBUG_ANDROID_TAG,
-						"Exception occurred while trying to get data from table: \"" + tableName + "\"",
-						ex);
+				Log.w( Constants.nics_DEBUG_ANDROID_TAG,	"Exception occurred while trying to get data from table: \"" + tableName + "\"", ex);
 			}
 		}
 		else
 		{
-			Log.w(Constants.nics_DEBUG_ANDROID_TAG,
-					"Could not get database to get all data from table: \"" + tableName + "\"");
+			Log.w(Constants.nics_DEBUG_ANDROID_TAG,"Could not get database to get all data from table: \"" + tableName + "\"");
 		}
 
 		return dataList;
@@ -260,6 +316,11 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 	 * @param database The database.
 	 * @return The timestamp of the last message received or (-1L) if no messages were received for that chat room.
 	 */
+
+	// TODO ================================================================================================
+	// TODO - Make these sections compatible
+	// TODO ================================================================================================
+
 	public long getLastDataTimestamp (SQLiteDatabase database)
 	{
 		long lastMessageTimestamp = -1L;
@@ -269,7 +330,7 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 			try
 			{
 				// Descending by timestamp so that the newest item is the first item returned.
-				String orderBy = "seqtime DESC";
+				String orderBy = "datecreated DESC";
 
 				Cursor cursor = database.query(tableName,                                                                   // Table
 						TABLE_COLUMNS_MAP.keySet().toArray(new String[TABLE_COLUMNS_MAP.size()]), // Columns
@@ -286,55 +347,11 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 					// First record is our newest item (largest timestamp).
 					if (!cursor.isAfterLast())
 					{
-						int colIdx = cursor.getColumnIndex("seqtime");
+						int colIdx = cursor.getColumnIndex("datecreated");
 						if (colIdx > -1)
 						{
 							lastMessageTimestamp = cursor.getLong(colIdx);
 						}
-					}
-
-					cursor.close();
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.w(Constants.nics_DEBUG_ANDROID_TAG,
-						"Exception occurred while trying to get data from table: \"" + tableName + "\"",
-						ex);
-			}
-		}
-		else
-		{
-			Log.w(Constants.nics_DEBUG_ANDROID_TAG,
-					"Could not get database to get all data from table: \"" + tableName + "\"");
-		}
-
-		return lastMessageTimestamp;
-	}
-
-	public long getLastDataForIncidentTimestamp (long incidentId, SQLiteDatabase database)
-	{
-		long lastMessageTimestamp = -1L;
-
-		if (database != null)
-		{
-			try
-			{
-				// Descending by time-stamp so that the newest item is the first item returned.
-				String orderBy = "seqtime DESC";
-				String sqlSelection = "incidentId==?";
-				String[] sqlSelectionArguments = {String.valueOf(incidentId)};
-
-				Cursor cursor = database.query(tableName, TABLE_COLUMNS_MAP.keySet().toArray(new String[TABLE_COLUMNS_MAP.size()]), sqlSelection, sqlSelectionArguments, null, null, orderBy);
-
-				if (cursor != null)
-				{
-					cursor.moveToFirst();
-
-					// First record is our newest item (largest time-stamp).
-					if (!cursor.isAfterLast())
-					{
-						lastMessageTimestamp = cursor.getLong(cursor.getColumnIndex("seqtime"));
 					}
 
 					cursor.close();
@@ -353,18 +370,22 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 		return lastMessageTimestamp;
 	}
 
-	public ReportOnConditionPayload getLastDataForIncidentId (long incidentId, SQLiteDatabase database)
+	// TODO ================================================================================================
+	// TODO - Make these sections compatible
+	// TODO ================================================================================================
+
+	public long getLastDataForIncidentTimestamp (long incidentid, SQLiteDatabase database)
 	{
-		ReportOnConditionPayload lastPayload = null;
+		long lastMessageTimestamp = -1L;
 
 		if (database != null)
 		{
 			try
 			{
 				// Descending by time-stamp so that the newest item is the first item returned.
-				String orderBy = "seqtime DESC";
-				String sqlSelection = "incidentId==?";
-				String[] sqlSelectionArguments = {String.valueOf(incidentId)};
+				String orderBy = "datecreated DESC";
+				String sqlSelection = "incidentid==?";
+				String[] sqlSelectionArguments = {String.valueOf(incidentid)};
 
 				Cursor cursor = database.query(tableName, TABLE_COLUMNS_MAP.keySet().toArray(new String[TABLE_COLUMNS_MAP.size()]), sqlSelection, sqlSelectionArguments, null, null, orderBy);
 
@@ -375,7 +396,55 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 					// First record is our newest item (largest time-stamp).
 					if (!cursor.isAfterLast())
 					{
-						lastPayload = new Gson().fromJson(cursor.getString(cursor.getColumnIndex("json")), ReportOnConditionPayload.class);
+						lastMessageTimestamp = cursor.getLong(cursor.getColumnIndex("datecreated"));
+					}
+
+					cursor.close();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Exception occurred while trying to get data from table: \"" + tableName + "\"", ex);
+			}
+		}
+		else
+		{
+			Log.w(Constants.nics_DEBUG_ANDROID_TAG, "Could not get database to get all data from table: \"" + tableName + "\"");
+		}
+
+		return lastMessageTimestamp;
+	}
+
+	public ReportOnConditionData getLastDataForIncident (long incidentid, SQLiteDatabase database)
+	{
+		ReportOnConditionData lastPayload = null;
+
+		if (database != null)
+		{
+			try
+			{
+				// Descending by time-stamp so that the newest item is the first item returned.
+				String orderBy = "datecreated DESC";
+				String sqlSelection = "incidentid==?";
+				String[] sqlSelectionArguments = {String.valueOf(incidentid)};
+
+				Cursor cursor = database.query(tableName, TABLE_COLUMNS_MAP.keySet().toArray(new String[TABLE_COLUMNS_MAP.size()]), sqlSelection, sqlSelectionArguments, null, null, orderBy);
+
+				if (cursor != null)
+				{
+					cursor.moveToFirst();
+
+					// First record is our newest item (largest time-stamp).
+					if (!cursor.isAfterLast())
+					{
+						lastPayload = ReportOnConditionData.fromJSON(cursor.getString(cursor.getColumnIndex("json")));
+
+						// If the dataItem was successfully converted from JSON
+						if(lastPayload != null)
+						{
+							// Update the dataItem fields that may have been modified while it is in the db:
+							lastPayload.sendStatus = ReportSendStatus.lookUp(cursor.getInt(cursor.getColumnIndex("sendStatus")));
+						}
 					}
 
 					cursor.close();
@@ -393,27 +462,20 @@ public class ReportOnConditionTable extends DatabaseTable<ReportOnConditionPaylo
 		return lastPayload;
 	}
 
-	public ArrayList<ReportOnConditionPayload> getDataForIncident (long collaborationRoomId, SQLiteDatabase database)
+	public ArrayList<ReportOnConditionData> getDataForIncident (long collaborationRoomId, SQLiteDatabase database)
 	{
-		String orderBy = "seqtime DESC";
-		String sqlSelection = "incidentId==?";
+		String orderBy = "datecreated DESC";
+		String sqlSelection = "incidentid==?";
 		String[] sqlSelectionArguments = {String.valueOf(collaborationRoomId)};
 
 		return getData(sqlSelection, sqlSelectionArguments, orderBy, NO_LIMIT, database);
 	}
 
+
 	@Override
-	public long addData (ArrayList<ReportOnConditionPayload> data, SQLiteDatabase database)
+	public long addData (ArrayList<ReportOnConditionData> data, SQLiteDatabase database)
 	{
 		return 0;
 	}
 
-	public ArrayList<ReportOnConditionPayload> getDataByReportId (int reportId, SQLiteDatabase database)
-	{
-		String orderBy = "seqtime DESC";
-		String sqlSelection = "id==?";
-		String[] sqlSelectionArguments = {String.valueOf(reportId)};
-
-		return getData(sqlSelection, sqlSelectionArguments, orderBy, NO_LIMIT, database);
-	}
 }

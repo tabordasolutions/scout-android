@@ -53,6 +53,8 @@ import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
@@ -65,6 +67,7 @@ import com.google.gson.Gson;
 import scout.edu.mit.ll.nics.android.api.data.MarkupFeature;
 import scout.edu.mit.ll.nics.android.api.data.OrgCapabilities;
 import scout.edu.mit.ll.nics.android.api.data.PropertyType;
+import scout.edu.mit.ll.nics.android.api.data.ReportOnConditionData;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportCategoryType;
 import scout.edu.mit.ll.nics.android.api.data.UserHealth;
 import scout.edu.mit.ll.nics.android.api.data.WeatherWindTypes;
@@ -79,7 +82,6 @@ import scout.edu.mit.ll.nics.android.api.payload.OrganizationPayload;
 import scout.edu.mit.ll.nics.android.api.payload.TrackingLayerPayload;
 import scout.edu.mit.ll.nics.android.api.payload.UserPayload;
 import scout.edu.mit.ll.nics.android.api.payload.WeatherPayload;
-import scout.edu.mit.ll.nics.android.api.payload.forms.ReportOnConditionPayload;
 import scout.edu.mit.ll.nics.android.api.payload.forms.SimpleReportPayload;
 import scout.edu.mit.ll.nics.android.utils.Constants;
 import scout.edu.mit.ll.nics.android.utils.EncryptedPreferences;
@@ -140,10 +142,15 @@ public class DataManager
 	private boolean newchatAvailable = false;
 	private boolean newMapAvailable = false;
 
-	// Set to true to point to app to STAGING instead of PRODUCTION
-	private final boolean STAGING = false;
-	// Set to true to point the app to a local DEV environment instead of PRODUCTION
-	private final boolean DEV = true;
+
+	// Which SCOUT environment to point the application to.
+	public static final int PROD = 1; // production
+	public static final int STAGING = 2; // staging
+	public static final int ITEST = 3; // integration test
+	public static final int DEV = 4; // development
+
+	// Which SCOUT servers to use
+	public static final int ENVIRONMENT = STAGING;
 
 	private CustomCommand invalidSessionIDCommand;
 	private CustomCommand invalidSRSessionIDCommand;
@@ -342,6 +349,8 @@ public class DataManager
 	{
 		mDatabaseManager.deleteAllSimpleReportsHistory();
 		mDatabaseManager.deleteAllSimpleReportsStoreAndForward();
+		mDatabaseManager.deleteAllReportOnConditionsHistory();
+		mDatabaseManager.deleteAllReportOnConditionsStoreAndForward();
 	}
 
 	// Simple Report Functions
@@ -417,33 +426,43 @@ public class DataManager
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	// Report on Condition Functions
 	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	public ArrayList<ReportOnConditionPayload> getReportOnConditionHistoryForIncident (long incidentId)
+	public ArrayList<ReportOnConditionData> getReportOnConditionHistoryForIncident (long incidentId)
 	{
 		return mDatabaseManager.getReportOnConditionHistoryForIncident(incidentId);
 	}
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionHistory ()
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionHistory ()
 	{
 		return mDatabaseManager.getAllReportOnConditionHistory();
 	}
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardReadyToSend ()
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionStoreAndForwardReadyToSend ()
 	{
 		return mDatabaseManager.getAllReportOnConditionStoreAndForwardReadyToSend();
 	}
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardReadyToSend (long incidentId)
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionStoreAndForwardReadyToSend (long incidentId)
 	{
 		return mDatabaseManager.getAllReportOnConditionStoreAndForwardReadyToSend(incidentId);
 	}
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardHasSent ()
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionStoreAndForwardHasSent ()
 	{
 		return mDatabaseManager.getAllReportOnConditionStoreAndForwardHasSent();
 	}
-	public ArrayList<ReportOnConditionPayload> getAllReportOnConditionStoreAndForwardHasSent (long incidentId)
+	public ArrayList<ReportOnConditionData> getAllReportOnConditionStoreAndForwardHasSent (long incidentId)
 	{
 		return mDatabaseManager.getAllReportOnConditionStoreAndForwardHasSent(incidentId);
 	}
-	public void addReportOnConditionToHistory (ReportOnConditionPayload payload)
+	public void addReportOnConditionToHistory (ReportOnConditionData payload)
 	{
 		mDatabaseManager.addReportOnConditionHistory(payload);
+	}
+	// Returns the report on condition with given incidentName and creationDate
+	public ReportOnConditionData getReportOnConditionStoreAndForward(String incidentName, long creationDate)
+	{
+		return mDatabaseManager.getReportOnConditionStoreAndForward(incidentName, creationDate);
+	}
+
+	public boolean deleteReportOnConditionStoreAndForward(String incidentName, long creationDate)
+	{
+		return mDatabaseManager.deleteReportOnConditionStoreAndForward(incidentName, creationDate);
 	}
 	public boolean deleteReportOnConditionFromHistory (long mReportId)
 	{
@@ -453,24 +472,114 @@ public class DataManager
 	{
 		return mDatabaseManager.deleteReportOnConditionHistoryByIncident(incidentId);
 	}
-	public boolean deleteReportOnConditionStoreAndForward (long mReportId)
-	{
-		return mDatabaseManager.deleteReportOnConditionStoreAndForward(mReportId);
-	}
-	public boolean addReportOnConditionToStoreAndForward (ReportOnConditionPayload payload)
-	{
-		return mDatabaseManager.addReportOnConditionToStoreAndForward(payload);
-	}
-	public long getLastReportOnConditionTimestamp ()
-	{
-		return mDatabaseManager.getLastReportOnConditionTimestamp(getActiveIncidentId());
-	}
-	public ReportOnConditionPayload getLastReportOnConditionPayload ()
-	{
-		return mDatabaseManager.getLastReportOnConditionPayload(getActiveIncidentId());
-	}
-	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+	public boolean addReportOnConditionToStoreAndForward (ReportOnConditionData data)
+	{
+		return mDatabaseManager.addReportOnConditionToStoreAndForward(data);
+	}
+	public long getLastReportOnConditionTimestamp (long incidentId)
+	{
+		if(incidentId == -1)
+			return -1;
+		return mDatabaseManager.getLastReportOnConditionTimestamp(incidentId);
+	}
+
+	public ReportOnConditionData getLastReportOnCondition (long incidentId)
+	{
+		Log.e("ROC","getLastReportOnCondition invoked with id: " + incidentId);
+		if(incidentId == -1)
+			return null;
+
+		return mDatabaseManager.getLastReportOnConditionData(incidentId);
+	}
+
+
+	// This method requests the latest ROC data for a specific incident from the server and executes the callback
+	public void pullLatestReportOnConditionForIncident(final String incidentName, final Handler.Callback successCallback, final Handler.Callback errorCallback)
+	{
+		new Thread((new Runnable() {
+			@Override
+			public void run ()
+			{
+				//-------------------------------------------------------------------------------------------
+				// If the RestClient is currently busy fetching ROCs, wait up to 5 seconds for it to clear up
+				//-------------------------------------------------------------------------------------------
+				int secondsToWait = 5;
+				while(RestClient.isCurrentlyFetchingReportOnConditions() && secondsToWait > 0)
+				{
+					// Sleep for 1.0 second
+					try
+					{
+						Thread.sleep(1000);
+					}
+					catch(Exception e)
+					{
+						Log.w("ROC","An exception was raised waiting for RestClient to finish its previous ROC fetch from server.");
+					}
+					secondsToWait--;
+				}
+				//-------------------------------------------------------------------------------------------
+
+				// If the RestClient is STILL busy, stop and execute the error callback:
+				if(RestClient.isCurrentlyFetchingReportOnConditions())
+				{
+					// Wait for up to 5 seconds for the request to finish:
+					if(errorCallback != null)
+						errorCallback.handleMessage(null);
+					return;
+				}
+
+
+				// Request ROCs:
+				long incidentId = getIncidentForName(incidentName).getIncidentId();
+
+				Log.e("ROC","ROC requesting aux ROC data for incident: \""+ incidentName +"\" with id: " + incidentId);
+
+				// Request the ROCs:
+				RestClient.getReportOnConditions(incidentId);
+
+
+				//-------------------------------------------------------------------------------------------
+				// Wait for up to 5 seconds for the new request to finish.
+				//-------------------------------------------------------------------------------------------
+				secondsToWait = 5;
+				while(RestClient.isCurrentlyFetchingReportOnConditions() && secondsToWait > 0)
+				{
+					// Sleep for 1.0 second
+					try
+					{
+						Thread.sleep(1000);
+					}
+					catch(Exception e)
+					{
+						Log.w("ROC","An exception was raised waiting for RestClient to finish its previous ROC fetch from server.");
+					}
+					secondsToWait--;
+				}
+				//-------------------------------------------------------------------------------------------
+
+				// If the request is still NOT finished:
+				if(RestClient.isCurrentlyFetchingReportOnConditions())
+				{
+					// Wait for up to 5 seconds for the request to finish:
+					if(errorCallback != null)
+						errorCallback.handleMessage(null);
+					return;
+				}
+
+				// Otherwise, the request finished, so call the successCallback
+				if(successCallback != null)
+					successCallback.handleMessage(null);
+
+			}
+		})).start();
+
+
+
+
+	}
+
+	//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 	public cz.msebera.android.httpclient.Header[] getAuthData ()
@@ -639,6 +748,8 @@ public class DataManager
 
 	public void requestReportOnConditionRepeating (int seconds, boolean immediately)
 	{
+		Log.e("ROC","About to request report on conditions seconds: " + seconds + ", immediately: " + immediately);
+
 		Intent intent = new Intent(Intents.nics_POLLING_TASK_REPORT_ON_CONDITION);
 		intent.putExtra("type", "reportoncondition");
 
@@ -646,11 +757,17 @@ public class DataManager
 
 		long secondsFromNow = SystemClock.elapsedRealtime() + 200;
 
-		if (!immediately)
-		{
+		//if (!immediately)
+		//{
 			secondsFromNow += (seconds * 1000);
-		}
+		//}
 		mAlarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, secondsFromNow, (seconds * 1000), mPendingReportOnConditionRequestIntent);
+
+		// If immediately is true, we want to fire the intent now
+		if(immediately)
+		{
+			mContext.sendBroadcast(intent);
+		}
 
 		Log.i("nicsDataManager", "Set ROC repeating fetch interval:" + seconds + " seconds.");
 	}
@@ -765,6 +882,7 @@ public class DataManager
 							}
 							else if (type.equals("reportoncondition"))
 							{
+								Log.e("ROC","Got intent to pull ROCs");
 								requestReportOnConditions();
 							}
 						}
@@ -1278,6 +1396,29 @@ public class DataManager
 		return nameArray;
 	}
 
+	// Returns the incidentPayload object that pertains to a certain incident
+	public IncidentPayload getIncidentForName(String incidentName)
+	{
+		return mIncidents.get(incidentName);
+	}
+
+	// TODO - remove me if this is never used
+	// Returns the incident ID of an incident with the desired name
+	// Returns -1 if there is no incident with the specified name
+	/*public long getIncidentIdForName(String incidentName)
+	{
+		IncidentPayload incident = mIncidents.get(incidentName);
+
+		if(incident != null)
+		{
+			return incident.getIncidentId();
+		}
+
+		return -1;
+	}*/
+
+
+
 	public long getPreviousIncidentId ()
 	{
 		return mSharedPreferences.getPreferenceLong(Constants.PREVIOUS_INCIDENT_ID);
@@ -1487,15 +1628,20 @@ public class DataManager
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mGlobalPreferences.getString("server_list", getContext().getResources().getString(R.string.config_server_default));
-		if (DEV)
+
+		switch(ENVIRONMENT)
 		{
-			return getContext().getResources().getString(R.string.config_server_dev);
+			case DEV:
+				return getContext().getResources().getString(R.string.config_server_dev);
+			case ITEST:
+				return null;// not yet configured
+			case STAGING:
+				return getContext().getResources().getString(R.string.config_server_staging);
+			case PROD:
+				return getContext().getResources().getString(R.string.config_server_default);
 		}
-		if (STAGING)
-		{
-			return getContext().getResources().getString(R.string.config_server_staging);
-		}
-		return getContext().getResources().getString(R.string.config_server_default);
+
+		return null;
 	}
 
 	public void setIplanetCookieDomain (String value)
@@ -1512,15 +1658,21 @@ public class DataManager
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mSharedPreferences.getPreferenceString(Constants.IPLANET_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default));
-		if (DEV)
+
+
+		switch(ENVIRONMENT)
 		{
-			return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_dev);
+			case DEV:
+				return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_dev);
+			case ITEST:
+				return null;// not yet configured
+			case STAGING:
+				return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_staging);
+			case PROD:
+				return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default);
 		}
-		if (STAGING)
-		{
-			return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_staging);
-		}
-		return getContext().getResources().getString(R.string.config_iplanet_cookie_domain_default);
+
+		return null;
 	}
 
 	public void setAmAuthCookieDomain (String value)
@@ -1536,15 +1688,20 @@ public class DataManager
 		}*/
 		// This setting has been removed to reduce settings complexity
 		//return mSharedPreferences.getPreferenceString(Constants.AMAUTH_COOKIE_DOMAIN, getContext().getResources().getString(R.string.config_amauth_cookie_domain_default));
-		if (DEV)
+
+		switch(ENVIRONMENT)
 		{
-			return getContext().getResources().getString(R.string.config_amauth_cookie_domain_dev);
+			case DEV:
+				return getContext().getResources().getString(R.string.config_amauth_cookie_domain_dev);
+			case ITEST:
+				return null;// not yet configured
+			case STAGING:
+				return getContext().getResources().getString(R.string.config_amauth_cookie_domain_staging);
+			case PROD:
+				return getContext().getResources().getString(R.string.config_amauth_cookie_domain_default);
 		}
-		if (STAGING)
-		{
-			return getContext().getResources().getString(R.string.config_amauth_cookie_domain_staging);
-		}
-		return getContext().getResources().getString(R.string.config_amauth_cookie_domain_default);
+
+		return null;
 	}
 
 	public boolean isCustomDomainEnabled ()
@@ -1654,15 +1811,20 @@ public class DataManager
 		//	return mGlobalPreferences.getString("custom_geo_server_url", getContext().getResources().getString(R.string.config_geo_server_default));
 		//}
 		//return mGlobalPreferences.getString("geo_server_list", getContext().getResources().getString(R.string.config_geo_server_default));
-		if (DEV)
+
+		switch(ENVIRONMENT)
 		{
-			return getContext().getResources().getString(R.string.config_geo_server_dev);
+			case DEV:
+				return getContext().getResources().getString(R.string.config_geo_server_dev);
+			case ITEST:
+				return null;// not yet configured
+			case STAGING:
+				return getContext().getResources().getString(R.string.config_geo_server_staging);
+			case PROD:
+				return getContext().getResources().getString(R.string.config_geo_server_default);
 		}
-		if (STAGING)
-		{
-			return getContext().getResources().getString(R.string.config_geo_server_staging);
-		}
-		return getContext().getResources().getString(R.string.config_geo_server_default);
+
+		return null;
 	}
 
 	public String getAuthServerURL ()
@@ -1672,15 +1834,20 @@ public class DataManager
 		//	return mGlobalPreferences.getString("custom_auth_server_url", getContext().getResources().getString(R.string.config_auth_server_default));
 		//}
 		//return mGlobalPreferences.getString("auth_server_list", getContext().getResources().getString(R.string.config_auth_server_default));
-		if (DEV)
+
+		switch(ENVIRONMENT)
 		{
-			return getContext().getResources().getString(R.string.config_auth_server_dev);
+			case DEV:
+				return getContext().getResources().getString(R.string.config_auth_server_dev);
+			case ITEST:
+				return null;// not yet configured
+			case STAGING:
+				return getContext().getResources().getString(R.string.config_auth_server_staging);
+			case PROD:
+				return getContext().getResources().getString(R.string.config_auth_server_default);
 		}
-		if (STAGING)
-		{
-			return getContext().getResources().getString(R.string.config_auth_server_staging);
-		}
-		return getContext().getResources().getString(R.string.config_auth_server_default);
+
+		return null;
 	}
 
 	public String getAuthToken ()
@@ -2019,12 +2186,12 @@ public class DataManager
 		double longitude = 0;
 
 
-		// If we were given a hashmap, attempt to read the lat/long from there.
+		// If we were given a JSONObject, attempt to read the lat/long from there.
 		if(locationData != null)
 		{
 			try
 			{
-				// Read the lat/long from the hashmap
+				// Read the lat/long from the JSONObject
 				latitude = locationData.getDouble("latitude");
 				longitude = locationData.getDouble("longitude");
 
@@ -2032,6 +2199,7 @@ public class DataManager
 			}
 			catch(Exception e)
 			{
+				Log.w("DataManager","getROCLocationInfo - was given locationData object, but unable to parse lat/long. Exception: " + e);
 			}
 		}
 
@@ -2043,7 +2211,7 @@ public class DataManager
 		}
 
 
-		Log.e("ROC","About to make request to ROC for location: lat:" + latitude + ", long:" + longitude);
+		Log.e("ROC","About to make request to ROC for location: lat:" + latitude + ", long:" + longitude + "( hasLatLong = " + hasLatLong + ")");
 
 
 		result = RestClient.getROCLocationDataForLocation(latitude,longitude);
@@ -2051,7 +2219,18 @@ public class DataManager
 		// Parse out the "data" object from the response:
 		try
 		{
-			JSONObject data = result.getJSONObject("data");
+			JSONObject data = null;
+
+			if(result != null)
+			{
+				data = result.getJSONObject("data");
+			}
+
+			// If we don't have a valid data object, create one so we can at least return the lat/long coordinates
+			if(data == null || data == JSONObject.NULL)
+			{
+				data = new JSONObject();
+			}
 
 			// Append the lat / long so the UI knows what location this data pertains to:
 			data.put("latitude",latitude);
@@ -2060,7 +2239,7 @@ public class DataManager
 		}
 		catch(Exception e)
 		{
-			Log.w("DataManager","getROCLocationInfo Exception occurred when trying to extract \"data\" field of \"" + result + "\"");
+			Log.w("DataManager","getROCLocationInfo Exception occurred when trying to extract \"data\" field of \"" + result + "\". Exception: " + e);
 		}
 
 		return null;

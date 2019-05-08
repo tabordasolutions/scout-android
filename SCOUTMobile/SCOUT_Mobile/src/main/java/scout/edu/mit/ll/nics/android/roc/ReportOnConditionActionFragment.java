@@ -48,6 +48,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -144,14 +145,17 @@ public class ReportOnConditionActionFragment extends Fragment
 			switch (v.getId())
 			{
 				case R.id.reportOnConditionViewButton:
-					//TODO: navigate to ROC viewer
 					//FIXME - the -2 value was implied, I'm not sure what it should be
+					//Toast toast = Toast.makeText(mContext, "Feature coming soon", Toast.LENGTH_SHORT);
+					//toast.show();
+
+					// Let the ReportOnConditionFragment that we only want to view the latest ROC
+					ReportOnConditionFragment.isViewingRoc = true;
 					mContext.onNavigationItemSelected(NavigationOptions.ROCFORM.getValue(), -2);
-					//mContext.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -2);
 					break;
 				case R.id.reportOnConditionCreateButton:
-					//TODO: navigate to ROC viewer
-					//mContext.onNavigationItemSelected(NavigationOptions.DAMAGESURVEY.getValue(), -2);
+					// Let the ReportOnConditionFragment that we want to create a new ROC
+					ReportOnConditionFragment.isViewingRoc = false;
 					mContext.onNavigationItemSelected(NavigationOptions.ROCFORM.getValue(), -2);
 					break;
 			}
