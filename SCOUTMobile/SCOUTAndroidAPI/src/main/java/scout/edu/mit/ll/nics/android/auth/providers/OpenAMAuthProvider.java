@@ -110,7 +110,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 
 		// If we are using the staging or dev server, trust whatever SSL certificate is in use by the server.
 		// (otherwise, self-signed certificates won't work)
-		if(DataManager.ENVIRONMENT == DataManager.STAGING || DataManager.ENVIRONMENT == DataManager.DEV)
+		/*if(DataManager.ENVIRONMENT == DataManager.STAGING || DataManager.ENVIRONMENT == DataManager.DEV)
 		{
 			try
 			{
@@ -156,7 +156,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 			{
 				Log.e("CERT","There was an error trusting the self-signed certificate for staging or dev environment.");
 			}
-		}
+		}*/
 
 
 
@@ -202,7 +202,6 @@ public class OpenAMAuthProvider extends AuthProvider {
 		Log.e("USIDDEFECTrq","Requesting Auth Token from OpenAM:");
 		Log.e("USIDDEFECTrq","requestAuthToken URL: " + mDataManager.getAuthServerURL() + "json/authenticate");
 		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " X-OpenAM-Username: " + username);
-		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " X-OpenAM-Password: " + password);
 		Log.e("USIDDEFECTrq","requestAuthToken Header: " + " Content-Type: " + "application/json");
 
 

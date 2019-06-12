@@ -62,6 +62,7 @@ import scout.edu.mit.ll.nics.android.api.data.MarkupFeature;
 import scout.edu.mit.ll.nics.android.api.data.OperationalUnit;
 import scout.edu.mit.ll.nics.android.api.data.OrgCapabilities;
 import scout.edu.mit.ll.nics.android.api.data.ReportOnConditionData;
+import scout.edu.mit.ll.nics.android.api.data.ReportSendStatus;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportCategoryType;
 import scout.edu.mit.ll.nics.android.api.data.SimpleReportData;
 import scout.edu.mit.ll.nics.android.api.handlers.ChatResponseHandler;
@@ -1121,6 +1122,10 @@ public class RestClient
 
 		for (ReportOnConditionData roc: rocs)
 		{
+			// Don't send ones that have already been sent
+			if(roc.sendStatus == ReportSendStatus.SENT)
+				continue;
+
 			Log.e("ROC","RestClient - postReportOnConditions - posting roc with incident id: " + roc.incidentid + ", name: " + roc.incidentname);
 
 			// TODO - none of these seem to apply to ROCs (for now)
@@ -1130,7 +1135,16 @@ public class RestClient
 				Log.w("nics_POST", "Adding ROC " + roc.incidentname + ", " + roc.datecreated + " to send queue.");
 
 
-				// TODO - pass this to the roc to make a server payload.
+				// Delete this payload from the store and forward
+				mDataManager.deleteReportOnConditionStoreAndForward(roc.incidentname,roc.datecreated.getTime());
+
+				// Mark this ROC has having been sent
+				roc.sendStatus = ReportSendStatus.SENT;
+
+				// Add it back to the store and forward with the new send status
+				mDataManager.addReportOnConditionToStoreAndForward(roc);
+
+
 				long userSessionId = mDataManager.getUserSessionId();
 				ReportOnConditionResponseHandler responseHandler = new ReportOnConditionResponseHandler(mContext, mDataManager, roc.incidentname, roc.datecreated.getTime(), userSessionId);
 				String payload = roc.toServerPayload(userSessionId).toString();
@@ -1144,17 +1158,17 @@ public class RestClient
 
 					String url;
 
-					if(!roc.isForNewIncident)
-					{
-						long incidentId = roc.incidentid;
-
-						url = "reports/" + incidentId + "/ROC";
-					}
-					else
+					if(roc.isForNewIncident)
 					{
 						int orgId = mDataManager.getCurrentOrganziation().getOrgid();
 
 						url = "reports/" + orgId + "/IncidentAndROC";
+					}
+					else
+					{
+						long incidentId = roc.incidentid;
+
+						url = "reports/" + incidentId + "/ROC";
 					}
 
 					mAuthManager.getClient().post( url, entity, responseHandler);

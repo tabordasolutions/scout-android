@@ -53,6 +53,7 @@ public class ReportOnConditionData
 	public long incidentid;
 	public String incidentname;
 	public Date datecreated;
+	public String incidentnumber;
 
 	public String reportType;
 	public String county;
@@ -65,16 +66,16 @@ public class ReportOnConditionData
 	public String jurisdiction;
 	public ArrayList<String> incidentTypes;
 	public String incidentState;
-	public String acreage; // FIXME - this really should be a double, but webapp allows any text as input, so we are forced to treat this as a String to handle extraneous text
+	public String acreage;
 	public String spreadRate;
 	public ArrayList<String> fuelTypes;
 	public String otherFuelTypes;
-	public String percentContained;// FIXME - this really should be a double, but webapp allows any text as input, so we are forced to treat this as a String to handle extraneous text
-	public String temperature;// FIXME - this really should be a double, but webapp allows any text as input, so we are forced to treat this as a String to handle extraneous text
-	public String relHumidity;// FIXME - this really should be a double, but webapp allows any text as input, so we are forced to treat this as a String to handle extraneous text
-	public String windSpeed;// FIXME - this really should be a double, but webapp allows any text as input, so we are forced to treat this as a String to handle extraneous text
+	public String percentContained;
+	public String temperature;
+	public String relHumidity;
+	public String windSpeed;
 	public String windDirection;
-	public String windGusts;// FIXME - this really should be a double, but webapp allows any text as input, so we are forced to treat this as a String to handle extraneous text
+	public String windGusts;
 	public String evacuations;
 	public ArrayList<String> evacuationsInProgress;
 	public String structureThreats;
@@ -138,8 +139,9 @@ public class ReportOnConditionData
 				return "Civil Unrest";
 			case 19:
 				return "Flood";
-			case 20:
-				return "Vegetation Fire";
+// TODO - Add once we add Vegetation Fire incident type.
+			/*			case 20:
+				return "Vegetation Fire";*/
 			default:
 				return null;
 		}
@@ -258,6 +260,7 @@ public class ReportOnConditionData
 	// If the array has more than one value, the array value will be a JSON array containing strings
 	static private ArrayList<String> parseStringArrayFromJson(JSONObject obj, String str) throws JSONException
 	{
+		//otherThreatsAndEvacuations
 		if(obj == null)
 		{
 			return null;
@@ -268,8 +271,8 @@ public class ReportOnConditionData
 		Log.e("ROCARRAY","ROC Reading string: \"" + str + "\"");
 
 		Log.e("ROCARRAY","ROC Object: " + obj);
-		Log.e("ROCARRAY","ROC Get string returns: " + obj.getString(str));
-		Log.e("ROCARRAY","ROC getJSONArray returns: " + obj.getJSONArray(str));
+		Log.e("ROCARRAY","ROC Get string returns: " + obj.optString(str,""));
+		Log.e("ROCARRAY","ROC getJSONArray returns: " + obj.optJSONArray(str));
 
 		// Try reading an array first
 		if(obj.optJSONArray(str) != null)
@@ -285,11 +288,10 @@ public class ReportOnConditionData
 		}
 
 		// obj might contain a single string, so try reading that
-		else if(obj.optString(str) != null)
+		else if(obj.optString(str,null) != null)
 		{
-			list.add(obj.getString(str));
+			list.add(obj.optString(str));
 		}
-
 		// The object was not found
 		else
 		{
@@ -427,8 +429,8 @@ public class ReportOnConditionData
 			//================================================
 			// Form metadata fields:
 			//================================================
-			report.incidentid = payload.getInt("incidentid");
-			report.datecreated = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(messagePayload.getString("datecreated"));
+			report.incidentid = payload.optInt("incidentid",-1);
+			report.datecreated = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(messagePayload.optString("datecreated",""));
 
 
 			//================================================
@@ -442,14 +444,15 @@ public class ReportOnConditionData
 			// Incident Info Fields
 			//================================================
 
-			// TODO - what should incidentNumber be parsed from?
-			// AutoCompleteTextView incidentNumberTextView;
-
-
+			report.incidentnumber = rocPayload.optString("incidentnumber","");
 			report.incidentTypes = getIncidentTypesArrayFromJson(rocPayload.optJSONObject("incidentTypes"));
+			if(report.incidentTypes == null)
+			{
+				report.incidentTypes = new ArrayList<String>();
+			}
 
-			report.latitude = rocPayload.getDouble("latitudeAtROCSubmission");
-			report.longitude = rocPayload.getDouble("longitudeAtROCSubmission");
+			report.latitude = rocPayload.optDouble("latitudeAtROCSubmission",-1);
+			report.longitude = rocPayload.optDouble("longitudeAtROCSubmission",-1);
 			// Not all server ROCs have an incidentState yet, we have to allow for that
 			// use optString so that reading the ROC doesn't fail
 			report.incidentState = rocPayload.optString("incidentState","");
@@ -458,37 +461,59 @@ public class ReportOnConditionData
 			// ROC Incident Info Fields
 			//================================================
 
-			report.county = rocPayload.getString("county");
-			report.additionalAffectedCounties = rocPayload.getString("additionalAffectedCounties");
-			report.location = rocPayload.getString("location");
+			report.county = rocPayload.optString("county","");
+			report.additionalAffectedCounties = rocPayload.optString("additionalAffectedCounties","");
+			report.location = rocPayload.optString("location","");
 
-			report.dpa = rocPayload.getString("dpa");
+			report.dpa = rocPayload.optString("dpa","");
 			// not a bug, the json schema reuses "sra" as ownership field
-			report.ownership = rocPayload.getString("sra");
-			report.jurisdiction = rocPayload.getString("jurisdiction");
+			report.ownership = rocPayload.optString("sra","");
+			report.jurisdiction = rocPayload.optString("jurisdiction","");
 
 			// Parse the string to a Date object
-			report.startDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(rocPayload.getString("date"));
-			report.startTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(rocPayload.getString("starttime"));
+
+			String startDate = rocPayload.optString("date","");
+			if(!startDate.equals(""))
+			{
+				report.startDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(startDate);
+			}
+			else
+			{
+				report.startDate = new Date(70,1,1);
+			}
+
+			String startTime = rocPayload.optString("starttime","");
+			if(!startTime.equals(""))
+			{
+				report.startTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(startTime);
+			}
+			else
+			{
+				report.startTime = new Date(70,1,1);
+			}
 
 			//================================================
 			// Vegetation Fire Incident Scope Fields
 			//================================================
 
-			report.acreage = rocPayload.getString("scope");//getDoubleFromJsonString(rocPayload, "scope");
-			report.spreadRate = rocPayload.getString("spreadRate");
+			report.acreage = rocPayload.optString("scope","");//getDoubleFromJsonString(rocPayload, "scope");
+			report.spreadRate = rocPayload.optString("spreadRate","");
 			report.fuelTypes = parseStringArrayFromJson(rocPayload, "fuelTypes");
-			report.otherFuelTypes = rocPayload.getString("otherFuelTypes");
-			report.percentContained = rocPayload.getString("percentContained");//getDoubleFromJsonString(rocPayload, "percentContained");
+			if(report.fuelTypes == null)
+			{
+				report.fuelTypes = new ArrayList<String>();
+			}
+			report.otherFuelTypes = rocPayload.optString("otherFuelTypes","");
+			report.percentContained = rocPayload.optString("percentContained","");//getDoubleFromJsonString(rocPayload, "percentContained");
 
 			//================================================
 			// Weather Information Fields
 			//================================================
 
-			report.temperature = rocPayload.getString("temperature");//getDoubleFromJsonString(rocPayload, "temperature");
-			report.relHumidity = rocPayload.getString("relHumidity");//getDoubleFromJsonString(rocPayload, "relHumidity");
-			report.windSpeed = rocPayload.getString("windSpeed");//getDoubleFromJsonString(rocPayload, "windSpeed");
-			report.windDirection = rocPayload.getString("windDirection");
+			report.temperature = rocPayload.optString("temperature","");
+			report.relHumidity = rocPayload.optString("relHumidity","");
+			report.windSpeed = rocPayload.optString("windSpeed","");
+			report.windDirection = rocPayload.optString("windDirection","");
 
 			// TODO - WindGusts are currently not in JSON payload, add this once they have been added
 			report.windGusts = "";// FIXME - this is wrong
@@ -498,21 +523,37 @@ public class ReportOnConditionData
 			// Threats & Evacuations Fields
 			//================================================
 
-			report.evacuations = rocPayload.getString("evacuations");
+			report.evacuations = rocPayload.optString("evacuations","");
 			report.evacuationsInProgress = parseStringArrayFromJson(rocPayload.optJSONObject("evacuationsInProgress"),"evacuations");
+			if(report.evacuationsInProgress == null)
+			{
+				report.evacuationsInProgress = new ArrayList<String>();
+			}
 
-			report.structureThreats = rocPayload.getString("structuresThreat");
+			report.structureThreats = rocPayload.optString("structuresThreat","");
 			report.structureThreatsInProgress = parseStringArrayFromJson(rocPayload.optJSONObject("structuresThreatInProgress"),"structuresThreat");
+			if(report.structureThreatsInProgress == null)
+			{
+				report.structureThreatsInProgress = new ArrayList<String>();
+			}
 
-			report.infrastructureThreats = rocPayload.getString("infrastructuresThreat");
+			report.infrastructureThreats = rocPayload.optString("infrastructuresThreat","");
 			report.infrastructureThreatsInProgress = parseStringArrayFromJson(rocPayload.optJSONObject("infrastructuresThreatInProgress"),"infrastructuresThreat");
+			if(report.infrastructureThreatsInProgress == null)
+			{
+				report.infrastructureThreatsInProgress = new ArrayList<String>();
+			}
 
 			//================================================
 			// Resource Commitment Fields
 			//================================================
 
-			report.calfireIncident = rocPayload.getString("calfireIncident");
+			report.calfireIncident = rocPayload.optString("calfireIncident","");
 			report.resourcesAssigned = parseStringArrayFromJson(rocPayload.optJSONObject("resourcesAssigned"), "resourcesAssigned");
+			if(report.resourcesAssigned == null)
+			{
+				report.resourcesAssigned = new ArrayList<String>();
+			}
 
 			//================================================
 			// Other Significant Info Fields
@@ -520,17 +561,20 @@ public class ReportOnConditionData
 
 			//report.otherThreatsAndEvacuations = rocPayload.getString("otherThreatsAndEvacuations");
 			report.otherThreatsAndEvacuationsInProgress = parseStringArrayFromJson(rocPayload.optJSONObject("otherThreatsAndEvacuationsInProgress"),"otherThreatsAndEvacuations");
+			if(report.otherThreatsAndEvacuationsInProgress == null)
+			{
+				report.otherThreatsAndEvacuationsInProgress = new ArrayList<String>();
+			}
 
 			//================================================
 			// Email Fields
 			//================================================
 
-			report.email = rocPayload.getString("email");
+			report.email = rocPayload.optString("email","");
 
 			//================================================
 			// Other Fields
 			//================================================
-
 			report.weatherDataAvailable = rocPayload.optBoolean("weatherDataAvailable");
 
 			Log.e("ROC","Parsed report JSON: " + report.toJSON().toString());
@@ -542,10 +586,6 @@ public class ReportOnConditionData
 			return null;
 		}
 	}
-
-
-
-
 
 
 
@@ -634,11 +674,7 @@ public class ReportOnConditionData
 			// Incident Info Fields
 			//================================================
 
-			// TODO - what should incidentNumber be parsed from?
-			// AutoCompleteTextView incidentNumberTextView;
-
-
-			// TODO - Parse incidentTypes (don't know what the data looks like, I assume its an array of ints or strings)
+			rocPayload.put("incidentnumber",incidentnumber);
 			rocPayload.put("incidentTypes",createIncidentTypePayload(this));
 			rocPayload.put("latitudeAtROCSubmission", latitude);
 			rocPayload.put("longitudeAtROCSubmission", longitude);
@@ -803,7 +839,7 @@ public class ReportOnConditionData
 			}
 			incidentPayload.put("incidentIncidenttypes",incidentTypesArray);
 
-			// Adding the incident payoad to the entire payload
+			// Adding the incident payload to the entire payload
 			payload.put("incident",incidentPayload);
 			return payload;
 		}

@@ -591,10 +591,35 @@ public class OverviewFragment extends Fragment
 			mDialogBuilder.setTitle(R.string.select_an_incident);
 			mDialogBuilder.setMessage(null);
 			mDialogBuilder.setPositiveButton(null, null);
-			HashMap<String, IncidentPayload> incidentsMap = mDataManager.getIncidents();
+			final HashMap<String, IncidentPayload> incidentsMap = mDataManager.getIncidents();
 			incidentArray = new String[incidentsMap.size()];
 			incidentsMap.keySet().toArray(incidentArray);
-			Arrays.sort(incidentArray);
+
+			// Building a custom comparator that uses the incident creation date
+			Comparator<String> incidentComparator = new Comparator<String>() {
+				@Override
+				public int compare (String lhs, String rhs)
+				{
+					// Return whichever incident was created first
+					IncidentPayload lhsIncident = incidentsMap.get(lhs);
+					IncidentPayload rhsIncident = incidentsMap.get(rhs);
+
+					if(lhsIncident == null || rhsIncident == null)
+						return 0;
+
+					Long lhsCreated = lhsIncident.getCreated();
+					Long rhsCreated = rhsIncident.getCreated();
+
+					// Compare the creation dates
+					return -1 * lhsCreated.compareTo(rhsCreated);
+				}
+			};
+
+			Arrays.sort(incidentArray, incidentComparator);
+
+			//incidentsMap.get("test").getCreated()
+
+			//Arrays.sort(incidentArray);
 
 			// Adding "none" to the beginning of the incident's list to leave an incident
 			String[] incidentOptionsArray = new String[incidentArray.length + 1];
@@ -724,6 +749,9 @@ public class OverviewFragment extends Fragment
 
 			mDataManager.setCurrentIncidentData(currentIncident, -1, "");
 			mDataManager.setSelectedCollabRoom(null);
+
+			// Request ROC data immediately after joining an incident
+			mDataManager.requestReportOnConditions();
 
 			mDataManager.stopPollingAssignment();
 			mDataManager.stopPollingChat();

@@ -33,6 +33,7 @@ package scout.edu.mit.ll.nics.android.api.handlers;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpResponseHandler;
@@ -91,8 +92,6 @@ public class ReportOnConditionResponseHandler extends AsyncHttpResponseHandler {
 
 			// Add the updated rocData to the history db
 			mDataManager.addReportOnConditionToHistory(rocData);
-			// Add the updated rocData back to the db
-			//mDataManager.addReportOnConditionToStoreAndForward(rocData);
 		}
 
 		RestClient.setSendingReportOnConditions(false);
@@ -103,6 +102,29 @@ public class ReportOnConditionResponseHandler extends AsyncHttpResponseHandler {
 	
 	@Override
 	public void onFailure(int statusCode, cz.msebera.android.httpclient.Header[] headers, byte[] responseBody, Throwable error) {
+
+		Toast.makeText(mContext, "Failed to post ROC - " + error.getMessage(), Toast.LENGTH_SHORT).show();
+
+		// FIXME - if we leave the ROC in the send queue, it will rapidly try resending it over and over again, leading to MANY toasts...
+
+		// Remove the ROC from the send queue, we cannot reqover from an internal server error, so repeatedly sending it over and over solves nothing
+		ReportOnConditionData rocData = mDataManager.getReportOnConditionStoreAndForward(mIncidentName, mCreationDate);
+
+		if(rocData != null)
+		{
+			// Removing it from the db
+			mDataManager.deleteReportOnConditionStoreAndForward(mIncidentName, mCreationDate);
+
+			rocData.sendStatus = ReportSendStatus.SENT;
+
+			// Don't add it to history table because we had a server error...
+			// Updating the send status:
+			//rocData.sendStatus = ReportSendStatus.SENT;
+
+			// Add the updated rocData to the history db
+			//mDataManager.addReportOnConditionToHistory(rocData);
+		}
+
 
 		Log.e("ROC", "ROCResponseHandler - onFailure - Information: " + error.getMessage());
 		Log.e("ROC","ROC - Error Information:" + error.toString());

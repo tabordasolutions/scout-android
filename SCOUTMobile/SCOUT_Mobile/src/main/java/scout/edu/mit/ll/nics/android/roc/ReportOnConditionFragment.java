@@ -328,11 +328,34 @@ public class ReportOnConditionFragment extends Fragment
 		// Defer assigning the rest of the member variables until onResume.
 		// The way they should be set up depends on what incident is active, etc.. (which may change between onResume calls)
 
+		//setupFragment();
+
+		if (savedInstanceState == null)
+		{
+
+
+		}
+		else
+		{
+
+		}
+
+
+
+
+		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, test, "your_fragment_tag").commit();
+	} else {
+	TestFragment test = (TestFragment) getSupportFragmentManager().findFragmentByTag("your_fragment_tag");
+}
+
+
+
 		return mRootView;
 	}
 
-	@Override
-	public void onResume()
+
+	// This method is responsible for setting up the form every time the Fragment is shown
+	public void setupFragment()
 	{
 		rocFragment = this;
 		gotWeatherData = false;
@@ -340,23 +363,9 @@ public class ReportOnConditionFragment extends Fragment
 		// Ensure no member variables are null:
 		setUpAllFields();
 
-
 		//------------------------------------------------------------------------------------------------
 		// Retrieve all data from dataManager for field auto-fills, required fields, etc.
-
-
 		allIncidentNames = mDataManager.getAllIncidentNames();
-
-		// TODO - pull all data that we need from mDataManager for autocomplete
-		// (stuff like all incident names, incident numbers, etc.)
-		//	ArrayList<IncidentTypePayload> activeIncidentTypes = activeIncident.getIncidentIncidenttypes();
-
-		//	for(IncidentTypePayload type : activeIncidentTypes)
-		//	{
-		//		IncidentTypePayload.IncidentTypeIncidentTypePayload t = type.getIncidentType();
-		//		String typeName = type.getIncidentType().getIncidentTypeName();
-		//		Log.e("hullo", "Incident \"" + activeIncident.getIncidentName() + "\" got type: \"" + typeName + "\"");
-		//	}
 		IncidentPayload activeIncident = mDataManager.getActiveIncident();
 
 		// This object is where we will store the final form data
@@ -364,7 +373,6 @@ public class ReportOnConditionFragment extends Fragment
 
 		//------------------------------------------------------------------------------------------------
 		// Hide all fields:
-
 		reportTypeLayout.setVisibility(View.GONE);
 		collapseAllSections();
 
@@ -384,7 +392,6 @@ public class ReportOnConditionFragment extends Fragment
 		// Hide the submit button
 		submitButton.setVisibility(View.INVISIBLE);
 
-
 		//================================================================================================
 		// If we're only viewing the ROC, set up the form for viewing
 		//================================================================================================
@@ -400,15 +407,6 @@ public class ReportOnConditionFragment extends Fragment
 				messageTextView.setVisibility(View.VISIBLE);
 				messageTextView.setText("You must first join an incident to view ROC data.");
 				loadingIncidentInfoProgressBar.setVisibility(View.GONE);
-
-				// TODO - Center the messageTextView vertically
-				// TODO - setting topMargin to 20 didn't work, setting gravity to Gravity.CENTER didn't work, setting layout height to MATCH_PARENT didn't work.
-				// Make the messageTextView larger:
-				//LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-				//layoutParams.gravity = Gravity.CENTER;
-				//layoutParams.topMargin = 20;
-				//messageTextView.setLayoutParams(layoutParams);
-
 				super.onResume();
 				return;
 			}
@@ -427,113 +425,6 @@ public class ReportOnConditionFragment extends Fragment
 		// Make Entering an Incident Name show the report type spinner
 		//------------------------------------------------------------------------------------------------
 		incidentNameTextView.addTextChangedListener(incidentNameTextWatcher);
-
-		//------------------------------------------------------------------------------------------------
-		// Make selecting a report type show the correct fields:
-		//------------------------------------------------------------------------------------------------
-		reportTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-
-			// The OnItemSelectedListener will perform a corresponding callback
-			ReportOnConditionFragment fragment;
-			public AdapterView.OnItemSelectedListener setFragment(ReportOnConditionFragment f)
-			{
-				this.fragment = f;
-				return this;
-			}
-
-			@Override
-			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
-			{
-				fragment.reportTypeChanged(position);
-			}
-
-			@Override
-			public void onNothingSelected (AdapterView<?> parent) {}
-		}.setFragment(this));
-
-
-		//------------------------------------------------------------------------------------------------
-		// Make Selecting "Other" for fuel types show the "Other text box"
-		//------------------------------------------------------------------------------------------------
-		vegFireFuelTypeOtherCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged (CompoundButton buttonView, boolean isChecked)
-			{
-				if(isChecked)
-				{
-					vegFireOtherFuelTypeLabelTextView.setVisibility(View.VISIBLE);
-					vegFireOtherFuelTypeEditText.setVisibility(View.VISIBLE);
-				}
-				else
-				{
-					vegFireOtherFuelTypeLabelTextView.setVisibility(View.GONE);
-					vegFireOtherFuelTypeEditText.setVisibility(View.GONE);
-				}
-			}
-		});
-
-		//------------------------------------------------------------------------------------------------
-		// Making the threats & evacs Evacuations Spinner show the correct options
-		//------------------------------------------------------------------------------------------------
-		threatsEvacsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
-			{
-				threatsEvacsErrorView.setVisibility(View.GONE);
-				rocFragment.threatsEvacsSpinnerChanged(position);
-			}
-
-			@Override
-			public void onNothingSelected (AdapterView<?> parent) {}
-		});
-
-		//------------------------------------------------------------------------------------------------
-		// Making the threats & evacs Structures Threat Spinner show the correct options
-		//------------------------------------------------------------------------------------------------
-		threatsStructuresSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
-			{
-				threatsStructuresErrorView.setVisibility(View.GONE);
-				rocFragment.threatsStructuresChanged(position);
-			}
-
-			@Override
-			public void onNothingSelected (AdapterView<?> parent) {}
-		});
-
-		//------------------------------------------------------------------------------------------------
-		// Making the threats & evacs Infrastructure Threat Spinner show the correct options
-		//------------------------------------------------------------------------------------------------
-		threatsInfrastructureSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
-			{
-				threatsInfrastructureErrorView.setVisibility(View.GONE);
-				rocFragment.threatsInfrastructureChanged(position);
-			}
-
-			@Override
-			public void onNothingSelected (AdapterView<?> parent) {}
-		});
-
-		//------------------------------------------------------------------------------------------------
-		// Don't let the incident type spinner ever be the 0th item:
-		//------------------------------------------------------------------------------------------------
-		incidentTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
-			{
-				incidentTypeTextView.setError(null);
-				rocFragment.incidentTypeChanged();
-			}
-
-			@Override
-			public void onNothingSelected (AdapterView<?> parent) {}
-		});
-
-
-		//------------------------------------------------------------------------------------------------
 
 		//------------------------------------------------------------------------------------------------
 		// Update the form based on current context
@@ -555,6 +446,11 @@ public class ReportOnConditionFragment extends Fragment
 		// NOTE - setting the text above executes incidentNameTextView.onTextChanged, which in turn calls incidentNameChanged
 		// incidentNameChanged finishes setting up the form from here.
 
+	}
+
+	@Override
+	public void onResume()
+	{
 		super.onResume();
 	}
 
@@ -664,8 +560,7 @@ public class ReportOnConditionFragment extends Fragment
 		//================================================
 
 		// --------- Setting the field values ---------
-		// TODO - Assign incident Number once data is added to schema
-		incidentNumberTextView.setText("");
+		incidentNumberTextView.setText(rocData.incidentnumber);
 		String incidntTypeString = "";
 		incidentTypeSelectedItems = new HashSet<String>();
 		for(String type : rocData.incidentTypes)
@@ -1128,6 +1023,29 @@ public class ReportOnConditionFragment extends Fragment
 			currentIncidentLastRocSubmitted = ROC_NONE;
 			gotIncidentROCData(null);
 		}
+
+		//------------------------------------------------------------------------------------------------
+		// Make selecting a report type show the correct fields:
+		//------------------------------------------------------------------------------------------------
+		reportTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+			// The OnItemSelectedListener will perform a corresponding callback
+			ReportOnConditionFragment fragment;
+			private AdapterView.OnItemSelectedListener setFragment(ReportOnConditionFragment f)
+			{
+				this.fragment = f;
+				return this;
+			}
+
+			@Override
+			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
+			{
+				fragment.reportTypeChanged(position);
+			}
+
+			@Override
+			public void onNothingSelected (AdapterView<?> parent) {}
+		}.setFragment(this));
 	}
 
 	// Called when we retrieve the latest ROC data for an incident
@@ -1253,11 +1171,12 @@ public class ReportOnConditionFragment extends Fragment
 
 		//----------------------------------------------------------------------------
 		// Hiding weather info for UPDATE or FINAL forms
+		// NOTE: Change in requirements - they want weather section to be visible in all report types
 		//----------------------------------------------------------------------------
-		if(currentReportType == ROC_UPDATE || currentReportType == ROC_FINAL)
+		/*if(currentReportType == ROC_UPDATE || currentReportType == ROC_FINAL)
 		{
 			weatherInfoHeader.setVisibility(View.GONE);
-		}
+		}*/
 
 		//----------------------------------------------------------------------------
 		// Hiding start date and time for UPDATE or FINAL forms
@@ -1319,7 +1238,7 @@ public class ReportOnConditionFragment extends Fragment
 			spreadRateOptions = mContext.getResources().getStringArray(R.array.roc_rate_of_spread_spinner_options_final);
 		}
 
-		vegFireRateOfSpreadSpinner.setAdapter(new ArrayAdapter<String> (mContext, android.R.layout.simple_spinner_item, spreadRateOptions));
+		vegFireRateOfSpreadSpinner.setAdapter(new ArrayAdapter<String> (mContext, android.R.layout.simple_spinner_dropdown_item, spreadRateOptions));
 
 
 
@@ -1479,7 +1398,7 @@ public class ReportOnConditionFragment extends Fragment
 				// Incident Number:
 				// TODO - incident payload does not have incidentNumber yet... but it should.
 				// This probably shouldn't use description.
-				incidentNumberTextView.setText(incidentData.getDescription()); // Should look like: "18 CA-XXX-000000"
+				//incidentNumberTextView.setText(incidentData.getDescription()); // Should look like: "18 CA-XXX-000000"
 
 				String incidntTypeString = "";
 				for(IncidentTypePayload type : incidentData.getIncidentIncidenttypes())
@@ -1533,6 +1452,87 @@ public class ReportOnConditionFragment extends Fragment
 			incidentStateTextView.setEnabled(true);
 		}
 
+		//------------------------------------------------------------------------------------------------
+		// Make Selecting "Other" for fuel types show the "Other text box"
+		//------------------------------------------------------------------------------------------------
+		vegFireFuelTypeOtherCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged (CompoundButton buttonView, boolean isChecked)
+			{
+				if(isChecked)
+				{
+					vegFireOtherFuelTypeLabelTextView.setVisibility(View.VISIBLE);
+					vegFireOtherFuelTypeEditText.setVisibility(View.VISIBLE);
+				}
+				else
+				{
+					vegFireOtherFuelTypeLabelTextView.setVisibility(View.GONE);
+					vegFireOtherFuelTypeEditText.setVisibility(View.GONE);
+				}
+			}
+		});
+
+		//------------------------------------------------------------------------------------------------
+		// Making the threats & evacs Evacuations Spinner show the correct options
+		//------------------------------------------------------------------------------------------------
+		threatsEvacsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
+			{
+				threatsEvacsErrorView.setVisibility(View.GONE);
+				rocFragment.threatsEvacsSpinnerChanged(position);
+			}
+
+			@Override
+			public void onNothingSelected (AdapterView<?> parent) {}
+		});
+
+		//------------------------------------------------------------------------------------------------
+		// Making the threats & evacs Structures Threat Spinner show the correct options
+		//------------------------------------------------------------------------------------------------
+		threatsStructuresSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
+			{
+				threatsStructuresErrorView.setVisibility(View.GONE);
+				rocFragment.threatsStructuresChanged(position);
+			}
+
+			@Override
+			public void onNothingSelected (AdapterView<?> parent) {}
+		});
+
+		//------------------------------------------------------------------------------------------------
+		// Making the threats & evacs Infrastructure Threat Spinner show the correct options
+		//------------------------------------------------------------------------------------------------
+		threatsInfrastructureSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
+			{
+				threatsInfrastructureErrorView.setVisibility(View.GONE);
+				rocFragment.threatsInfrastructureChanged(position);
+			}
+
+			@Override
+			public void onNothingSelected (AdapterView<?> parent) {}
+		});
+
+		//------------------------------------------------------------------------------------------------
+		// Don't let the incident type spinner ever be the 0th item:
+		//------------------------------------------------------------------------------------------------
+		incidentTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
+			{
+				incidentTypeTextView.setError(null);
+				rocFragment.incidentTypeChanged();
+			}
+
+			@Override
+			public void onNothingSelected (AdapterView<?> parent) {}
+		});
+
+		//------------------------------------------------------------------------------------------------
 
 		//----------------------------------------------------------------------------
 		// If NEW, autopopulate start date with current date
@@ -1625,7 +1625,8 @@ public class ReportOnConditionFragment extends Fragment
 	{
 		incidentTypeSpinner.setSelection(0);
 
-		if(incidentTypeSelectedItems.contains("Fire (Vegetation)"))
+		// TODO - Change to "Vegetation Fire" once we add vegetation fire incident type
+		if(incidentTypeSelectedItems.contains("Fire (Wildland)"))
 		{
 			vegFireAcreageEditText.setHint("(required)");
 			vegFirePercentContainedEditText.setHint("(required)");
@@ -1942,7 +1943,7 @@ public class ReportOnConditionFragment extends Fragment
 					public void onTimeSet(TimePicker view, int hour, int minute)
 					{
 						// They want the format to be hhmm (i.e. 2300)
-						String time = hour + "" + minute;
+						String time = String.format("%02d%02d",hour,minute,Locale.US);
 						rocStartTimeTextView.setText(time);
 					}
 				}, hour, minute, true);
@@ -2176,7 +2177,6 @@ public class ReportOnConditionFragment extends Fragment
 		// Populate the fields:
 		Log.e("ROC","Async got back results: " + data);
 
-
 		// Running this on the UI Thread:
 		getActivity().runOnUiThread((new Runnable()
 		{
@@ -2190,41 +2190,44 @@ public class ReportOnConditionFragment extends Fragment
 			@Override
 			public void run ()
 			{
-				// Assigning the lat/long fields:
-				setUILatLong(data);
-
-
-				setUIStringField(data, "location", rocLocationTextView);
-				setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView);
-				setUIStringField(data, "state", incidentStateTextView);
-
-				setUIStringSpinner(data, "sra", rocOwnershipSpinner, rocOwnershipErrorView);
-				setUIStringSpinner(data, "dpa", rocDPASpinner, rocDPAErrorView);
-
-				setUIStringField(data, "jurisdiction", rocJurisdictionTextView);
-
-
-				// Keep track if we failed to get any weather field:
-				boolean failedToGetWeatherData = false;
-
-
-				if(!setUIStringField(data, "temperature", weatherTempEditText))
-					failedToGetWeatherData = true;
-				if(!setUIStringField(data, "relHumidity", weatherRelativeHumidityEditText))
-					failedToGetWeatherData = true;
-				if(!setUIStringField(data, "windSpeed", weatherWindSpeedEditText))
-					failedToGetWeatherData = true;
-				if(!setUIStringSpinner(data, "windDirection", weatherWindDirectionSpinner, weatherWindDirectionError))
-					failedToGetWeatherData = true;
-
-				// TODO setUIStringField(data, "windGusts", weatherGustsEditText);
-				// FIXME-  then update the following field to 5:
-
-				// If none of the weather requests failed
-				if(!failedToGetWeatherData)
+				// Only try parsing the data if we have valid data
+				if(data != null)
 				{
-					// Mark that we got valid weather data for the form
-					gotWeatherData = true;
+					// Assigning the lat/long fields:
+					setUILatLong(data);
+
+
+					setUIStringField(data, "location", rocLocationTextView);
+					setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView);
+					setUIStringField(data, "state", incidentStateTextView);
+
+					setUIStringSpinner(data, "sra", rocOwnershipSpinner, rocOwnershipErrorView);
+					setUIStringSpinner(data, "dpa", rocDPASpinner, rocDPAErrorView);
+
+					setUIStringField(data, "jurisdiction", rocJurisdictionTextView);
+
+
+					// Keep track if we failed to get any weather field:
+					boolean failedToGetWeatherData = false;
+
+					if (!setUIStringField(data, "temperature", weatherTempEditText))
+						failedToGetWeatherData = true;
+					if (!setUIStringField(data, "relHumidity", weatherRelativeHumidityEditText))
+						failedToGetWeatherData = true;
+					if (!setUIStringField(data, "windSpeed", weatherWindSpeedEditText))
+						failedToGetWeatherData = true;
+					if (!setUIStringSpinner(data, "windDirection", weatherWindDirectionSpinner, weatherWindDirectionError))
+						failedToGetWeatherData = true;
+
+					// TODO setUIStringField(data, "windGusts", weatherGustsEditText);
+					// FIXME-  then update the following field to 5:
+
+					// If none of the weather requests failed
+					if (!failedToGetWeatherData)
+					{
+						// Mark that we got valid weather data for the form
+						gotWeatherData = true;
+					}
 				}
 
 				// Show the Locate button, hide the progress bar
@@ -2745,6 +2748,8 @@ public class ReportOnConditionFragment extends Fragment
 			{
 				JSONObject data;
 				data = mDataManager.getROCLocationInfo(param);
+
+
 				populateROCLocationFields(data);
 			}
 		}).setParam(coords)).start();
@@ -3252,7 +3257,8 @@ public class ReportOnConditionFragment extends Fragment
 			boolean isVegFireInfoValid = true;
 
 
-			if(incidentTypeSelectedItems.contains("Fire (Vegetation)"))
+			// TODO - Change to "Vegetation Fire" once we add vegetation fire
+			if(incidentTypeSelectedItems.contains("Fire (Wildland)"))
 			{
 				vegFireFieldsRequired = true;
 				Log.e("ROC","Found veg fire!");
@@ -3906,7 +3912,7 @@ public class ReportOnConditionFragment extends Fragment
 				rocData.isForNewIncident = true;
 				rocData.incidentid = -1;
 
-				// If the incidentData exists, set hte incident id, and set isForNewIncident to false (indicating that this ROC should not create an incident)
+				// If the incidentData exists, set the incident id, and set isForNewIncident to false (indicating that this ROC should not create an incident)
 				if(incidentData != null)
 				{
 					rocData.incidentid = incidentData.getIncidentId();
@@ -3917,22 +3923,30 @@ public class ReportOnConditionFragment extends Fragment
 				rocData.weatherDataAvailable = gotWeatherData;
 
 
-				// Carefully format the incident name:
+				// If we're creating a new incident, carefully format the incident name:
 				// The incident name should be prefixed with the user's "org state" and "org prefix"
 				// i.e. Taborda's org state is "CA"
 				// Taborda's org prefix is "TAB"
 				// Therefore, incidents created by users in the Taborda org should be prefixed with "CA TAB"
-				String incidentNameOrgPrefix = "";
-				String incidentNameStatePrefix = "";
-				OrganizationPayload orgPayload = mDataManager.getCurrentOrganziation();
-				if(orgPayload != null)
-				{
-					incidentNameOrgPrefix = orgPayload.getPrefix() + " ";
-					incidentNameStatePrefix = orgPayload.getState() + " ";
-				}
-				// Add the prefix to the incident name:
-				rocData.incidentname = incidentNameStatePrefix + incidentNameOrgPrefix + incidentNameTextView.getText().toString();
 
+				if(rocData.isForNewIncident)
+				{
+					String incidentNameOrgPrefix = "";
+					String incidentNameStatePrefix = "";
+					OrganizationPayload orgPayload = mDataManager.getCurrentOrganziation();
+					if(orgPayload != null)
+					{
+						incidentNameOrgPrefix = orgPayload.getPrefix() + " ";
+						incidentNameStatePrefix = orgPayload.getState() + " ";
+					}
+					// Add the prefix to the incident name:
+					rocData.incidentname = incidentNameStatePrefix + incidentNameOrgPrefix + incidentNameTextView.getText().toString();
+				}
+				// If we're not creating a new incident, the incident name should already have this formatting
+				else
+				{
+					rocData.incidentname = incidentNameTextView.getText().toString();
+				}
 
 				rocData.reportType = reportTypeSpinner.getSelectedItem().toString();
 
@@ -3940,8 +3954,7 @@ public class ReportOnConditionFragment extends Fragment
 				// Incident Info Fields
 				//================================================
 
-				// TODO- Add incidentNumber once its in the payload
-				//rocData.incidentnumber
+				rocData.incidentnumber = incidentNumberTextView.getText().toString();
 				rocData.incidentTypes = new ArrayList<String>(incidentTypeSelectedItems);
 
 				// Location data:
@@ -4054,7 +4067,14 @@ public class ReportOnConditionFragment extends Fragment
 				//----------------------------------------
 				// Evacuations
 				//----------------------------------------
-				rocData.evacuations = threatsEvacsSpinner.getSelectedItem().toString();
+				if(threatsEvacsSpinner.getSelectedItemPosition() != 0)
+				{
+					rocData.evacuations = threatsEvacsSpinner.getSelectedItem().toString();
+				}
+				else
+				{
+					rocData.evacuations = "";
+				}
 				rocData.evacuationsInProgress = new ArrayList<String>();
 
 				// For each of the text fields added, add the text
@@ -4075,7 +4095,14 @@ public class ReportOnConditionFragment extends Fragment
 				//----------------------------------------
 				// Structure Threats
 				//----------------------------------------
-				rocData.structureThreats = threatsStructuresSpinner.getSelectedItem().toString();
+				if(threatsStructuresSpinner.getSelectedItemPosition() != 0)
+				{
+					rocData.structureThreats = threatsStructuresSpinner.getSelectedItem().toString();
+				}
+				else
+				{
+					rocData.structureThreats = "";
+				}
 				rocData.structureThreatsInProgress = new ArrayList<String>();
 
 				// For each of the text fields added, add the text
@@ -4097,7 +4124,14 @@ public class ReportOnConditionFragment extends Fragment
 				//----------------------------------------
 				// Infrastructure Threats
 				//----------------------------------------
-				rocData.infrastructureThreats = threatsInfrastructureSpinner.getSelectedItem().toString();
+				if(threatsInfrastructureSpinner.getSelectedItemPosition() != 0)
+				{
+					rocData.infrastructureThreats = threatsInfrastructureSpinner.getSelectedItem().toString();
+				}
+				else
+				{
+					rocData.infrastructureThreats = "";
+				}
 				rocData.infrastructureThreatsInProgress = new ArrayList<String>();
 
 				// For each of the text fields added, add the text

@@ -61,6 +61,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.util.LongSparseArray;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -2206,12 +2207,20 @@ public class DataManager
 		// If we were unable to read the latlong, use the phone's current GPS coords
 		if(!hasLatLong)
 		{
+			forceLocationUpdate();
+
 			latitude = getMDTLatitude();
 			longitude = getMDTLongitude();
 		}
 
 
-		Log.e("ROC","About to make request to ROC for location: lat:" + latitude + ", long:" + longitude + "( hasLatLong = " + hasLatLong + ")");
+		Log.e("ROC","About to make request to ROC for location: lat:" + latitude + ", long:" + longitude + " (hasLatLong = " + hasLatLong + ")");
+
+		if(Double.isNaN(latitude) || Double.isNaN(longitude))
+		{
+			Log.e("ROC","Attempt to retrieve location-based data aborted, tried to get location data for latitude: " + latitude + ", longitude: " + longitude);
+			return null;
+		}
 
 
 		result = RestClient.getROCLocationDataForLocation(latitude,longitude);
