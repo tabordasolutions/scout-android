@@ -40,6 +40,8 @@ public class IncidentPayload {
 	private long parentincidentid;
 	private long usersessionid;
 	private String incidentname;
+	private String incidentnumber;
+	// TODO - make this optional ^^^
 	private double lat;
 	private double lon;
 	private boolean active;
@@ -72,6 +74,14 @@ public class IncidentPayload {
 	}
 	public void setIncidentName(String incidentName) {
 		this.incidentname = incidentName;
+	}
+	public String getIncidentNumber()
+	{
+		return incidentnumber;
+	}
+	public void setIncidentNumber(String incidentNumber)
+	{
+		this.incidentnumber = incidentNumber;
 	}
 	public ArrayList<CollabroomPayload> getCollabrooms() {
 		return collabrooms;

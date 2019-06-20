@@ -71,9 +71,8 @@ public class ParseReportOnConditionsTask extends AsyncTask<ArrayList<ReportOnCon
 			data.sendStatus = ReportSendStatus.SENT;
 			data.isForNewIncident = true;
 
-			Log.e("ROC","Adding ROC data to table.");
+			Log.e("ROC","Adding ROC data to table: " + data.toJSON());
 			mDataManager.addReportOnConditionToHistory(data);
-
 
 			// Broadcast that we've received a new report
 			// These broadcasts are used for UI changes based on having received a new report

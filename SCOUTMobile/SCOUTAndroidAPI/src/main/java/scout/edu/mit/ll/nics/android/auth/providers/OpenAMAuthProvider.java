@@ -127,7 +127,7 @@ public class OpenAMAuthProvider extends AuthProvider {
 				// Creating a keystore containing our trusted certificate
 				String keyStoreType = KeyStore.getDefaultType();
 				KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-				keyStore.load(null, null);
+				keyStore.load(null, null);luis
 				keyStore.setCertificateEntry("ca", certificate);
 
 				//-------------------------------------------------

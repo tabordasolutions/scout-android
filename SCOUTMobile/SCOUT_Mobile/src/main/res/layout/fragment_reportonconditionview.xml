@@ -40,190 +40,254 @@
     android:animateLayoutChanges="true"
     android:orientation="vertical">
 
-    <ScrollView
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/rocSwipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.85">
 
-        <LinearLayout
+        <ScrollView
+            android:id="@+id/rocParentScrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginStart="0dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <!-- ======================================================================================================================================================================== -->
-            <!-- Incident / Report Type Section -->
-            <!-- ======================================================================================================================================================================== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginStart="0dp"
                 android:orientation="vertical">
-                <TextView
-                    android:id="@+id/rocIncidentNameLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Incident Name:"
-                    android:textSize="18sp"/>
-                <AutoCompleteTextView
-                    android:id="@+id/rocIncidentName"
+
+                <!-- ======================================================================================================================================================================== -->
+                <!-- Incident / Report Type Section -->
+                <!-- ======================================================================================================================================================================== -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:completionThreshold="1"
-                    android:hint="(required)"
-                    android:textSize="18sp"/>
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginStart="5dp"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/rocIncidentNameLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Incident Name:"
+                        android:textSize="18sp"/>
+                    <AutoCompleteTextView
+                        android:id="@+id/rocIncidentName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:hint="(required)"
+                        android:textSize="18sp"/>
 
 
-                <ProgressBar
-                    android:id="@+id/rocLoadingIncidentData"
-                    android:layout_marginTop="20dp"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
-                    android:layout_gravity="center" />
+                    <ProgressBar
+                        android:id="@+id/rocLoadingIncidentData"
+                        android:layout_marginTop="20dp"
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:layout_gravity="center" />
 
-                <TextView
-                    android:id="@+id/rocMessageTextView"
-                    android:layout_marginTop="20dp"
+                    <TextView
+                        android:id="@+id/rocMessageTextView"
+                        android:layout_marginTop="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="Loading incident data..."/>
+
+
+                    <LinearLayout
+                        android:id="@+id/rocReportTypeSection"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Report Type:"
+                            android:textSize="18sp"/>
+                        <Spinner
+                            android:id="@+id/rocReportType"
+                            android:layout_width="match_parent"
+                            android:layout_height="fill_parent"
+                            android:textSize="18sp">
+                        </Spinner>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp">
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <!-- ======================================================================================================================================================================== -->
+                <!-- Incident Info Section -->
+                <!-- ======================================================================================================================================================================== -->
+
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="Loading incident data..."/>
+                    android:layout_height="wrap_content">
 
+                    <TextView
+                        android:id="@+id/rocIncidentInfoHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#202020"
+                        android:drawableEnd="@drawable/down_arrow"
+                        android:drawableRight="@drawable/down_arrow"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Incident Info"
+                        android:textSize="20sp"/>
+                    <ImageView
+                        android:id="@+id/rocIncidentInfoHeaderError"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="50dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:focusable="false"
+                        android:src="@drawable/red_exclamation_point"/>
+                </RelativeLayout>
 
                 <LinearLayout
-                    android:id="@+id/rocReportTypeSection"
+                    android:id="@+id/rocIncidentInfoSection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="visible">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Report Type:"
+                        android:layout_marginTop="10dp"
+                        android:text="Incident Number:"
+                        android:textSize="18sp"/>
+                    <AutoCompleteTextView
+                        android:id="@+id/rocIncidentNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:hint=""
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Incident Type(s):"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:id="@+id/rocIncidentTypeTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp"
+                        android:text=""
                         android:textSize="18sp"/>
                     <Spinner
-                        android:id="@+id/rocReportType"
+                        android:id="@+id/rocIncidentTypeSpinner"
                         android:layout_width="match_parent"
-                        android:layout_height="fill_parent"
-                        android:textSize="18sp">
-                    </Spinner>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="20dp">
-                </LinearLayout>
-
-            </LinearLayout>
+                        android:layout_height="wrap_content"
+                        android:textSize="18sp"/>
 
 
-            <!-- ======================================================================================================================================================================== -->
-            <!-- Incident Info Section -->
-            <!-- ======================================================================================================================================================================== -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Location:"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:text="Latitude:"
+                        android:textSize="18sp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="5"
+                                android:orientation="horizontal">
+                                <EditText
+                                    android:id="@+id/rocIncidentLatitudeDegrees"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="7"
+                                    android:layout_height="wrap_content"
+                                    android:hint="(required)"
+                                    android:inputType="number|numberDecimal|numberSigned"
+                                    android:textColor="@drawable/edit_text_selector"
+                                    android:textSize="18sp"/>
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="º"
+                                    android:textSize="18sp"/>
+                            </LinearLayout>
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                        <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_weight="5"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+                                <EditText
+                                    android:id="@+id/rocIncidentLatitudeMinutes"
+                                    android:layout_width="0dp"
+                                    android:layout_weight="7"
+                                    android:layout_height="wrap_content"
+                                    android:hint="(required)"
+                                    android:inputType="number|numberDecimal"
+                                    android:textColor="@drawable/edit_text_selector"
+                                    android:textSize="18sp"/>
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="'"
+                                    android:textSize="18sp"/>
+                            </LinearLayout>
+                    </LinearLayout>
 
-                <TextView
-                    android:id="@+id/rocIncidentInfoHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#202020"
-                    android:drawableEnd="@drawable/down_arrow"
-                    android:drawableRight="@drawable/down_arrow"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Incident Info"
-                    android:textSize="20sp"/>
-                <ImageView
-                    android:id="@+id/rocIncidentInfoHeaderError"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="50dp"
-                    android:clickable="false"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
-                    android:src="@drawable/red_exclamation_point"/>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/rocIncidentInfoSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:visibility="visible">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Incident Number:"
-                    android:textSize="18sp"/>
-                <AutoCompleteTextView
-                    android:id="@+id/rocIncidentNumber"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:completionThreshold="1"
-                    android:hint=""
-                    android:textSize="18sp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Incident Type(s):"
-                    android:textSize="18sp"/>
-                <TextView
-                    android:id="@+id/rocIncidentTypeTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:text=""
-                    android:textSize="18sp"/>
-                <Spinner
-                    android:id="@+id/rocIncidentTypeSpinner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="18sp"/>
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Location:"
-                    android:textSize="18sp"/>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="5dp"
-                    android:text="Latitude:"
-                    android:textSize="18sp"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="5dp"
+                        android:text="Longitude:"
+                        android:textSize="18sp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="5"
                             android:orientation="horizontal">
                             <EditText
-                                android:id="@+id/rocIncidentLatitudeDegrees"
+                                android:id="@+id/rocIncidentLongitudeDegrees"
                                 android:layout_width="0dp"
                                 android:layout_weight="7"
                                 android:layout_height="wrap_content"
@@ -239,13 +303,14 @@
                                 android:textSize="18sp"/>
                         </LinearLayout>
 
-                    <LinearLayout
+
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_weight="5"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
                             <EditText
-                                android:id="@+id/rocIncidentLatitudeMinutes"
+                                android:id="@+id/rocIncidentLongitudeMinutes"
                                 android:layout_width="0dp"
                                 android:layout_weight="7"
                                 android:layout_height="wrap_content"
@@ -260,166 +325,24 @@
                                 android:text="'"
                                 android:textSize="18sp"/>
                         </LinearLayout>
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginTop="5dp"
-                    android:text="Longitude:"
-                    android:textSize="18sp"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="5"
-                        android:orientation="horizontal">
-                        <EditText
-                            android:id="@+id/rocIncidentLongitudeDegrees"
-                            android:layout_width="0dp"
-                            android:layout_weight="7"
-                            android:layout_height="wrap_content"
-                            android:hint="(required)"
-                            android:inputType="number|numberDecimal|numberSigned"
-                            android:textColor="@drawable/edit_text_selector"
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="º"
-                            android:textSize="18sp"/>
                     </LinearLayout>
 
-
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="5"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-                        <EditText
-                            android:id="@+id/rocIncidentLongitudeMinutes"
-                            android:layout_width="0dp"
-                            android:layout_weight="7"
-                            android:layout_height="wrap_content"
-                            android:hint="(required)"
-                            android:inputType="number|numberDecimal"
-                            android:textColor="@drawable/edit_text_selector"
-                            android:textSize="18sp"/>
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="'"
-                            android:textSize="18sp"/>
-                    </LinearLayout>
-                </LinearLayout>
+                        android:orientation="horizontal"
+                        android:gravity="right">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="right">
-
-                    <ProgressBar
-                        android:id="@+id/rocLocationDataProgressBar"
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:layout_gravity="right" />
-
-                    <ImageButton
-                        android:id="@+id/rocLocateButton"
-                        android:layout_width="34dp"
-                        android:layout_height="34dp"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="My GPS Location"
-                        android:focusable="true"
-                        android:maxHeight="32dp"
-                        android:maxWidth="32dp"
-                        android:minHeight="32dip"
-                        android:minWidth="32dip"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="10dp"
-                        android:src="@drawable/myloc"/>
-                </LinearLayout>
-
-
-
-            <!-- Retaining old location layout in case we want to revert
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Location:"
-                    android:textSize="18sp"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="4"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="5dp"
-                            android:text="Latitude:"
-                            android:textSize="18sp"/>
-                        <EditText
-                            android:id="@+id/rocIncidentLatitude"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:inputType="numberSigned|numberDecimal"
-                            android:hint="(required)"
-
-                            android:textSize="18sp"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="4"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginStart="10dp"
-                            android:layout_marginTop="5dp"
-                            android:text="Longitude:"
-                            android:textSize="18sp"/>
-                        <EditText
-                            android:id="@+id/rocIncidentLongitude"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:inputType="numberSigned|numberDecimal"
-                            android:hint="(required)"
-                            android:textSize="18sp"/>
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="28sp"></LinearLayout>
-                        <ImageButton
-                            android:id="@+id/rocLocateButton2"
-                            android:layout_width="38dp"
+                        <ProgressBar
+                            android:id="@+id/rocLocationDataProgressBar"
+                            android:layout_width="34dp"
                             android:layout_height="34dp"
-                            android:layout_weight="0"
+                            android:layout_gravity="right" />
+
+                        <ImageButton
+                            android:id="@+id/rocLocateButton"
+                            android:layout_width="34dp"
+                            android:layout_height="34dp"
                             android:adjustViewBounds="true"
                             android:contentDescription="My GPS Location"
                             android:focusable="true"
@@ -427,1258 +350,1343 @@
                             android:maxWidth="32dp"
                             android:minHeight="32dip"
                             android:minWidth="32dip"
+                            android:layout_gravity="end"
+                            android:layout_marginTop="10dp"
                             android:src="@drawable/myloc"/>
                     </LinearLayout>
-                </LinearLayout>-->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="State / Province / Region:"
-                    android:textSize="18sp"/>
-                <AutoCompleteTextView
-                    android:id="@+id/rocIncidentState"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:completionThreshold="1"
-                    android:hint="(required)"
-                    android:textSize="18sp"/>
-
-            </LinearLayout>
-
-            <!-- ======================================================================================================================================================================== -->
-            <!-- ROC Incident Info Section -->
-            <!-- ======================================================================================================================================================================== -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/rocRocIncidentInfoHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#202020"
-                    android:drawableEnd="@drawable/down_arrow"
-                    android:drawableRight="@drawable/down_arrow"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="10dp"
-                    android:text="ROC Incident Info"
-                    android:textSize="20sp"/>
-                <ImageView
-                    android:id="@+id/rocRocIncidentInfoHeaderError"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="50dp"
-                    android:clickable="false"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
-                    android:src="@drawable/red_exclamation_point"/>
-            </RelativeLayout>
 
 
-            <LinearLayout
-                android:id="@+id/rocRocIncidentInfoSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:visibility="gone">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Initial County:"
-                    android:textSize="18sp"/>
+                <!-- Retaining old location layout in case we want to revert
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Location:"
+                        android:textSize="18sp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="4"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginTop="5dp"
+                                android:text="Latitude:"
+                                android:textSize="18sp"/>
+                            <EditText
+                                android:id="@+id/rocIncidentLatitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:inputType="numberSigned|numberDecimal"
+                                android:hint="(required)"
+
+                                android:textSize="18sp"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="4"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:layout_marginStart="10dp"
+                                android:layout_marginTop="5dp"
+                                android:text="Longitude:"
+                                android:textSize="18sp"/>
+                            <EditText
+                                android:id="@+id/rocIncidentLongitude"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:inputType="numberSigned|numberDecimal"
+                                android:hint="(required)"
+                                android:textSize="18sp"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="28sp"></LinearLayout>
+                            <ImageButton
+                                android:id="@+id/rocLocateButton2"
+                                android:layout_width="38dp"
+                                android:layout_height="34dp"
+                                android:layout_weight="0"
+                                android:adjustViewBounds="true"
+                                android:contentDescription="My GPS Location"
+                                android:focusable="true"
+                                android:maxHeight="32dp"
+                                android:maxWidth="32dp"
+                                android:minHeight="32dip"
+                                android:minWidth="32dip"
+                                android:src="@drawable/myloc"/>
+                        </LinearLayout>
+                    </LinearLayout>-->
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="State / Province / Region:"
+                        android:textSize="18sp"/>
+                    <AutoCompleteTextView
+                        android:id="@+id/rocIncidentState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:hint="(required)"
+                        android:textSize="18sp"/>
+
+                </LinearLayout>
+
+                <!-- ======================================================================================================================================================================== -->
+                <!-- ROC Incident Info Section -->
+                <!-- ======================================================================================================================================================================== -->
+
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/rocRocIncidentInfoHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#202020"
+                        android:drawableEnd="@drawable/down_arrow"
+                        android:drawableRight="@drawable/down_arrow"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="ROC Incident Info"
+                        android:textSize="20sp"/>
                     <ImageView
-                        android:id="@+id/rocCountyError"
+                        android:id="@+id/rocRocIncidentInfoHeaderError"
                         android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
+                        android:paddingRight="50dp"
                         android:clickable="false"
                         android:focusableInTouchMode="false"
                         android:focusable="false"
                         android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocCounty"
-                        android:entries="@array/roc_incident_initial_county_spinner_options"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"/>
                 </RelativeLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Additional Counties:"
-                    android:textSize="18sp"/>
-                <AutoCompleteTextView
-                    android:id="@+id/rocAdditionalCounties"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:completionThreshold="1"
-                    android:hint=""
-                    android:textSize="18sp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Location:"
-                    android:textSize="18sp"/>
-                <AutoCompleteTextView
-                    android:id="@+id/rocLocation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:completionThreshold="1"
-                    android:hint="(required)"
-                    android:textSize="18sp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="DPA:"
-                    android:textSize="18sp"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/rocDPAError"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:focusable="false"
-                        android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocDPA"
-                        android:entries="@array/roc_dpa_spinner_options"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"/>
-                </RelativeLayout>
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Ownership:"
-                    android:textSize="18sp"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/rocOwnershipError"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:focusable="false"
-                        android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocOwnership"
-                        android:entries="@array/roc_responsibility_spinner_options"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"/>
-                </RelativeLayout>
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Jurisdiction:"
-                    android:textSize="18sp"/>
-                <AutoCompleteTextView
-                    android:id="@+id/rocJurisdiction"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:completionThreshold="1"
-                    android:hint="(required)"
-                    android:textSize="18sp"/>
 
                 <LinearLayout
-                    android:id="@+id/rocDateTimeLayout"
+                    android:id="@+id/rocRocIncidentInfoSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Date:"
-                        android:textSize="18sp"/>
-                    <TextView
-                        android:id="@+id/rocStartDate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="(required)"
-                        android:paddingLeft="10dp"
-                        android:paddingStart="10dp"
-                        android:inputType="date"
-                        android:textSize="18sp"/>
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="gone">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="Time:"
+                        android:text="Initial County:"
                         android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocCountyError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocCounty"
+                            android:entries="@array/roc_incident_initial_county_spinner_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+
                     <TextView
-                        android:id="@+id/rocStartTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Additional Counties:"
+                        android:textSize="18sp"/>
+                    <AutoCompleteTextView
+                        android:id="@+id/rocAdditionalCounties"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:hint=""
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Location:"
+                        android:textSize="18sp"/>
+                    <AutoCompleteTextView
+                        android:id="@+id/rocLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
                         android:hint="(required)"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="DPA:"
+                        android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocDPAError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocDPA"
+                            android:entries="@array/roc_dpa_spinner_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Ownership:"
+                        android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocOwnershipError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocOwnership"
+                            android:entries="@array/roc_responsibility_spinner_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Jurisdiction:"
+                        android:textSize="18sp"/>
+                    <AutoCompleteTextView
+                        android:id="@+id/rocJurisdiction"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:hint="(required)"
+                        android:textSize="18sp"/>
+
+                    <LinearLayout
+                        android:id="@+id/rocDateTimeLayout"
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Date:"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:id="@+id/rocStartDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="(required)"
+                            android:paddingLeft="10dp"
+                            android:paddingStart="10dp"
+                            android:inputType="date"
+                            android:textSize="18sp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Time:"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:id="@+id/rocStartTime"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="(required)"
+                            android:paddingLeft="10dp"
+                            android:paddingStart="10dp"
+                            android:inputType="time"
+                            android:textSize="18sp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- ======================================================================================================================================================================== -->
+                <!-- Vegetation Fire Incident Scope Section -->
+                <!-- ======================================================================================================================================================================== -->
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/rocVegFireIncidentScopeHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#202020"
+                        android:drawableEnd="@drawable/down_arrow"
+                        android:drawableRight="@drawable/down_arrow"
+                        android:paddingBottom="10dp"
                         android:paddingLeft="10dp"
-                        android:paddingStart="10dp"
-                        android:inputType="time"
-                        android:textSize="18sp"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- ======================================================================================================================================================================== -->
-            <!-- Vegetation Fire Incident Scope Section -->
-            <!-- ======================================================================================================================================================================== -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/rocVegFireIncidentScopeHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#202020"
-                    android:drawableEnd="@drawable/down_arrow"
-                    android:drawableRight="@drawable/down_arrow"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Vegetation Fire Incident Scope"
-                    android:textSize="20sp"/>
-                <ImageView
-                    android:id="@+id/rocVegFireIncidentScopeHeaderError"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="50dp"
-                    android:clickable="false"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
-                    android:src="@drawable/red_exclamation_point"/>
-            </RelativeLayout>
-
-
-            <LinearLayout
-                android:id="@+id/rocVegFireIncidentScopeSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:visibility="visible">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Acreage:"
-                    android:textSize="18sp"/>
-                <EditText
-                    android:id="@+id/rocVegFireAcreage"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="(required)"
-                    android:inputType="numberDecimal"
-                    android:textColor="@color/common_signin_btn_text_dark"
-                    android:textSize="18sp"/>
-
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Rate of Spread:"
-                    android:textSize="18sp"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Vegetation Fire Incident Scope"
+                        android:textSize="20sp"/>
                     <ImageView
-                        android:id="@+id/rocVegFireRateOfSpreadError"
+                        android:id="@+id/rocVegFireIncidentScopeHeaderError"
                         android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
+                        android:paddingRight="50dp"
                         android:clickable="false"
                         android:focusableInTouchMode="false"
                         android:focusable="false"
                         android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocVegFireRateOfSpread"
-                        android:entries="@array/roc_rate_of_spread_spinner_options"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp">
-                    </Spinner>
                 </RelativeLayout>
 
 
-                <TextView
-                    android:id="@+id/rocVegFireFuelTypeLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Fuel Types:"
-                    android:textSize="18sp"/>
                 <LinearLayout
-                    android:paddingLeft="30dp"
+                    android:id="@+id/rocVegFireIncidentScopeSection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <CheckBox
-                        android:id="@+id/rocVegFireFuelTypeGrass"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Grass"/>
-                    <CheckBox
-                        android:id="@+id/rocVegFireFuelTypeBrush"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Brush"/>
-                    <CheckBox
-                        android:id="@+id/rocVegFireFuelTypeTimber"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Timber"/>
-                    <CheckBox
-                        android:id="@+id/rocVegFireFuelTypeOakWoodland"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Oak Woodland"/>
-                    <CheckBox
-                        android:id="@+id/rocVegFireFuelTypeOther"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Other"/>
-                </LinearLayout>
+                    android:orientation="vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="visible">
 
-                <TextView
-                    android:id="@+id/rocVegFireFuelTypeOtherLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Other Fuel Types:"
-                    android:textSize="18sp"/>
-                <EditText
-                    android:id="@+id/rocVegFireFuelTypeOtherText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="(required)"
-                    android:textColor="@color/common_signin_btn_text_dark"
-                    android:textSize="18sp"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Percent Contained:"
-                    android:textSize="18sp"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Acreage:"
+                        android:textSize="18sp"/>
                     <EditText
-                        android:id="@+id/rocVegFirePercentContained"
-                        android:layout_width="0dp"
-                        android:layout_weight="7"
+                        android:id="@+id/rocVegFireAcreage"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="(required)"
-                        android:inputType="number"
+                        android:inputType="numberDecimal"
                         android:textColor="@color/common_signin_btn_text_dark"
                         android:textSize="18sp"/>
+
+
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="%"
+                        android:layout_marginTop="10dp"
+                        android:text="Rate of Spread:"
                         android:textSize="18sp"/>
-                </LinearLayout>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocVegFireRateOfSpreadError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocVegFireRateOfSpread"
+                            android:entries="@array/roc_rate_of_spread_spinner_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp">
+                        </Spinner>
+                    </RelativeLayout>
 
-            </LinearLayout>
 
+                    <TextView
+                        android:id="@+id/rocVegFireFuelTypeLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Fuel Types:"
+                        android:textSize="18sp"/>
+                    <LinearLayout
+                        android:paddingLeft="30dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <CheckBox
+                            android:id="@+id/rocVegFireFuelTypeGrass"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Grass"/>
+                        <CheckBox
+                            android:id="@+id/rocVegFireFuelTypeBrush"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Brush"/>
+                        <CheckBox
+                            android:id="@+id/rocVegFireFuelTypeTimber"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Timber"/>
+                        <CheckBox
+                            android:id="@+id/rocVegFireFuelTypeOakWoodland"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Oak Woodland"/>
+                        <CheckBox
+                            android:id="@+id/rocVegFireFuelTypeOther"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Other"/>
+                    </LinearLayout>
 
-            <!-- ======================================================================================================================================================================== -->
-            <!-- Weather Information Section -->
-            <!-- ======================================================================================================================================================================== -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/rocWeatherInfoHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#202020"
-                    android:drawableEnd="@drawable/down_arrow"
-                    android:drawableRight="@drawable/down_arrow"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Weather Information"
-                    android:textSize="20sp"/>
-                <ImageView
-                    android:id="@+id/rocWeatherInfoHeaderError"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="50dp"
-                    android:clickable="false"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
-                    android:src="@drawable/red_exclamation_point"/>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/rocWeatherInfoSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:visibility="visible">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Temperature:"
-                    android:textSize="18sp"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    <TextView
+                        android:id="@+id/rocVegFireFuelTypeOtherLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Other Fuel Types:"
+                        android:textSize="18sp"/>
                     <EditText
-                        android:id="@+id/rocWeatherTemp"
-                        android:layout_width="0dp"
-                        android:layout_weight="7"
+                        android:id="@+id/rocVegFireFuelTypeOtherText"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint=""
-                        android:inputType="number"
+                        android:hint="(required)"
                         android:textColor="@color/common_signin_btn_text_dark"
                         android:textSize="18sp"/>
+
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="ºF"
+                        android:layout_marginTop="10dp"
+                        android:text="Percent Contained:"
                         android:textSize="18sp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/rocVegFirePercentContained"
+                            android:layout_width="0dp"
+                            android:layout_weight="7"
+                            android:layout_height="wrap_content"
+                            android:hint="(required)"
+                            android:inputType="number"
+                            android:textColor="@color/common_signin_btn_text_dark"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="%"
+                            android:textSize="18sp"/>
+                    </LinearLayout>
+
                 </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Relative Humidity:"
-                    android:textSize="18sp"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <EditText
-                        android:id="@+id/rocWeatherRelativeHumidity"
-                        android:layout_width="0dp"
-                        android:layout_weight="7"
-                        android:layout_height="wrap_content"
-                        android:hint=""
-                        android:inputType="number"
-                        android:textColor="@color/common_signin_btn_text_dark"
-                        android:textSize="18sp"/>
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="%"
-                        android:textSize="18sp"/>
-                </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Wind Speed:"
-                    android:textSize="18sp"/>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <EditText
-                        android:id="@+id/rocWeatherWindSpeed"
-                        android:layout_width="0dp"
-                        android:layout_weight="7"
-                        android:layout_height="wrap_content"
-                        android:hint=""
-                        android:inputType="number"
-                        android:textColor="@color/common_signin_btn_text_dark"
-                        android:textSize="18sp"/>
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="mph"
-                        android:textSize="18sp"/>
-                </LinearLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Wind Direction:"
-                    android:textSize="18sp"/>
+                <!-- ======================================================================================================================================================================== -->
+                <!-- Weather Information Section -->
+                <!-- ======================================================================================================================================================================== -->
 
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/rocWeatherInfoHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#202020"
+                        android:drawableEnd="@drawable/down_arrow"
+                        android:drawableRight="@drawable/down_arrow"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Weather Information"
+                        android:textSize="20sp"/>
                     <ImageView
-                        android:id="@+id/rocWeatherWindDirectionError"
+                        android:id="@+id/rocWeatherInfoHeaderError"
                         android:visibility="gone"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
+                        android:paddingRight="50dp"
                         android:clickable="false"
                         android:focusableInTouchMode="false"
                         android:focusable="false"
                         android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocWeatherWindDirection"
-                        android:entries="@array/roc_weather_wind_direction_spinner_options"
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/rocWeatherInfoSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Temperature:"
+                        android:textSize="18sp"/>
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/rocWeatherTemp"
+                            android:layout_width="0dp"
+                            android:layout_weight="7"
+                            android:layout_height="wrap_content"
+                            android:hint=""
+                            android:inputType="number"
+                            android:textColor="@color/common_signin_btn_text_dark"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="ºF"
+                            android:textSize="18sp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Relative Humidity:"
                         android:textSize="18sp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/rocWeatherRelativeHumidity"
+                            android:layout_width="0dp"
+                            android:layout_weight="7"
+                            android:layout_height="wrap_content"
+                            android:hint=""
+                            android:inputType="number"
+                            android:textColor="@color/common_signin_btn_text_dark"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="%"
+                            android:textSize="18sp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Wind Speed:"
+                        android:textSize="18sp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/rocWeatherWindSpeed"
+                            android:layout_width="0dp"
+                            android:layout_weight="7"
+                            android:layout_height="wrap_content"
+                            android:hint=""
+                            android:inputType="number"
+                            android:textColor="@color/common_signin_btn_text_dark"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="mph"
+                            android:textSize="18sp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Wind Direction:"
+                        android:textSize="18sp"/>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocWeatherWindDirectionError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocWeatherWindDirection"
+                            android:entries="@array/roc_weather_wind_direction_spinner_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+
+
+
+                    <!--<LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/rocWeatherWindDirection"
+                            android:layout_width="0dp"
+                            android:layout_weight="7"
+                            android:layout_height="wrap_content"
+                            android:hint=""
+                            android:inputType="number"
+                            android:textColor="@color/common_signin_btn_text_dark"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="º"
+                            android:textSize="18sp"/>
+                    </LinearLayout>-->
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Gusts:"
+                        android:textSize="18sp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/rocWeatherGusts"
+                            android:layout_width="0dp"
+                            android:layout_weight="7"
+                            android:layout_height="wrap_content"
+                            android:hint=""
+                            android:inputType="number"
+                            android:textColor="@color/common_signin_btn_text_dark"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="mph"
+                            android:textSize="18sp"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+
+                <!-- ======================================================================================================================================================================== -->
+                <!-- Threats & Evacuations Section -->
+                <!-- ======================================================================================================================================================================== -->
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/rocThreatsEvacsHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#202020"
+                        android:drawableEnd="@drawable/down_arrow"
+                        android:drawableRight="@drawable/down_arrow"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Threats &amp; Evacuations"
+                        android:textSize="20sp"/>
+                    <ImageView
+                        android:id="@+id/rocThreatsEvacsHeaderError"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="50dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:focusable="false"
+                        android:src="@drawable/red_exclamation_point"/>
+                </RelativeLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/rocThreatsEvacsSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="visible">
+
+                    <!-- ___________________ Evacuations ____________________ -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Evacuations:"
+                        android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocThreatsEvacuationsError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocThreatsEvacuations"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/rocThreatsEvacuationsLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Evacuations in progress for:"
+                        android:textSize="18sp"/>
+                    <!-- We programmatically add AutoCompleteTextViews to this sections -->
+                    <LinearLayout
+                        android:id="@+id/rocThreatsEvacuationsList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:orientation="horizontal">
+                        <ImageButton
+                            android:id="@+id/rocThreatsEvacuationsAddButton"
+                            android:layout_width="38dp"
+                            android:layout_height="34dp"
+                            android:layout_weight="0"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/markup_AddSymbolButton"
+                            android:focusable="true"
+                            android:maxHeight="32dp"
+                            android:maxWidth="32dp"
+                            android:minHeight="32dip"
+                            android:minWidth="32dip"
+                            android:src="@drawable/plus_symbol"/>
+                    </LinearLayout>
+
+                    <!-- ___________________ Structures Threat ____________________ -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Structures Threat:"
+                        android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocThreatsStructuresError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocThreatsStructures"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/rocThreatsStructuresLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Structures Threat in progress for:"
+                        android:textSize="18sp"/>
+                    <!-- We programmatically add AutoCompleteTextViews to this sections -->
+                    <LinearLayout
+                        android:id="@+id/rocThreatsStructuresList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:orientation="horizontal">
+                        <ImageButton
+                            android:id="@+id/rocThreatsStructuresAddButton"
+                            android:layout_width="38dp"
+                            android:layout_height="34dp"
+                            android:layout_weight="0"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/markup_AddSymbolButton"
+                            android:focusable="true"
+                            android:maxHeight="32dp"
+                            android:maxWidth="32dp"
+                            android:minHeight="32dip"
+                            android:minWidth="32dip"
+                            android:src="@drawable/plus_symbol"/>
+                    </LinearLayout>
+
+                    <!-- ___________________ Infrastructures Threat ____________________ -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Infrastructure Threat:"
+                        android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocThreatsInfrastructureError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocThreatsInfrastructure"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/rocThreatsInfrastructureLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Infrastructure Threat in progress for:"
+                        android:textSize="18sp"/>
+                    <!-- We programmatically add AutoCompleteTextViews to this sections -->
+                    <LinearLayout
+                        android:id="@+id/rocThreatsInfrastructureList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:orientation="horizontal">
+                        <ImageButton
+                            android:id="@+id/rocThreatsInfrastructureAddButton"
+                            android:layout_width="38dp"
+                            android:layout_height="34dp"
+                            android:layout_weight="0"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/markup_AddSymbolButton"
+                            android:focusable="true"
+                            android:maxHeight="32dp"
+                            android:maxWidth="32dp"
+                            android:minHeight="32dip"
+                            android:minWidth="32dip"
+                            android:src="@drawable/plus_symbol"/>
+                    </LinearLayout>
+
+                    <!-- ___________________ Other Threats & Evacuations ____________________ -->
+                    <!--<TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Other Threats &amp; Evacuations:"
+                        android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocThreatsOtherError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocThreatsOther"
+                            android:entries="@array/roc_threats_evacs_spinner_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Other Threats &amp; Evacuations information:"
+                        android:textSize="18sp"/>-->
+                    <!-- We programmatically add AutoCompleteTextViews to this sections -->
+                    <!--<LinearLayout
+                        android:id="@+id/rocThreatsOtherList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:orientation="horizontal">
+                        <ImageButton
+                            android:id="@+id/rocThreatsOtherAddButton"
+                            android:layout_width="38dp"
+                            android:layout_height="34dp"
+                            android:layout_weight="0"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/markup_AddSymbolButton"
+                            android:focusable="true"
+                            android:maxHeight="32dp"
+                            android:maxWidth="32dp"
+                            android:minHeight="32dip"
+                            android:minWidth="32dip"
+                            android:src="@drawable/plus_symbol"/>
+                    </LinearLayout>-->
+                </LinearLayout>
+
+
+                <!-- ======================================================================================================================================================================== -->
+                <!-- Resources Commitment Section -->
+                <!-- ======================================================================================================================================================================== -->
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/rocCalFireResourcesHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#202020"
+                        android:drawableEnd="@drawable/down_arrow"
+                        android:drawableRight="@drawable/down_arrow"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Resource Commitment"
+                        android:textSize="20sp"/>
+                    <ImageView
+                        android:id="@+id/rocCalFireResourcesHeaderError"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="50dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:focusable="false"
+                        android:src="@drawable/red_exclamation_point"/>
                 </RelativeLayout>
 
 
 
-                <!--<LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <EditText
-                        android:id="@+id/rocWeatherWindDirection"
-                        android:layout_width="0dp"
-                        android:layout_weight="7"
-                        android:layout_height="wrap_content"
-                        android:hint=""
-                        android:inputType="number"
-                        android:textColor="@color/common_signin_btn_text_dark"
-                        android:textSize="18sp"/>
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="º"
-                        android:textSize="18sp"/>
-                </LinearLayout>-->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Gusts:"
-                    android:textSize="18sp"/>
                 <LinearLayout
+                    android:id="@+id/rocCalFireResourcesSection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <EditText
-                        android:id="@+id/rocWeatherGusts"
-                        android:layout_width="0dp"
-                        android:layout_weight="7"
-                        android:layout_height="wrap_content"
-                        android:hint=""
-                        android:inputType="number"
-                        android:textColor="@color/common_signin_btn_text_dark"
-                        android:textSize="18sp"/>
+                    android:orientation="vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="visible">
+
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="mph"
+                        android:layout_marginTop="10dp"
+                        android:text="CAL FIRE Incident:"
+                        android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocCalFireIncidentError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocCalFireIncident"
+                            android:entries="@array/roc_cal_fire_incident_spinner_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Resources Assigned:"
+                        android:textSize="18sp"/>
+                    <LinearLayout
+                        android:paddingLeft="30dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <!--<CheckBox
+                            android:id="@+id/rocCalFireResourcesNone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No CAL FIRE Resources Assigned"/>
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesAir"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="CAL FIRE Air Resources Assigned"/>
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesGround"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="CAL FIRE Ground Resources Assigned"/>
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesAllReleased"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="All CAL FIRE Resources Released"/>-->
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesNone"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No CAL FIRE resources assigned"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesAir"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="CAL FIRE air resources assigned"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesGround"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="CAL FIRE ground resources assigned"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesAirAndGround"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="CAL FIRE air and ground resources assigned"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesAirAndGroundAugmented"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="CAL FIRE air and ground resources augmented"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesAgencyRepOrdered"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="CAL FIRE Agency Rep ordered"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesAgencyRepAssigned"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="CAL FIRE Agency Rep assigned"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesContinued"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Continued commitment of CAL FIRE air and ground resources"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesSignificantAugmentation"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Significant augmentation of resources"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesVlatOrder"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Very Large Air Tanker (VLAT) on order"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesVlatAssigned"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Very Large Air Tanker (VLAT) assigned"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesNoDivert"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="No divert on Air Tankers for life safety"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesLatAssigned"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Large Air Tanker (LAT) assigned"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesAllReleased"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="All CAL FIRE air and ground resources released"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- ======================================================================================================================================================================== -->
+                <!-- Other Significant Info Section -->
+                <!-- ======================================================================================================================================================================== -->
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/rocOtherInfoHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#202020"
+                        android:drawableEnd="@drawable/down_arrow"
+                        android:drawableRight="@drawable/down_arrow"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Other Significant Info"
+                        android:textSize="20sp"/>
+                    <ImageView
+                        android:id="@+id/rocOtherInfoHeaderError"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="50dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:focusable="false"
+                        android:src="@drawable/red_exclamation_point"/>
+                </RelativeLayout>
+
+
+                <LinearLayout
+                    android:id="@+id/rocOtherInfoSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="visible">
+
+                    <!-- ___________________ Other Significant Info ____________________ -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Other Significant Info:"
+                        android:textSize="18sp"/>
+                    <!-- We programmatically add AutoCompleteTextViews to this sections -->
+                    <LinearLayout
+                        android:id="@+id/rocOtherInfoList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="right"
+                        android:orientation="horizontal">
+                        <ImageButton
+                            android:id="@+id/rocOtherInfoAddButton"
+                            android:layout_width="38dp"
+                            android:layout_height="34dp"
+                            android:layout_weight="0"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/markup_AddSymbolButton"
+                            android:focusable="true"
+                            android:maxHeight="32dp"
+                            android:maxWidth="32dp"
+                            android:minHeight="32dip"
+                            android:minWidth="32dip"
+                            android:src="@drawable/plus_symbol"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+
+                <!-- ======================================================================================================================================================================== -->
+                <!-- Email Section -->
+                <!-- ======================================================================================================================================================================== -->
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/rocEmailHeader"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#202020"
+                        android:drawableEnd="@drawable/down_arrow"
+                        android:drawableRight="@drawable/down_arrow"
+                        android:paddingBottom="10dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp"
+                        android:text="Email"
+                        android:textSize="20sp"/>
+                    <ImageView
+                        android:id="@+id/rocEmailHeaderError"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:paddingRight="50dp"
+                        android:clickable="false"
+                        android:focusableInTouchMode="false"
+                        android:focusable="false"
+                        android:src="@drawable/red_exclamation_point"/>
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/rocEmailSection"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Recipient Email:"
+                        android:textSize="18sp"/>
+
+                    <TextView
+                        android:id="@+id/rocEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:paddingLeft="10dp"
+                        android:text="none"
                         android:textSize="18sp"/>
                 </LinearLayout>
+
 
             </LinearLayout>
-
-
-            <!-- ======================================================================================================================================================================== -->
-            <!-- Threats & Evacuations Section -->
-            <!-- ======================================================================================================================================================================== -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/rocThreatsEvacsHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#202020"
-                    android:drawableEnd="@drawable/down_arrow"
-                    android:drawableRight="@drawable/down_arrow"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Threats &amp; Evacuations"
-                    android:textSize="20sp"/>
-                <ImageView
-                    android:id="@+id/rocThreatsEvacsHeaderError"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="50dp"
-                    android:clickable="false"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
-                    android:src="@drawable/red_exclamation_point"/>
-            </RelativeLayout>
-
-
-            <LinearLayout
-                android:id="@+id/rocThreatsEvacsSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:visibility="visible">
-
-                <!-- ___________________ Evacuations ____________________ -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Evacuations:"
-                    android:textSize="18sp"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/rocThreatsEvacuationsError"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:focusable="false"
-                        android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocThreatsEvacuations"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"/>
-                </RelativeLayout>
-                <TextView
-                    android:id="@+id/rocThreatsEvacuationsLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Evacuations in progress for:"
-                    android:textSize="18sp"/>
-                <!-- We programmatically add AutoCompleteTextViews to this sections -->
-                <LinearLayout
-                    android:id="@+id/rocThreatsEvacuationsList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="horizontal">
-                    <ImageButton
-                        android:id="@+id/rocThreatsEvacuationsAddButton"
-                        android:layout_width="38dp"
-                        android:layout_height="34dp"
-                        android:layout_weight="0"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/markup_AddSymbolButton"
-                        android:focusable="true"
-                        android:maxHeight="32dp"
-                        android:maxWidth="32dp"
-                        android:minHeight="32dip"
-                        android:minWidth="32dip"
-                        android:src="@drawable/plus_symbol"/>
-                </LinearLayout>
-
-                <!-- ___________________ Structures Threat ____________________ -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Structures Threat:"
-                    android:textSize="18sp"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/rocThreatsStructuresError"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:focusable="false"
-                        android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocThreatsStructures"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"/>
-                </RelativeLayout>
-                <TextView
-                    android:id="@+id/rocThreatsStructuresLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Structures Threat in progress for:"
-                    android:textSize="18sp"/>
-                <!-- We programmatically add AutoCompleteTextViews to this sections -->
-                <LinearLayout
-                    android:id="@+id/rocThreatsStructuresList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="horizontal">
-                    <ImageButton
-                        android:id="@+id/rocThreatsStructuresAddButton"
-                        android:layout_width="38dp"
-                        android:layout_height="34dp"
-                        android:layout_weight="0"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/markup_AddSymbolButton"
-                        android:focusable="true"
-                        android:maxHeight="32dp"
-                        android:maxWidth="32dp"
-                        android:minHeight="32dip"
-                        android:minWidth="32dip"
-                        android:src="@drawable/plus_symbol"/>
-                </LinearLayout>
-
-                <!-- ___________________ Infrastructures Threat ____________________ -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Infrastructure Threat:"
-                    android:textSize="18sp"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/rocThreatsInfrastructureError"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:focusable="false"
-                        android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocThreatsInfrastructure"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"/>
-                </RelativeLayout>
-                <TextView
-                    android:id="@+id/rocThreatsInfrastructureLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Infrastructure Threat in progress for:"
-                    android:textSize="18sp"/>
-                <!-- We programmatically add AutoCompleteTextViews to this sections -->
-                <LinearLayout
-                    android:id="@+id/rocThreatsInfrastructureList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="horizontal">
-                    <ImageButton
-                        android:id="@+id/rocThreatsInfrastructureAddButton"
-                        android:layout_width="38dp"
-                        android:layout_height="34dp"
-                        android:layout_weight="0"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/markup_AddSymbolButton"
-                        android:focusable="true"
-                        android:maxHeight="32dp"
-                        android:maxWidth="32dp"
-                        android:minHeight="32dip"
-                        android:minWidth="32dip"
-                        android:src="@drawable/plus_symbol"/>
-                </LinearLayout>
-
-                <!-- ___________________ Other Threats & Evacuations ____________________ -->
-                <!--<TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Other Threats &amp; Evacuations:"
-                    android:textSize="18sp"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/rocThreatsOtherError"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:focusable="false"
-                        android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocThreatsOther"
-                        android:entries="@array/roc_threats_evacs_spinner_options"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"/>
-                </RelativeLayout>
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Other Threats &amp; Evacuations information:"
-                    android:textSize="18sp"/>-->
-                <!-- We programmatically add AutoCompleteTextViews to this sections -->
-                <!--<LinearLayout
-                    android:id="@+id/rocThreatsOtherList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="horizontal">
-                    <ImageButton
-                        android:id="@+id/rocThreatsOtherAddButton"
-                        android:layout_width="38dp"
-                        android:layout_height="34dp"
-                        android:layout_weight="0"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/markup_AddSymbolButton"
-                        android:focusable="true"
-                        android:maxHeight="32dp"
-                        android:maxWidth="32dp"
-                        android:minHeight="32dip"
-                        android:minWidth="32dip"
-                        android:src="@drawable/plus_symbol"/>
-                </LinearLayout>-->
-            </LinearLayout>
-
-
-            <!-- ======================================================================================================================================================================== -->
-            <!-- Resources Commitment Section -->
-            <!-- ======================================================================================================================================================================== -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/rocCalFireResourcesHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#202020"
-                    android:drawableEnd="@drawable/down_arrow"
-                    android:drawableRight="@drawable/down_arrow"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Resource Commitment"
-                    android:textSize="20sp"/>
-                <ImageView
-                    android:id="@+id/rocCalFireResourcesHeaderError"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="50dp"
-                    android:clickable="false"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
-                    android:src="@drawable/red_exclamation_point"/>
-            </RelativeLayout>
-
-
-
-            <LinearLayout
-                android:id="@+id/rocCalFireResourcesSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:visibility="visible">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="CAL FIRE Incident:"
-                    android:textSize="18sp"/>
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <ImageView
-                        android:id="@+id/rocCalFireIncidentError"
-                        android:visibility="gone"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:paddingRight="15dp"
-                        android:clickable="false"
-                        android:focusableInTouchMode="false"
-                        android:focusable="false"
-                        android:src="@drawable/red_exclamation_point"/>
-                    <Spinner
-                        android:id="@+id/rocCalFireIncident"
-                        android:entries="@array/roc_cal_fire_incident_spinner_options"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="18sp"/>
-                </RelativeLayout>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Resources Assigned:"
-                    android:textSize="18sp"/>
-                <LinearLayout
-                    android:paddingLeft="30dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!--<CheckBox
-                        android:id="@+id/rocCalFireResourcesNone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="No CAL FIRE Resources Assigned"/>
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesAir"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="CAL FIRE Air Resources Assigned"/>
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesGround"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="CAL FIRE Ground Resources Assigned"/>
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesAllReleased"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="All CAL FIRE Resources Released"/>-->
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesNone"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="No CAL FIRE resources assigned"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesAir"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="CAL FIRE air resources assigned"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesGround"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="CAL FIRE ground resources assigned"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesAirAndGround"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="CAL FIRE air and ground resources assigned"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesAirAndGroundAugmented"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="CAL FIRE air and ground resources augmented"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesAgencyRepOrdered"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="CAL FIRE Agency Rep ordered"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesAgencyRepAssigned"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="CAL FIRE Agency Rep assigned"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesContinued"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Continued commitment of CAL FIRE air and ground resources"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesSignificantAugmentation"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Significant augmentation of resources"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesVlatOrder"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Very Large Air Tanker (VLAT) on order"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesVlatAssigned"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Very Large Air Tanker (VLAT) assigned"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesNoDivert"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="No divert on Air Tankers for life safety"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesLatAssigned"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Large Air Tanker (LAT) assigned"/>
-
-                    <CheckBox
-                        android:id="@+id/rocCalFireResourcesAllReleased"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="All CAL FIRE air and ground resources released"/>
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- ======================================================================================================================================================================== -->
-            <!-- Other Significant Info Section -->
-            <!-- ======================================================================================================================================================================== -->
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/rocOtherInfoHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#202020"
-                    android:drawableEnd="@drawable/down_arrow"
-                    android:drawableRight="@drawable/down_arrow"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Other Significant Info"
-                    android:textSize="20sp"/>
-                <ImageView
-                    android:id="@+id/rocOtherInfoHeaderError"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="50dp"
-                    android:clickable="false"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
-                    android:src="@drawable/red_exclamation_point"/>
-            </RelativeLayout>
-
-
-            <LinearLayout
-                android:id="@+id/rocOtherInfoSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:visibility="visible">
-
-                <!-- ___________________ Other Significant Info ____________________ -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Other Significant Info:"
-                    android:textSize="18sp"/>
-                <!-- We programmatically add AutoCompleteTextViews to this sections -->
-                <LinearLayout
-                    android:id="@+id/rocOtherInfoList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                </LinearLayout>
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="right"
-                    android:orientation="horizontal">
-                    <ImageButton
-                        android:id="@+id/rocOtherInfoAddButton"
-                        android:layout_width="38dp"
-                        android:layout_height="34dp"
-                        android:layout_weight="0"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/markup_AddSymbolButton"
-                        android:focusable="true"
-                        android:maxHeight="32dp"
-                        android:maxWidth="32dp"
-                        android:minHeight="32dip"
-                        android:minWidth="32dip"
-                        android:src="@drawable/plus_symbol"/>
-                </LinearLayout>
-            </LinearLayout>
-
-
-            <!-- ======================================================================================================================================================================== -->
-            <!-- Email Section -->
-            <!-- ======================================================================================================================================================================== -->
-
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <TextView
-                    android:id="@+id/rocEmailHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="#202020"
-                    android:drawableEnd="@drawable/down_arrow"
-                    android:drawableRight="@drawable/down_arrow"
-                    android:paddingBottom="10dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="10dp"
-                    android:text="Email"
-                    android:textSize="20sp"/>
-                <ImageView
-                    android:id="@+id/rocEmailHeaderError"
-                    android:visibility="gone"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:paddingRight="50dp"
-                    android:clickable="false"
-                    android:focusableInTouchMode="false"
-                    android:focusable="false"
-                    android:src="@drawable/red_exclamation_point"/>
-            </RelativeLayout>
-
-            <LinearLayout
-                android:id="@+id/rocEmailSection"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:visibility="visible">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Recipient Email:"
-                    android:textSize="18sp"/>
-
-                <TextView
-                    android:id="@+id/rocEmail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:paddingLeft="10dp"
-                    android:text="none"
-                    android:textSize="18sp"/>
-            </LinearLayout>
-
-
-        </LinearLayout>
-    </ScrollView>
+        </ScrollView>
+    </android.support.v4.widget.SwipeRefreshLayout>
     <LinearLayout
         style="?android:attr/buttonBarStyle"
         android:id="@+id/rocSubmitButtonSection"

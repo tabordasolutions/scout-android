@@ -524,6 +524,8 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
 	public void onSaveInstanceState (Bundle outState)
 	{
+		super.onSaveInstanceState(outState);
+
 		// Serialize the current dropdown position.
 		outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, mLastPosition);
 
@@ -533,6 +535,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 		outState.putBoolean(STATE_REPORT_OPENED_FROM_MAP, mReportOpenedFromMap);
 		outState.putBoolean(STATE_IS_EDIT_SIMPLE_REPORT, mEditSimpleReport);
 		outState.putBoolean(STATE_IS_VIEW_SIMPLE_REPORT, mViewSimpleReport);
+
 
 		//OES828 TODO - Store the ROC state
 
@@ -828,12 +831,10 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 				mMapMarkupFragment.removeMapFragment();
 			}
 
-			mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), false);
-			mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), false);
-			mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), false);
-			mDataManager.requestReportOnConditionRepeating(mDataManager.getIncidentDataRate(), false);
-
-			//OES828 TODO - request ROC reports repeating (use getIncidentDataRate() as update frequency)
+			mDataManager.requestMarkupRepeating(mDataManager.getCollabroomDataRate(), true);
+			mDataManager.requestChatMessagesRepeating(mDataManager.getCollabroomDataRate(), true);
+			mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), true);
+			mDataManager.requestReportOnConditionRepeating(mDataManager.getIncidentDataRate(), true);
 
 			boolean showIncidentName = false;
 
@@ -915,8 +916,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					break;
 
 				case ROCACTIONFORM:
-					//OES828 TODO - finish this section
-					// TODO - if we're already on the destination page, don't do anything
 					//--------------------------------------------------------------------
 					// if the destination page fragment is null, create it
 					//--------------------------------------------------------------------
@@ -947,21 +946,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 
 
 				case ROCFORM:
-					//OES828 TODO - finish this section
-					// TODO - if we're already on the destination page, don't do anything
-					// TODO - if the destination page fragment is null, create it
-					// TODO - Set the view title
-					// TODO - assign fragment to the destination page fragment
-					// TODO - assign any data we need to set up the fragment (like fragment2, etc...)
-
-					// TODO - if we're already on the destination page, don't do anything
 					//--------------------------------------------------------------------
 					// if the destination page fragment is null, create it
 					//--------------------------------------------------------------------
-					if(mReportOnConditionFragment == null)
-					{
+					// We don't want to reuse the fragment, create a new one
+					//if(mReportOnConditionFragment == null)
+					//{
 						mReportOnConditionFragment = new ReportOnConditionFragment();
-					}
+					//}
 					//--------------------------------------------------------------------
 
 					//--------------------------------------------------------------------
@@ -975,79 +967,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 					//--------------------------------------------------------------------
 					fragment = mReportOnConditionFragment;
 					//--------------------------------------------------------------------
-
-					//--------------------------------------------------------------------
-					// assign any data we need to set up the fragment (like fragment2, etc...)
-					//--------------------------------------------------------------------
-					// nothing for now
-					// TODO - check if we are going to VIEW, or create a NEW, UPDATE, or FINAL ROC
-					// TODO - Set the mReportOnConditionFragment's payload
-					// that'll update it internally.
-					//--------------------------------------------------------------------
 					break;
-
-					/*//OES828 TODO - if ROC fragment is not null, store the ROC payload and ROC ID
-					//TODO create the ROC form fragment
-					if (currentFragment != null && currentFragment2 != null)
-					{
-						// If we're already on the page, stop.
-						//FIXME: add ROCFORM fragment
-						//if(currentFragment == mSimpleReportFragment && currentFragment2 ==  mSimpleReportListFragment)
-						//{
-						//	break;
-						//}
-					}
-					if (mReportOnConditionActionFragment == null)
-					{
-						mReportOnConditionActionFragment = new ReportOnConditionActionFragment();
-					}
-
-					//viewTitle = getString(R.string.fragment_title_field_report);
-
-					//if using tablet view and map is closed
-					//set detail view on left side
-					fragment = mReportOnConditionActionFragment;*/
-					/*if(mDataManager.getTabletLayoutOn() && !mMapMarkupOpenTablet)
-					{
-
-						SimpleReportPayload payload = new Gson().fromJson(mOpenedSimpleReportPayload, SimpleReportPayload.class);
-						if(payload == null)
-						{
-							payload = mDataManager.getLastSimpleReportPayload();
-						}
-						if(payload == null)
-						{
-							addSimpleReportToDetailView(false);
-						}
-						else
-						{
-							payload.parse();
-							openSimpleReport(payload, mEditSimpleReport);
-						}
-
-						mBackStack.clear();
-					}
-					else if((mViewSimpleReport || mEditSimpleReport) && mOpenedSimpleReportPayload != null)
-					{
-						SimpleReportPayload payload = new Gson().fromJson(mOpenedSimpleReportPayload, SimpleReportPayload.class);
-						payload.parse();
-
-						openSimpleReport(payload, this.mEditSimpleReport);
-						if(!mMapMarkupOpenTablet && mDataManager.getTabletLayoutOn())
-						{
-							fragment = mSimpleReportListFragment;
-							mBackStack.clear();
-						}
-						else
-						{
-							fragment2 = mSimpleReportFragment;
-						}
-					}*/
-					//TODO - dataManager request roc forms
-					//mDataManager.requestSimpleReportRepeating(mDataManager.getIncidentDataRate(), false);
-					//showIncidentName = true;
-				//	break;
-
 				case MAPCOLLABORATION:
 					if (mMapMarkupFragment == null)
 					{

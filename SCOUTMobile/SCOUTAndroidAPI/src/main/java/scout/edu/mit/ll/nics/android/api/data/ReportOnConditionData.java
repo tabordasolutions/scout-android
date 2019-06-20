@@ -268,12 +268,6 @@ public class ReportOnConditionData
 
 		ArrayList<String> list = new ArrayList<String>();
 
-		Log.e("ROCARRAY","ROC Reading string: \"" + str + "\"");
-
-		Log.e("ROCARRAY","ROC Object: " + obj);
-		Log.e("ROCARRAY","ROC Get string returns: " + obj.optString(str,""));
-		Log.e("ROCARRAY","ROC getJSONArray returns: " + obj.optJSONArray(str));
-
 		// Try reading an array first
 		if(obj.optJSONArray(str) != null)
 		{
@@ -298,8 +292,6 @@ public class ReportOnConditionData
 			// return null
 			list = null;
 		}
-
-		Log.e("ROCARRAY","ROC Got array: " + list);
 
 		return list;
 	}
@@ -577,7 +569,7 @@ public class ReportOnConditionData
 			//================================================
 			report.weatherDataAvailable = rocPayload.optBoolean("weatherDataAvailable");
 
-			Log.e("ROC","Parsed report JSON: " + report.toJSON().toString());
+			Log.i("ROC","ReportOnConditionData - fromServerPayload - Parsed report JSON: " + report.toJSON().toString());
 			return report;
 		}
 		catch(Exception e)
@@ -674,7 +666,6 @@ public class ReportOnConditionData
 			// Incident Info Fields
 			//================================================
 
-			rocPayload.put("incidentnumber",incidentnumber);
 			rocPayload.put("incidentTypes",createIncidentTypePayload(this));
 			rocPayload.put("latitudeAtROCSubmission", latitude);
 			rocPayload.put("longitudeAtROCSubmission", longitude);
@@ -821,6 +812,7 @@ public class ReportOnConditionData
 			incidentPayload.put("usersession",null);
 
 			incidentPayload.put("incidentname",incidentname);
+			incidentPayload.put("incidentnumber",incidentnumber);
 			incidentPayload.put("lat", latitude);
 			incidentPayload.put("lon", longitude);
 			incidentPayload.put("active", true);
@@ -899,6 +891,8 @@ public class ReportOnConditionData
 			// long cannot be null, use regular obj.put()
 			obj.put("incidentid", incidentid);
 			obj.put("incidentname", incidentname);
+			obj.put("incidentnumber", incidentnumber);
+
 			obj.put("datecreated", dateFormatter.format(datecreated));
 
 			obj.put("reportType", reportType);
@@ -985,6 +979,7 @@ public class ReportOnConditionData
 			data.incidentid = obj.getLong("incidentid");
 			data.incidentname = obj.getString("incidentname");
 			data.datecreated = dateFormatter.parse(obj.getString("datecreated"));
+			data.incidentnumber = obj.getString("incidentnumber");
 
 			data.reportType = obj.getString("reportType");
 			data.county = obj.getString("county");

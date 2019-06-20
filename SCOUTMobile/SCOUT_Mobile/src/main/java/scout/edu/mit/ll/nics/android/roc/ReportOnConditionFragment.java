@@ -38,6 +38,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -60,6 +62,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -92,6 +95,9 @@ public class ReportOnConditionFragment extends Fragment
 {
 	public static boolean isViewingRoc;
 	public static boolean gotWeatherData;
+
+	private ScrollView outermostScrollView;
+	private SwipeRefreshLayout swipeRefreshLayout;
 
 	private TextView incidentInfoHeader;
 	private LinearLayout incidentInfoSection;
@@ -300,57 +306,141 @@ public class ReportOnConditionFragment extends Fragment
 	//private long mReportId;
 
 
-	@Override
-	public void onCreate(Bundle savedInstanceState)
+	// Can be called when viewing an ROC
+	// Executes a network request to pull the latest ROCs from the server
+	// Then fills the form with the latest ROC data
+	public void refreshRequested()
 	{
-		super.onCreate(savedInstanceState);
+		// Call this whenever we invoke a programmatic refresh
+		// swipeRefreshLayout.setRefreshing(true);
 
-		mContext = (MainActivity) getActivity();
-		mDataManager = DataManager.getInstance();
-		//mReportId = -1;
-		//isDraft  = true;
-		setHasOptionsMenu(true);
+		Log.e("ROC","ROC - swipeRefreshLayout - onRefresh called");
 
-	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-	{
-		super.onCreateView(inflater, container, savedInstanceState);
-		if (container == null)
+		// todo - hide all of the fields
+
+		// ------------------------------------------------------------------------
+		// Hiding all of the form fields
+		// ------------------------------------------------------------------------
+		reportTypeLayout.setVisibility(View.GONE);
+		collapseAllSections();
+
+		// Hiding all headers:
+		incidentInfoHeader.setVisibility(View.GONE);
+		rocIncidentInfoHeader.setVisibility(View.GONE);
+		vegFireIncidentScopeHeader.setVisibility(View.GONE);
+		weatherInfoHeader.setVisibility(View.GONE);
+		threatsEvacsHeader.setVisibility(View.GONE);
+		resourceCommitmentHeader.setVisibility(View.GONE);
+		otherInfoHeader.setVisibility(View.GONE);
+		emailHeader.setVisibility(View.GONE);
+
+
+		// ------------------------------------------------------------------------
+		// Showing the message and in-progress spinner
+		// ------------------------------------------------------------------------
+		messageTextView.setVisibility(View.VISIBLE);
+		loadingIncidentInfoProgressBar.setVisibility(View.VISIBLE);
+		messageTextView.setText("Fetching latest ROC data for incident...");
+
+
+
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run ()
+			{
+				swipeRefreshLayout.setRefreshing(false);
+			}
+		}, 3000);
+
+
+		// --------------------------------------------
+				// request the ROC info for that incident, show the progress bar and a message letting the user know.
+				messageTextView.setVisibility(View.VISIBLE);
+				loadingIncidentInfoProgressBar.setVisibility(View.VISIBLE);
+				messageTextView.setText("Fetching latest ROC data for incident...");
+
+				// Setting it as an undefined value
+				currentIncidentLastRocSubmitted = -1;
+
+
+
+
+				// Building the success and error callbacks:
+				Handler.Callback callback = new Handler.Callback() {
+					@Override
+					public boolean handleMessage (Message msg)
+					{
+						getActivity().runOnUiThread(new Runnable()
+						{
+							@Override
+							public void run ()
+							{
+								// ------------------------------------------------------------------------
+								// Hide the message and in-progress spinner
+								// ------------------------------------------------------------------------
+								messageTextView.setVisibility(View.GONE);
+								loadingIncidentInfoProgressBar.setVisibility(View.GONE);
+
+								setupFormForViewingMode(mDataManager.getActiveIncident());
+
+								//ReportOnConditionData rocData = (incidentData != null) ? mDataManager.getLastReportOnCondition(incidentData.getIncidentId()) : null;
+								//gotIncidentROCData(rocData);
+							}
+						});
+						return true;
+					}
+				};
+
+				mDataManager.pullLatestReportOnConditionForIncident(rocData.incidentname, callback, callback);
+		// --------------------------------------------
+
+/*
+		// Building the success and error callbacks:
+		Handler.Callback successCallback = new Handler.Callback()
 		{
-			return null;
-		}
+			@Override
+			public boolean handleMessage (Message msg)
+			{
+				getActivity().runOnUiThread(new Runnable()
+				{
+					@Override
+					public void run ()
+					{
+						swipeRefreshLayout.setRefreshing(false);
+						// TODO - get latest ROC data
+						// and set the form to view it.
+						//ReportOnConditionData rocData = (incidentData != null) ? mDataManager.getLastReportOnCondition(incidentData.getIncidentId()) : null;
+						// gotIncidentROCData(rocData);
+					}
+				});
+				return true;
+			}
+		};
 
-		mRootView = inflater.inflate(R.layout.fragment_reportonconditionview, container, false);
-		mDataManager = DataManager.getInstance(getActivity());
-
-		// Defer assigning the rest of the member variables until onResume.
-		// The way they should be set up depends on what incident is active, etc.. (which may change between onResume calls)
-
-		//setupFragment();
-
-		if (savedInstanceState == null)
+		Handler.Callback errorCallback = new Handler.Callback()
 		{
+			@Override
+			public boolean handleMessage (Message msg)
+			{
+				getActivity().runOnUiThread(new Runnable()
+				{
+					@Override
+					public void run ()
+					{
 
+						// Indicate that we've finished refreshing
+						swipeRefreshLayout.setRefreshing(false);
+						// TODO - set refresh text as:
+						//messageTextView.setText("There was an error retrieving incident ROC data. Please try again.");
+					}
+				});
+				return true;
+			}
+		};
 
-		}
-		else
-		{
+		mDataManager.pullLatestReportOnConditionForIncident(mDataManager.getActiveIncidentName(), successCallback, errorCallback);*/
 
-		}
-
-
-
-
-		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, test, "your_fragment_tag").commit();
-	} else {
-	TestFragment test = (TestFragment) getSupportFragmentManager().findFragmentByTag("your_fragment_tag");
-}
-
-
-
-		return mRootView;
 	}
 
 
@@ -362,6 +452,20 @@ public class ReportOnConditionFragment extends Fragment
 
 		// Ensure no member variables are null:
 		setUpAllFields();
+
+
+		// Setting up the pull-to-refresh functionality:
+		swipeRefreshLayout.setEnabled(true);
+		swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+			@Override
+			public void onRefresh ()
+			{
+				refreshRequested();
+			}
+		});
+
+		// By default, disable the swiperefresh layout
+		swipeRefreshLayout.setEnabled(false);
 
 		//------------------------------------------------------------------------------------------------
 		// Retrieve all data from dataManager for field auto-fills, required fields, etc.
@@ -386,9 +490,6 @@ public class ReportOnConditionFragment extends Fragment
 		otherInfoHeader.setVisibility(View.GONE);
 		emailHeader.setVisibility(View.GONE);
 
-		// Set up the Incident Name field to autocomplete based on incident names.
-		makeAutoCompleteTextField(incidentNameTextView, allIncidentNames);
-
 		// Hide the submit button
 		submitButton.setVisibility(View.INVISIBLE);
 
@@ -407,12 +508,13 @@ public class ReportOnConditionFragment extends Fragment
 				messageTextView.setVisibility(View.VISIBLE);
 				messageTextView.setText("You must first join an incident to view ROC data.");
 				loadingIncidentInfoProgressBar.setVisibility(View.GONE);
-				super.onResume();
 				return;
 			}
 
+			// We only want to enable the swipe refresh if we're in viewing mode
+			swipeRefreshLayout.setEnabled(true);
+
 			setupFormForViewingMode(activeIncident);
-			super.onResume();
 			return;
 		}
 
@@ -420,6 +522,8 @@ public class ReportOnConditionFragment extends Fragment
 		// Set up Field Behaviors
 		//================================================================================================
 
+		// Set up the Incident Name field to autocomplete based on incident names.
+		makeAutoCompleteTextField(incidentNameTextView, allIncidentNames);
 
 		//------------------------------------------------------------------------------------------------
 		// Make Entering an Incident Name show the report type spinner
@@ -449,34 +553,216 @@ public class ReportOnConditionFragment extends Fragment
 	}
 
 	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		Log.e("ROC","ROC - ROCFragment - onCreate");
+
+		Log.e("ROC","ROC - ROCFragment - onCreate - savedInstanceState: " + savedInstanceState);
+
+
+		super.onCreate(savedInstanceState);
+
+		mContext = (MainActivity) getActivity();
+		mDataManager = DataManager.getInstance();
+		//mReportId = -1;
+		//isDraft  = true;
+		setHasOptionsMenu(true);
+
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+	{
+		super.onCreateView(inflater, container, savedInstanceState);
+		if (container == null)
+		{
+			return null;
+		}
+
+		mRootView = inflater.inflate(R.layout.fragment_reportonconditionview, container, false);
+		mDataManager = DataManager.getInstance(getActivity());
+
+		// Setting the View's ID
+		// Per the Android documentation: onSaveInstanceState will only be called for a view it has an id set
+//		mRootView.setId(R.id.rocViewId);
+
+
+		// Defer assigning the rest of the member variables until onResume.
+		// The way they should be set up depends on what incident is active, etc.. (which may change between onResume calls)
+
+		setupFragment();
+
+		Log.e("ROC","ROC - ROCFragment - onCreateView - savedInstanceState: " + savedInstanceState);
+
+
+		// TODO - Need to implement restoring the saved state from this app
+		// TODO - Not sure if it should be implemented here or in MainActivity
+		/*if(savedInstanceState != null)
+		{
+			// Retrieving the stored ROC data:
+
+			String draftDataJson = savedInstanceState.getString("rocDraftDataJson");
+
+			Log.e("ROC", "ROC - ROCFragment - found a draft: " + draftDataJson);
+
+			if(draftDataJson != null)
+			{
+				// TODO - do I need to set current incident payload & current ROC payload?
+
+				ReportOnConditionData draftData = ReportOnConditionData.fromJSON(draftDataJson);
+
+				Log.e("ROC", "ROC - ROCFragment - recovered the following ROC data: " + draftData.toJSON().toString());
+
+				setAllFormFieldsFromRoc(draftData);
+			}
+		}*/
+
+//		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, test, "your_fragment_tag").commit();
+//	} else {
+//	TestFragment test = (TestFragment) getSupportFragmentManager().findFragmentByTag("your_fragment_tag");
+//}
+		return mRootView;
+	}
+
+	@Override
 	public void onResume()
 	{
+		Log.e("ROC","ROC - ROCFragment - onResume");
 		super.onResume();
 	}
 
-
-	// This fills the form fields and disables interactivity with the form.
-	protected void setupFormForViewingMode(IncidentPayload incident)
+	@Override
+	public void onStart()
 	{
-		incidentData = incident;
-		// Getting the rocData for the incident:
-		rocData = mDataManager.getLastReportOnCondition(incident.getIncidentId());
+		Log.e("ROC","ROC - ROCFragment - onStart");
+		super.onStart();
+	}
 
-		// If the data is null, we don't have any ROC data to display
-		if(rocData == null)
+
+
+	// TODO - Need to implement restoring the saved state from this app
+	// TODO - Not sure if it should be implemented here or in MainActivity
+	/*@Override
+	public void onSaveInstanceState (Bundle outState)
+	{
+		Log.e("ROC","ROC - ROCFragment - onSaveInstanceState");
+
+		super.onSaveInstanceState(outState);
+
+		// If we're creating an ROC, then store the draft to restore it
+		if(!isViewingRoc)
 		{
-			incidentNameLabel.setVisibility(View.GONE);
-			incidentNameTextView.setVisibility(View.GONE);
-			messageTextView.setVisibility(View.VISIBLE);
-			messageTextView.setText("No ROC data found for incident: \"" + incident.getIncidentName() + "\".");
-			loadingIncidentInfoProgressBar.setVisibility(View.GONE);
+			Log.e("ROC","ROC - ROCFragment - onSaveInstanceState - not viewing ROC");
+
+			ReportOnConditionData draftData = formToReportOnConditionData();
+			outState.putString("rocDraftDataJson",draftData.toJSON().toString());
+		}
+	}*/
+
+
+
+	@Override
+	public void onPause()
+	{
+		Log.e("ROC","ROC - ROCFragment - onPause");
+		super.onPause();
+	}
+
+	@Override
+	public void onStop()
+	{
+		Log.e("ROC","ROC - ROCFragment - onStop");
+
+		super.onStop();
+	}
+
+	@Override
+	public void onDestroy()
+	{
+		Log.e("ROC","ROC - ROCFragment - onDestroy");
+		super.onDestroy();
+	}
+
+
+	// Sets all of the form fields based on the values from the incident
+	// if setName is true, we assign the incident name field as well
+	// (Setting the incident name invokes "incidentnamechanged", and we don't always want to do that)
+	protected void setAllFormFieldsFromIncident(IncidentPayload incidentData, boolean setName)
+	{
+		if(incidentData == null)
 			return;
+
+		// ------------------------------------------------
+		// Incident Name
+		// ------------------------------------------------
+
+		if(setName)
+		{
+			incidentNameTextView.setText(incidentData.getIncidentName());
 		}
 
-		messageTextView.setVisibility(View.GONE);
-		loadingIncidentInfoProgressBar.setVisibility(View.GONE);
+		// ------------------------------------------------
+		// Incident Type
+		// ------------------------------------------------
 
-		incidentNameTextView.setText(incident.getIncidentName());
+		String incidntTypeString = "";
+		for(IncidentTypePayload type : incidentData.getIncidentIncidenttypes())
+		{
+			incidntTypeString += type.getIncidentType().getIncidentTypeName() + "\n";
+
+			String incidentTypeName = type.getIncidentType().getIncidentTypeName();
+
+			if(!incidentTypeSelectedItems.contains(incidentTypeName))
+			{
+				incidentTypeSelectedItems.add(incidentTypeName);
+			}
+		}
+		incidentTypeTextView.setText(incidntTypeString);
+
+		// ------------------------------------------------
+		// Incident Location
+		// ------------------------------------------------
+		// Converting incident lat/long to degrees and minutes:
+		incidentLatitudeDegreesEditText.setText(String.valueOf(getDegree(incidentData.getLat())));
+		incidentLatitudeMinutesEditText.setText(String.valueOf(getMinutes(incidentData.getLat())));
+		incidentLongitudeDegreesEditText.setText(String.valueOf(getDegree(incidentData.getLon())));
+		incidentLongitudeMinutesEditText.setText(String.valueOf(getMinutes(incidentData.getLon())));
+		// ------------------------------------------------
+		// Incident Number
+		// ------------------------------------------------
+		incidentNumberTextView.setText(incidentData.getIncidentNumber());
+		// ------------------------------------------------
+		// Incident State
+		// ------------------------------------------------
+
+		// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// TODO - incident state is not available to incident payload, but it might be embedded in the incident name:
+		// TODO - For example: "CA TAB Test incident", the first two characters are "CA"
+		// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// TODO - In the future, this should be added to incident payload,
+		// TODO - or removed from the ROC form if it is not required to create an incident
+		// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+		// Get the first three characters of the string:
+		String incidentName = incidentData.getIncidentName();
+		String incidentNamePrefix = incidentName .substring(0,Math.min(incidentName .length(), 3));
+
+		if(incidentNamePrefix.equals("CA "))
+		{
+			incidentStateTextView.setText("CA");
+		}
+		// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+	}
+
+	// Sets all of the form fields as the values from the rocData
+	protected void setAllFormFieldsFromRoc(ReportOnConditionData rocData)
+	{
+		if(rocData == null)
+			return;
+
+		this.rocData = rocData;
+
+		incidentNameTextView.setText(rocData.incidentname);
 
 		reportTypeLayout.setVisibility(View.VISIBLE);
 
@@ -540,7 +826,7 @@ public class ReportOnConditionFragment extends Fragment
 		setupFormForCurrentReportType();
 
 		//================================================================================================
-		// Making the form read-only and filling in data from rocData:
+		// filling in data from rocData:
 		//================================================================================================
 
 		//================================================
@@ -551,59 +837,30 @@ public class ReportOnConditionFragment extends Fragment
 		//incidentName is already set above
 		//reportType is already set above
 
-		// --------- Disabling the fields ---------
-		incidentNameTextView.setEnabled(false);
-		reportTypeSpinner.setEnabled(false);
-
 		//================================================
 		// Incident Info Fields
 		//================================================
 
 		// --------- Setting the field values ---------
 		incidentNumberTextView.setText(rocData.incidentnumber);
-		String incidntTypeString = "";
+		String incidentTypeString = "";
 		incidentTypeSelectedItems = new HashSet<String>();
 		for(String type : rocData.incidentTypes)
 		{
-			incidntTypeString += type + "\n";
-			incidentTypeSelectedItems.add(type);
+			incidentTypeString += type + "\n";
+			if(!incidentTypeSelectedItems.contains(type))
+			{
+				incidentTypeSelectedItems.add(type);
+			}
 		}
-		incidentTypeTextView.setText(incidntTypeString);
+		incidentTypeTextView.setText(incidentTypeString);
 		// Converting incident lat/long to degrees and minutes:
 		incidentLatitudeDegreesEditText.setText(String.valueOf(getDegree(rocData.latitude)));
 		incidentLatitudeMinutesEditText.setText(String.valueOf(getMinutes(rocData.latitude)));
 		incidentLongitudeDegreesEditText.setText(String.valueOf(getDegree(rocData.longitude)));
 		incidentLongitudeMinutesEditText.setText(String.valueOf(getMinutes(rocData.longitude)));
-		// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// TODO - incident state is not available to incident payload, but it might be embedded in the incident name:
-		// TODO - For example: "CA TAB Test incident", the first two characters are "CA"
-		// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// TODO - In the future, this should be added to incident payload,
-		// TODO - or removed from the ROC form if it is not required to create an incident
-		// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-		// Get the first three characters of the string:
-		String incidentName = incidentData.getIncidentName();
-		String incidentNamePrefix = incidentName .substring(0,Math.min(incidentName .length(), 3));
 
-		if(incidentNamePrefix.equals("CA "))
-		{
-			incidentStateTextView.setText("CA");
-		}
-		// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-		// --------- Disabling the fields ---------
-		incidentNumberTextView.setEnabled(false);
-		incidentTypeSpinner.setEnabled(false);
-		incidentTypeSpinner.setVisibility(View.GONE);
-		incidentLatitudeDegreesEditText.setEnabled(false);
-		incidentLatitudeMinutesEditText.setEnabled(false);
-		incidentLongitudeDegreesEditText.setEnabled(false);
-		incidentLongitudeMinutesEditText.setEnabled(false);
-		incidentStateTextView.setEnabled(false);
-
-		// Hide the locate button
-		incidentLocateButton.setVisibility(View.GONE);
-		incidentLocateProgressBar.setVisibility(View.GONE);
+		incidentStateTextView.setText(rocData.incidentState);
 
 		//================================================
 		// ROC Incident Info Fields
@@ -611,6 +868,7 @@ public class ReportOnConditionFragment extends Fragment
 
 		// --------- Setting the field values ---------
 		setSpinnerValue(rocData.county, rocInitialCountySpinner);
+		Log.e("ROC","ROC - setupFormForViewingMode - additional counties = \"" + rocData.additionalAffectedCounties + "\"");
 		rocAdditionalCountiesTextView.setText(rocData.additionalAffectedCounties);
 		rocLocationTextView.setText(rocData.location);
 		setSpinnerValue(rocData.dpa, rocDPASpinner);
@@ -618,16 +876,6 @@ public class ReportOnConditionFragment extends Fragment
 		rocJurisdictionTextView.setText(rocData.jurisdiction);
 		rocStartDateTextView.setText((new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())).format(rocData.startDate));
 		rocStartTimeTextView.setText((new SimpleDateFormat("HHmm", Locale.getDefault())).format(rocData.startTime));
-
-		// --------- Disabling the fields ---------
-		rocInitialCountySpinner.setEnabled(false);
-		rocAdditionalCountiesTextView.setEnabled(false);
-		rocLocationTextView.setEnabled(false);
-		rocDPASpinner.setEnabled(false);
-		rocOwnershipSpinner.setEnabled(false);
-		rocJurisdictionTextView.setEnabled(false);
-		rocStartDateTextView.setEnabled(false);
-		rocStartTimeTextView.setEnabled(false);
 
 		//================================================
 		// Vegetation Fire Incident Scope Fields
@@ -682,16 +930,6 @@ public class ReportOnConditionFragment extends Fragment
 		}
 		vegFirePercentContainedEditText.setText(rocData.percentContained);
 
-		// --------- Disabling the fields ---------
-		vegFireAcreageEditText.setEnabled(false);
-		vegFireRateOfSpreadSpinner.setEnabled(false);
-		for(CheckBox checkbox : fuelTypes)
-		{
-			checkbox.setEnabled(false);
-		}
-		vegFireOtherFuelTypeEditText.setEnabled(false);
-		vegFirePercentContainedEditText.setEnabled(false);
-
 		//================================================
 		// Weather Information Fields
 		//================================================
@@ -703,24 +941,8 @@ public class ReportOnConditionFragment extends Fragment
 		setSpinnerValue(rocData.windDirection, weatherWindDirectionSpinner);
 		weatherGustsEditText.setText(rocData.windGusts);
 
-		// --------- Disabling the fields ---------
-		weatherTempEditText.setEnabled(false);
-		weatherRelativeHumidityEditText.setEnabled(false);
-		weatherWindSpeedEditText.setEnabled(false);
-		weatherWindDirectionSpinner.setEnabled(false);
-		weatherGustsEditText.setEnabled(false);
-
 		//================================================
 		// Threats & Evacuations Fields &&  Other Significant Info Fields
-		//================================================
-
-		// --------- Setting the field values ---------
-
-		// --------- Disabling the fields ---------
-
-		//LinearLayout otherInfoListLinearLayout;
-		//ImageButton otherInfoAddButton;
-
 		//================================================
 
 		// --------- Setting the field values ---------
@@ -789,12 +1011,6 @@ public class ReportOnConditionFragment extends Fragment
 					if(childView instanceof AutoCompleteTextView)
 					{
 						((AutoCompleteTextView) childView).setText(dataList.get(i).get(j));
-						((AutoCompleteTextView) childView).setEnabled(false);
-					}
-					// Hide the remove button
-					if(childView instanceof ImageButton)
-					{
-						childView.setVisibility(View.GONE);
 					}
 				}
 			}
@@ -810,7 +1026,6 @@ public class ReportOnConditionFragment extends Fragment
 		threatsInfrastructureListLinearLayout.setVisibility(View.VISIBLE);
 
 		otherInfoListLinearLayout.setVisibility(View.VISIBLE);
-
 
 		// If any of the spinners have a value of "No", hide the view:
 		if(rocData.evacuations.equals("No"))
@@ -828,19 +1043,6 @@ public class ReportOnConditionFragment extends Fragment
 			threatsInfrastructureListLinearLayout.setVisibility(View.GONE);
 			threatsInfrastructureLabelTextView.setVisibility(View.GONE);
 		}
-
-
-		// --------- Hiding the add buttons ------------
-		threatsEvacsAddButton.setVisibility(View.GONE);
-		threatsInfrastructureAddButton.setVisibility(View.GONE);
-		threatsStructuresAddButton.setVisibility(View.GONE);
-		otherInfoAddButton.setVisibility(View.GONE);
-
-		// --------- Disabling the fields ---------
-		threatsEvacsSpinner.setEnabled(false);
-		threatsStructuresSpinner.setEnabled(false);
-		threatsInfrastructureSpinner.setEnabled(false);
-
 
 		//================================================
 		// Resource Commitment Fields
@@ -872,7 +1074,6 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			checkBox.setChecked(false);
 
-
 			for(String resource : rocData.resourcesAssigned)
 			{
 				// Compare the strings in lower case to allow for different capitalizations
@@ -881,11 +1082,7 @@ public class ReportOnConditionFragment extends Fragment
 					checkBox.setChecked(true);
 				}
 			}
-			checkBox.setEnabled(false);
 		}
-
-		// --------- Disabling the fields ---------
-		calFireIncidentSpinner.setEnabled(false);
 
 		//================================================
 		// Email Fields
@@ -893,9 +1090,193 @@ public class ReportOnConditionFragment extends Fragment
 
 		// --------- Setting the field values ---------
 		emailTextView.setText(rocData.email);
+	}
+
+	// Sets all fields as read-only for viewing mode
+	protected void lockFormFieldsForViewingMode()
+	{
+		//================================================
+		// ROC Form Info Fields
+		//================================================
+
+		incidentNameTextView.setEnabled(false);
+		reportTypeSpinner.setEnabled(false);
+
+		//================================================
+		// Incident Info Fields
+		//================================================
+
+		incidentNumberTextView.setEnabled(false);
+		incidentTypeSpinner.setEnabled(false);
+		incidentTypeSpinner.setVisibility(View.GONE);
+		incidentLatitudeDegreesEditText.setEnabled(false);
+		incidentLatitudeMinutesEditText.setEnabled(false);
+		incidentLongitudeDegreesEditText.setEnabled(false);
+		incidentLongitudeMinutesEditText.setEnabled(false);
+		incidentStateTextView.setEnabled(false);
+
+		// Hide the locate button
+		incidentLocateButton.setVisibility(View.GONE);
+		incidentLocateProgressBar.setVisibility(View.GONE);
+
+		//================================================
+		// ROC Incident Info Fields
+		//================================================
+
+		rocInitialCountySpinner.setEnabled(false);
+		rocAdditionalCountiesTextView.setEnabled(false);
+		rocLocationTextView.setEnabled(false);
+		rocDPASpinner.setEnabled(false);
+		rocOwnershipSpinner.setEnabled(false);
+		rocJurisdictionTextView.setEnabled(false);
+		rocStartDateTextView.setEnabled(false);
+		rocStartTimeTextView.setEnabled(false);
+
+		//================================================
+		// Vegetation Fire Incident Scope Fields
+		//================================================
+
+		CheckBox fuelTypes[] = {vegFireFuelTypeGrassCheckBox, vegFireFuelTypeBrushCheckBox, vegFireFuelTypeTimberCheckBox, vegFireFuelTypeOakWoodlandCheckBox, vegFireFuelTypeOtherCheckBox};
+		vegFireAcreageEditText.setEnabled(false);
+		vegFireRateOfSpreadSpinner.setEnabled(false);
+		for(CheckBox checkbox : fuelTypes)
+		{
+			checkbox.setEnabled(false);
+		}
+		vegFireOtherFuelTypeEditText.setEnabled(false);
+		vegFirePercentContainedEditText.setEnabled(false);
+
+		//================================================
+		// Weather Information Fields
+		//================================================
+
+		weatherTempEditText.setEnabled(false);
+		weatherRelativeHumidityEditText.setEnabled(false);
+		weatherWindSpeedEditText.setEnabled(false);
+		weatherWindDirectionSpinner.setEnabled(false);
+		weatherGustsEditText.setEnabled(false);
+
+		//================================================
+		// Threats & Evacuations Fields &&  Other Significant Info Fields
+		//================================================
+
+		// Instead of having duplicate code for each of the 4 sections, iterate through them and run it on all
+		LinearLayout[] layouts = {
+				threatsEvacsListLinearLayout,
+				threatsStructuresListLinearLayout,
+				threatsInfrastructureListLinearLayout,
+				otherInfoListLinearLayout
+		};
+
+		ArrayList<ArrayList<String>> dataList = new ArrayList<ArrayList<String>>();
+		dataList.add(rocData.evacuationsInProgress);
+		dataList.add(rocData.structureThreatsInProgress);
+		dataList.add(rocData.infrastructureThreatsInProgress);
+		dataList.add(rocData.otherThreatsAndEvacuationsInProgress);
+
+		// For each of the 4 different LinearLayout lists
+		// Disable it, and hide the remove button
+		for(int i = 0; i < layouts.length; i++)
+		{
+			// For each of the linear layouts inside of a list
+			for(int j = 0; j < layouts[i].getChildCount(); j++)
+			{
+				LinearLayout layout = (LinearLayout) layouts[i].getChildAt(j);
+
+				// Iterate through layout's 2 children, find the textView and ImageButton
+				for(int k = 0; k < layout.getChildCount(); k++)
+				{
+					View childView = layout.getChildAt(k);
+					// Set the text
+					if(childView instanceof AutoCompleteTextView)
+					{
+						((AutoCompleteTextView) childView).setEnabled(false);
+					}
+					// Hide the remove button
+					if(childView instanceof ImageButton)
+					{
+						childView.setVisibility(View.GONE);
+					}
+				}
+			}
+		}
+
+		// --------- Hiding the add buttons ------------
+		threatsEvacsAddButton.setVisibility(View.GONE);
+		threatsInfrastructureAddButton.setVisibility(View.GONE);
+		threatsStructuresAddButton.setVisibility(View.GONE);
+		otherInfoAddButton.setVisibility(View.GONE);
 
 		// --------- Disabling the fields ---------
+		threatsEvacsSpinner.setEnabled(false);
+		threatsStructuresSpinner.setEnabled(false);
+		threatsInfrastructureSpinner.setEnabled(false);
+
+		//================================================
+		// Resource Commitment Fields
+		//================================================
+
+		// Making an array of all checkboxes to iterate over to reduce code
+		CheckBox[] resourceCheckboxes = {
+				calFireResourcesNoneCheckBox,
+				calFireResourcesAirCheckBox,
+				calFireResourcesGroundCheckBox,
+				calFireResourcesAirAndGroundCheckBox,
+				calFireResourcesAirAndGroundAugmentedCheckBox,
+				calFireResourcesAgencyRepOrderedCheckBox,
+				calFireResourcesAgencyRepAssignedCheckBox,
+				calFireResourcesContinuedCheckBox,
+				calFireResourcesSignificantAugmentationCheckBox,
+				calFireResourcesVlatOrderCheckBox,
+				calFireResourcesVlatAssignedCheckBox,
+				calFireResourcesNoDivertCheckBox,
+				calFireResourcesLatAssignedCheckBox,
+				calFireResourcesAllReleasedCheckBox
+		};
+
+
+		for(CheckBox checkBox : resourceCheckboxes)
+		{
+			checkBox.setEnabled(false);
+		}
+		// --------- Disabling the fields ---------
+		calFireIncidentSpinner.setEnabled(false);
+
+		//================================================
+		// Email Fields
+		//================================================
+		// --------- Disabling the fields ---------
 		emailTextView.setEnabled(false);
+	}
+
+
+	// This fills the form fields and disables interactivity with the form.
+	protected void setupFormForViewingMode(IncidentPayload incident)
+	{
+		incidentData = incident;
+		// Getting the rocData for the incident:
+		rocData = mDataManager.getLastReportOnCondition(incident.getIncidentId());
+
+		// If the data is null, we don't have any ROC data to display
+		if(rocData == null)
+		{
+			incidentNameLabel.setVisibility(View.GONE);
+			incidentNameTextView.setVisibility(View.GONE);
+			messageTextView.setVisibility(View.VISIBLE);
+			messageTextView.setText("No ROC data found for incident: \"" + incident.getIncidentName() + "\".");
+			loadingIncidentInfoProgressBar.setVisibility(View.GONE);
+			return;
+		}
+
+		Log.e("ROC","ROC - setupFormForViewingMode - getLastReportOnCondition(" + incident.getIncidentId() + ") returns: " + rocData.toJSON());
+
+
+		messageTextView.setVisibility(View.GONE);
+		loadingIncidentInfoProgressBar.setVisibility(View.GONE);
+
+		setAllFormFieldsFromRoc(rocData);
+		setAllFormFieldsFromIncident(incidentData,true);
+		lockFormFieldsForViewingMode();
 
 		//================================================
 		// ROC Submission Fields
@@ -983,15 +1364,20 @@ public class ReportOnConditionFragment extends Fragment
 				@Override
 				public boolean handleMessage (Message msg)
 				{
-					getActivity().runOnUiThread(new Runnable()
+					FragmentActivity activity = getActivity();
+
+					if(activity != null)
 					{
-						@Override
-						public void run ()
+						activity.runOnUiThread(new Runnable()
 						{
-							ReportOnConditionData rocData = (incidentData != null) ? mDataManager.getLastReportOnCondition(incidentData.getIncidentId()) : null;
-							gotIncidentROCData(rocData);
-						}
-					});
+							@Override
+							public void run ()
+							{
+								ReportOnConditionData rocData = (incidentData != null) ? mDataManager.getLastReportOnCondition(incidentData.getIncidentId()) : null;
+								gotIncidentROCData(rocData);
+							}
+						});
+					}
 					return true;
 				}
 			};
@@ -1000,16 +1386,21 @@ public class ReportOnConditionFragment extends Fragment
 				@Override
 				public boolean handleMessage (Message msg)
 				{
-					getActivity().runOnUiThread(new Runnable()
+					FragmentActivity activity = getActivity();
+
+					if(activity != null)
 					{
-						@Override
-						public void run ()
+						activity.runOnUiThread(new Runnable()
 						{
-							messageTextView.setVisibility(View.VISIBLE);
-							messageTextView.setText("There was an error retrieving incident ROC data. Please try again.");
-							loadingIncidentInfoProgressBar.setVisibility(View.GONE);
-						}
-					});
+							@Override
+							public void run ()
+							{
+								messageTextView.setVisibility(View.VISIBLE);
+								messageTextView.setText("There was an error retrieving incident ROC data. Please try again.");
+								loadingIncidentInfoProgressBar.setVisibility(View.GONE);
+							}
+						});
+					}
 					return true;
 				}
 			};
@@ -1048,7 +1439,7 @@ public class ReportOnConditionFragment extends Fragment
 		}.setFragment(this));
 	}
 
-	// Called when we retrieve the latest ROC data for an incident
+	// Called when we retrieve the latest ROC data for an incident when creating an incident
 	// if rocData is null, we treat this as having no previous ROCs
 	public void gotIncidentROCData(ReportOnConditionData latestROCData)
 	{
@@ -1367,6 +1758,18 @@ public class ReportOnConditionFragment extends Fragment
 		clearAllFormFieldErrors();
 		setupFormForCurrentReportType();
 
+
+		//----------------------------------------------------------------------------
+		// If we are NOT creating a new incident, autopopulate the incident data
+		//----------------------------------------------------------------------------
+
+		// Filling the form with data from the incident details:
+		if(!creatingNewIncident && incidentData != null)
+		{
+			setAllFormFieldsFromIncident(incidentData,false);
+		}
+
+
 		//----------------------------------------------------------------------------
 		// If we are NOT creating a new incident, make the incident info fields read-only:
 		//----------------------------------------------------------------------------
@@ -1386,54 +1789,6 @@ public class ReportOnConditionFragment extends Fragment
 			incidentLocateButton.setVisibility(View.GONE);
 			incidentStateTextView.setEnabled(false);
 			incidentLocateProgressBar.setVisibility(View.GONE);
-
-
-			// Filling the form with data from the incident details and last ROC submitted:
-			// If we're NOT creating a new incident, then the
-
-			// Just in case incidentData is somehow null...
-			if(incidentData != null)
-			{
-
-				// Incident Number:
-				// TODO - incident payload does not have incidentNumber yet... but it should.
-				// This probably shouldn't use description.
-				//incidentNumberTextView.setText(incidentData.getDescription()); // Should look like: "18 CA-XXX-000000"
-
-				String incidntTypeString = "";
-				for(IncidentTypePayload type : incidentData.getIncidentIncidenttypes())
-				{
-					incidntTypeString += type.getIncidentType().getIncidentTypeName() + "\n";
-					incidentTypeSelectedItems.add(type.getIncidentType().getIncidentTypeName());
-				}
-				incidentTypeTextView.setText(incidntTypeString);
-
-				//incidentTypeSpinner.setEnabled(false);
-				// Converting incident lat/long to degrees and minutes:
-				incidentLatitudeDegreesEditText.setText(String.valueOf(getDegree(incidentData.getLat())));
-				incidentLatitudeMinutesEditText.setText(String.valueOf(getMinutes(incidentData.getLat())));
-				incidentLongitudeDegreesEditText.setText(String.valueOf(getDegree(incidentData.getLon())));
-				incidentLongitudeMinutesEditText.setText(String.valueOf(getMinutes(incidentData.getLon())));
-
-
-				// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-				// TODO - incident state is not available to incident payload, but it might be embedded in the incident name:
-				// TODO - For example: "CA TAB Test incident", the first two characters are "CA"
-				// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-				// TODO - In the future, this should be added to incident payload,
-				// TODO - or removed from the ROC form if it is not required to create an incident
-				// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-				// Get the first three characters of the string:
-				String incidentName = incidentData.getIncidentName();
-				String incidentNamePrefix = incidentName .substring(0,Math.min(incidentName .length(), 3));
-
-				if(incidentNamePrefix.equals("CA "))
-				{
-					incidentStateTextView.setText("CA");
-				}
-				// TODO - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-			}
 		}
 		else
 		{
@@ -1558,21 +1913,6 @@ public class ReportOnConditionFragment extends Fragment
 		if(incidentData != null)
 		{
 			JSONObject coords = null;
-
-			// If the form has valid lat/long, get the location data for it:
-			/*try
-			{
-				// Build the JSON:
-				coords = new JSONObject();
-				coords.put("latitude", incidentData.getLat());
-				coords.put("longitude", incidentData.getLon());
-				requestIncidentLocationDetails(coords);
-			}
-			catch (JSONException e)
-			{
-				Log.w("ROCFragment", "Exception building coords. Exception: " + e);
-			}*/
-
 
 			// Request location-based data using those form fields:
 			requestIncidentLocationDetailsForFormCoords();
@@ -1749,12 +2089,6 @@ public class ReportOnConditionFragment extends Fragment
 
 
 	@Override
-	public void onSaveInstanceState(Bundle outState)
-	{
-		super.onSaveInstanceState(outState);
-	}
-
-	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
 	{
 		super.onCreateOptionsMenu(menu, inflater);
@@ -1775,6 +2109,9 @@ public class ReportOnConditionFragment extends Fragment
 	// This method then sets up the behavior of the fields
 	private void setUpAllFields()
 	{
+		swipeRefreshLayout = (SwipeRefreshLayout) mRootView.findViewById(R.id.rocSwipeRefreshLayout);
+		outermostScrollView = (ScrollView) mRootView.findViewById(R.id.rocParentScrollView);
+
 		//================================================================================================
 		//================================================================================================
 		// Setting up the major section headers and LinearLayouts
@@ -2178,7 +2515,13 @@ public class ReportOnConditionFragment extends Fragment
 		Log.e("ROC","Async got back results: " + data);
 
 		// Running this on the UI Thread:
-		getActivity().runOnUiThread((new Runnable()
+
+		FragmentActivity activity = getActivity();
+
+		if(activity == null)
+			return;
+
+		activity.runOnUiThread((new Runnable()
 		{
 			private JSONObject data;
 
@@ -2258,6 +2601,7 @@ public class ReportOnConditionFragment extends Fragment
 			TextView header = (TextView) v;
 			LinearLayout section = null;
 
+
 			if(header == incidentInfoHeader)
 			{
 				section = incidentInfoSection;
@@ -2295,9 +2639,8 @@ public class ReportOnConditionFragment extends Fragment
 				return;
 			}
 
-			boolean collapse = section.getVisibility() == View.VISIBLE;
 
-			collapseAllSections();
+			boolean collapse = section.getVisibility() == View.VISIBLE;
 
 			// Expanding the selected view
 			section.setVisibility(collapse ? View.GONE : View.VISIBLE);
@@ -2994,1234 +3337,1169 @@ public class ReportOnConditionFragment extends Fragment
 		//--------------------------------------------
 	}
 
+	// This method validates all form fields and shows error icons on each of the fields
+	// Returns true if all required fields are filled in, and all fields have valid data, false otherwise
+	private boolean isFormInfoValid()
+	{
+		boolean isFormValid = true;
+
+		clearAllFormFieldErrors();
+
+		//-------------------------------------------------------------------------------------------------
+		//-------------------------------------------------------------------------------------------------
+		// Performing form data validation (Ensuring all required fields are filled in)
+		//-------------------------------------------------------------------------------------------------
+		//-------------------------------------------------------------------------------------------------
+		//================================================
+		// ROC Form Info Fields
+		//================================================
+		//--------------------------------
+		// incidentName
+		// must not be empty, and must not be all whitespace
+		// TODO- check if there are additional requirements on incident name
+		//--------------------------------
+
+
+		// Check if the incident name is all whitespace:
+		if(incidentNameTextView.getText().toString().trim().length() == 0)
+		{
+			incidentNameTextView.setError("Incident name must not be empty.");
+			isFormValid = false;
+		}
+
+		//--------------------------------
+		// incidentType
+		// at least one incident type is required
+		//--------------------------------
+
+		// Check if a report type is selected:
+		if(reportTypeSpinner.getSelectedItemPosition() == 0)
+		{
+			((TextView) reportTypeSpinner.getSelectedView()).setError("You must select a report type.");
+			isFormValid = false;
+		}
+
+		//================================================
+		// Incident Info Fields
+		//================================================
+		boolean isIncidentInfoValid = true;
+		// Only validate the incident fields if we are creating a new incident
+		if(creatingNewIncident)
+		{
+			//--------------------------------
+			// incidentNumberTextView
+			// not required, no validation
+			//--------------------------------
+			//--------------------------------
+			// incidentType
+			// at least one incident type is required
+			//--------------------------------
+			if(incidentTypeSelectedItems.size() == 0)
+			{
+				incidentTypeTextView.setError("You must select at least one incident type.");
+				isIncidentInfoValid = false;
+				isFormValid = false;
+			}
+			//--------------------------------
+			// location
+			// lat / long all required:
+			// lat degrees in [-89, 89]
+			// lat minutes in [0, 60)
+			// lon degrees in [-179, 179]
+			// lon minutes in [0, 60)
+			//--------------------------------
+			//------------------
+			// Latitude Degrees:
+			//------------------
+			try
+			{
+				int latDeg = Integer.parseInt(incidentLatitudeDegreesEditText.getText().toString());
+				if(latDeg < -89 || latDeg > 89)
+					throw new NumberFormatException();
+
+			}
+			catch(Exception e)
+			{
+				incidentLatitudeDegreesEditText.setError("Latitude degrees must be between -89 and 89.");
+				isFormValid = false;
+				isIncidentInfoValid = false;
+			}
+			//------------------
+			// Latitude Minutes:
+			//------------------
+			try
+			{
+				double latMin = Double.parseDouble(incidentLatitudeMinutesEditText.getText().toString());
+				if(latMin < 0 || latMin >= 60)
+					throw new NumberFormatException();
+			}
+			catch(Exception e)
+			{
+				incidentLatitudeMinutesEditText.setError("Minutes must be between 0 and 59");
+				isFormValid = false;
+				isIncidentInfoValid = false;
+			}
+			//------------------
+			// Longitude Degrees:
+			//------------------
+			try
+			{
+				int lonDeg = Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
+				if(lonDeg < -179 || lonDeg > 179)
+					throw new NumberFormatException();
+			}
+			catch(Exception e)
+			{
+				incidentLongitudeDegreesEditText.setError("Longitude degrees must be between -179 and 179");
+				isFormValid = false;
+				isIncidentInfoValid = false;
+			}
+			//------------------
+			// Longitude Minutes:
+			//------------------
+			try
+			{
+				double lonMin = Double.parseDouble(incidentLongitudeMinutesEditText.getText().toString());
+				if(lonMin < 0 || lonMin >= 60)
+					throw new NumberFormatException();
+			}
+			catch(Exception e)
+			{
+				incidentLongitudeMinutesEditText.setError("Minutes must be between 0 and 59.");
+				isFormValid = false;
+				isIncidentInfoValid = false;
+			}
+
+			//--------------------------------
+			// incidentStateTextView
+			// must not be empty or blank
+			//--------------------------------
+			if(incidentStateTextView.getText().toString().trim().length() == 0)
+			{
+				incidentStateTextView.setError("Incident state / province / region cannot be blank.");
+				isFormValid = false;
+				isIncidentInfoValid = false;
+			}
+		}
+		//-----------------------------------------
+		//-----------------------------------------
+		// If there was an error in the incident info section
+		// show the error icon on the header
+		//-----------------------------------------
+		//-----------------------------------------
+		if(!isIncidentInfoValid)
+		{
+			incidentInfoHeaderErrorView.setVisibility(View.VISIBLE);
+		}
+
+		//================================================
+		// ROC Incident Info Fields
+		//================================================
+		boolean isRocIncidentInfoValid = true;
+
+		//--------------------------------
+		// rocInitialCountySpinner
+		// must have something selected
+		//--------------------------------
+		if(rocInitialCountySpinner.getSelectedItemPosition() == 0)
+		{
+			rocCountyErrorView.setVisibility(View.VISIBLE);
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocAdditionalCountiesTextView
+		// not required, not validated
+		//--------------------------------
+
+		//--------------------------------
+		// rocLocationTextView
+		// required, no validation
+		//--------------------------------
+		if(rocLocationTextView.getText().toString().trim().length() == 0)
+		{
+			rocLocationTextView.setError("General location is required.");
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocDPASpinner
+		// required
+		//--------------------------------
+		if(rocDPASpinner.getSelectedItemPosition() == 0)
+		{
+			rocDPAErrorView.setVisibility(View.VISIBLE);
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocOwnershipSpinner
+		// required
+		//--------------------------------
+		if(rocOwnershipSpinner.getSelectedItemPosition() == 0)
+		{
+			rocOwnershipErrorView.setVisibility(View.VISIBLE);
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocJurisdictionTextView
+		// required, no validation
+		//--------------------------------
+		if(rocJurisdictionTextView.getText().toString().trim().length() == 0)
+		{
+			rocJurisdictionTextView.setError("Jurisdiction is required.");
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocStartDateTextView
+		// required for NEW
+		//--------------------------------
+		if(currentReportType == ROC_NEW)
+		{
+			if (rocStartTimeTextView.getText().toString().trim().length() == 0)
+			{
+				rocStartTimeTextView.setError("Incident start time is required.");
+				isRocIncidentInfoValid = false;
+				isFormValid = false;
+			}
+			//--------------------------------
+			// rocStartTimeTextView
+			// required
+			//--------------------------------
+			if (rocStartDateTextView.getText().toString().trim().length() == 0)
+			{
+				rocStartDateTextView.setError("Incident start date is required.");
+				isRocIncidentInfoValid = false;
+				isFormValid = false;
+			}
+		}
+
+		//-----------------------------------------
+		//-----------------------------------------
+		// If there was an error in the roc incident info section
+		// show the error icon on the header
+		//-----------------------------------------
+		//-----------------------------------------
+		if(!isRocIncidentInfoValid)
+		{
+			rocIncidentInfoHeaderErrorView.setVisibility(View.VISIBLE);
+		}
+
+		//================================================
+		// Vegetation Fire Incident Scope Fields
+		//================================================
+
+		// All of the fields are required IFF the vegetation types includes "Fire (Vegetation)"
+		boolean vegFireFieldsRequired = false;
+		// Keep track if there was an error in the vegetation fire section
+		boolean isVegFireInfoValid = true;
+
+
+		// TODO - Change to "Vegetation Fire" once we add vegetation fire
+		if(incidentTypeSelectedItems.contains("Fire (Wildland)"))
+		{
+			vegFireFieldsRequired = true;
+			Log.e("ROC","Found veg fire!");
+		}
+		else
+		{
+			Log.e("ROC","Did not find veg fire!");
+		}
+
+		//--------------------------------
+		// vegFireAcreageEditText
+		// required if(vegFireFieldsRequired), should be a double
+		//--------------------------------
+		// Check if the field is empty and required
+		if(vegFireAcreageEditText.getText().toString().trim().length() == 0 && vegFireFieldsRequired)
+		{
+			vegFireAcreageEditText.setError("Acreage is required for Vegetation Fire incidents.");
+			isFormValid = false;
+			isVegFireInfoValid = false;
+		}
+		// Try to parse it as a double
+		else if(vegFireAcreageEditText.getText().toString().trim().length() > 0)
+		{
+			try
+			{
+				double vegFireAcreage = Double.parseDouble(vegFireAcreageEditText.getText().toString());
+
+				// Only accept positive numbers
+				if(vegFireAcreage < 0.0)
+				{
+					vegFireAcreageEditText.setError("Acreage must be greater than 0.");
+					isFormValid = false;
+					isVegFireInfoValid = false;
+				}
+			}
+			catch(Exception e)
+			{
+				vegFireAcreageEditText.setError("Acreage is required.");
+				isFormValid = false;
+				isVegFireInfoValid = false;
+			}
+		}
+
+		//--------------------------------
+		// vegFireRateOfSpreadSpinner
+		// required if(vegFireFieldsRequired)
+		//--------------------------------
+		if(vegFireRateOfSpreadSpinner.getSelectedItemPosition() == 0 && vegFireFieldsRequired)
+		{
+			vegFireRateOfSpreadErrorView.setVisibility(View.VISIBLE);
+		}
+
+		//--------------------------------
+		// Checkboxes:
+		// If (vegFireFieldsRequired), and not FINAL at least one must be checked:
+		//--------------------------------
+		if(vegFireFieldsRequired && currentReportType != ROC_FINAL)
+		{
+			do
+			{
+				if (vegFireFuelTypeGrassCheckBox.isChecked())
+				{
+					break;
+				}
+				else if (vegFireFuelTypeBrushCheckBox.isChecked())
+				{
+					break;
+				}
+				else if (vegFireFuelTypeTimberCheckBox.isChecked())
+				{
+					break;
+				}
+				else if (vegFireFuelTypeOakWoodlandCheckBox.isChecked())
+				{
+					break;
+				}
+				else if (vegFireFuelTypeOtherCheckBox.isChecked())
+				{
+					break;
+				}
+
+				vegFireFuelTypeLabelTextView.setError("At least one fuel type is required for Vegetation Fire incidents.");
+
+				// If none of them are checked, we have an error:
+				isFormValid = false;
+				isVegFireInfoValid = false;
+			}
+			while (false);
+		}
+
+		// If other is checked, the other textbox is required:
+		if(vegFireFuelTypeOtherCheckBox.isChecked())
+		{
+			if(vegFireOtherFuelTypeEditText.getText().toString().trim().length() == 0)
+			{
+				vegFireOtherFuelTypeEditText.setError("Other fuel type required.");
+			}
+		}
+
+		//--------------------------------
+		// vegFirePercentContainedEditText
+		// If (vegFireFieldsRequired), required
+		//--------------------------------
+
+		// Check if the field is empty and required
+		if(vegFirePercentContainedEditText.getText().toString().trim().length() == 0 && vegFireFieldsRequired)
+		{
+			vegFirePercentContainedEditText.setError("Percent Contained is required for Vegetation Fire incidents.");
+			isFormValid = false;
+			isVegFireInfoValid = false;
+		}
+		// Try to parse it as a double
+		else if(vegFirePercentContainedEditText.getText().toString().trim().length() > 0)
+		{
+			try
+			{
+				double vegFirePercentContained = Double.parseDouble(vegFirePercentContainedEditText.getText().toString());
+
+				// Only accept positive numbers
+				if(vegFirePercentContained < 0.0)
+				{
+					vegFirePercentContainedEditText.setError("Percent Contained must be greater than 0.");
+					isFormValid = false;
+					isVegFireInfoValid = false;
+				}
+				else if(vegFirePercentContained > 100.0)
+				{
+					vegFirePercentContainedEditText.setError("Percent Contained must be less than or equal to 100.0");
+					isFormValid = false;
+					isVegFireInfoValid = false;
+				}
+			}
+			catch(Exception e)
+			{
+				vegFirePercentContainedEditText.setError("Percent Contained should be a number.");
+				isFormValid = false;
+				isVegFireInfoValid = false;
+			}
+		}
+
+		//-----------------------------------------
+		//-----------------------------------------
+		// If there was an error in the roc incident info section
+		// show the error icon on the header
+		//-----------------------------------------
+		//-----------------------------------------
+		if(!isVegFireInfoValid)
+		{
+			vegFireIncidentScopeHeaderErrorView.setVisibility(View.VISIBLE);
+		}
+
+		//================================================
+		// Weather Information Fields
+		//================================================
+
+		boolean isWeatherInfoValid = true;
+
+		//--------------------------------
+		// weatherTempEditText
+		// should be a double, not required
+		//--------------------------------
+
+		// If the field is not empty
+		if(weatherTempEditText.getText().toString().trim().length() > 0)
+		{
+			try
+			{
+				double temp = Double.parseDouble(weatherTempEditText.getText().toString());
+			}
+			catch (Exception e)
+			{
+				weatherTempEditText.setError("Temperature should be a number.");
+				isFormValid = false;
+				isWeatherInfoValid = false;
+			}
+		}
+
+		//--------------------------------
+		// weatherRelativeHumidityEditText
+		// should be a double, not required
+		//--------------------------------
+		if(weatherRelativeHumidityEditText.getText().toString().trim().length() > 0)
+		{
+			try
+			{
+				double humidity = Double.parseDouble(weatherRelativeHumidityEditText.getText().toString());
+
+				// Should not be negative:
+				if(humidity < 0.0)
+				{
+					weatherRelativeHumidityEditText.setError("Humidity should be greater than 0.");
+					isFormValid = false;
+					isWeatherInfoValid = false;
+				}
+			}
+			catch (Exception e)
+			{
+				weatherRelativeHumidityEditText.setError("Humidity should be a number.");
+				isFormValid = false;
+				isWeatherInfoValid = false;
+			}
+		}
+
+		//--------------------------------
+		// weatherRelativeHumidityEditText
+		// should be a double, not required
+		//--------------------------------
+		if(weatherWindSpeedEditText.getText().toString().trim().length() > 0)
+		{
+			try
+			{
+				double windSpeed = Double.parseDouble(weatherWindSpeedEditText.getText().toString());
+
+				// Should not be negative:
+				if(windSpeed < 0.0)
+				{
+					weatherWindSpeedEditText.setError("Wind Speed should be greater than 0.");
+					isFormValid = false;
+					isWeatherInfoValid = false;
+				}
+			}
+			catch (Exception e)
+			{
+				weatherWindSpeedEditText.setError("Wind Speed should be a number.");
+				isFormValid = false;
+				isWeatherInfoValid = false;
+			}
+		}
+
+		//--------------------------------
+		// weatherWindDirectionSpinner
+		// no requirements
+		//--------------------------------
+
+
+		//--------------------------------
+		// weatherGustsEditText
+		// should be a double, not required
+		//--------------------------------
+		if(weatherGustsEditText.getText().toString().trim().length() > 0)
+		{
+			try
+			{
+				double gusts = Double.parseDouble(weatherGustsEditText.getText().toString());
+
+				// Should not be negative:
+				if(gusts < 0.0)
+				{
+					weatherGustsEditText.setError("Gusts should be greater than 0.");
+					isFormValid = false;
+					isWeatherInfoValid = false;
+				}
+			}
+			catch (Exception e)
+			{
+				weatherGustsEditText.setError("Gusts should be a number.");
+				isFormValid = false;
+				isWeatherInfoValid = false;
+			}
+		}
+
+
+		//-----------------------------------------
+		//-----------------------------------------
+		// If there was an error in the weather info section
+		// show the error icon on the header
+		//-----------------------------------------
+		//-----------------------------------------
+		if(!isWeatherInfoValid)
+		{
+			weatherInfoHeaderErrorView.setVisibility(View.VISIBLE);
+		}
+
+
+		//================================================
+		// Threats & Evacuations Fields
+		// This info is only required if vegFireFieldsRequired
+		// Apparently, these fields only really apply to vegetation fires
+		//================================================
+
+		boolean isThreatsInfoValid = true;
+
+		//--------------------------------
+		// threatsEvacsSpinner
+		// required if vegFireFieldsRequired
+		//--------------------------------
+		if(vegFireFieldsRequired && threatsEvacsSpinner.getSelectedItemPosition() == 0)
+		{
+			threatsEvacsErrorView.setVisibility(View.VISIBLE);
+			isFormValid = false;
+			isThreatsInfoValid = false;
+		}
+
+
+		//--------------------------------
+		// threatsEvacsListLinearLayout
+		// required
+		//--------------------------------
+		// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
+		if((currentReportType == ROC_FINAL && threatsEvacsSpinner.getSelectedItemPosition() == 1))
+		{
+			if(threatsEvacsListLinearLayout.getChildCount() == 0)
+			{
+				threatsEvacsErrorView.setVisibility(View.VISIBLE);
+				isThreatsInfoValid = false;
+				isFormValid = false;
+			}
+		}
+		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
+		if(currentReportType != ROC_FINAL && (threatsEvacsSpinner.getSelectedItemPosition() == 1 || threatsEvacsSpinner.getSelectedItemPosition() == 3))
+		{
+			if(threatsEvacsListLinearLayout.getChildCount() == 0)
+			{
+				threatsEvacsErrorView.setVisibility(View.VISIBLE);
+				isThreatsInfoValid = false;
+				isFormValid = false;
+			}
+		}
+
+
+		// For each of the text fields added, they should not be empty:
+		for(int i = 0; i < threatsEvacsListLinearLayout.getChildCount(); i++)
+		{
+			LinearLayout layout = (LinearLayout) threatsEvacsListLinearLayout.getChildAt(i);
+
+			// Iterate through layout's 2 children, find the textView
+			for(int j = 0; j < layout.getChildCount(); j++)
+			{
+				View childView = layout.getChildAt(j);
+				if(childView instanceof AutoCompleteTextView)
+				{
+					AutoCompleteTextView textView = (AutoCompleteTextView) childView;
+
+					// If it's empty, show an error:
+					if(textView.getText().toString().trim().length() == 0)
+					{
+						textView.setError("Evacuation info cannot be empty.");
+						isFormValid = false;
+						isThreatsInfoValid = false;
+					}
+				}
+			}
+		}
+
+
+		//--------------------------------
+		// threatsStructuresSpinner
+		// required if vegFireFieldsRequired
+		//--------------------------------
+		if(vegFireFieldsRequired && threatsStructuresSpinner.getSelectedItemPosition() == 0)
+		{
+			threatsStructuresErrorView.setVisibility(View.VISIBLE);
+			isFormValid = false;
+			isThreatsInfoValid = false;
+		}
+
+
+		//--------------------------------
+		// threatsStructuresListLinearLayout
+		// required
+		//--------------------------------
+		// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
+		if((currentReportType == ROC_FINAL && threatsStructuresSpinner.getSelectedItemPosition() == 1))
+		{
+			if(threatsStructuresListLinearLayout.getChildCount() == 0)
+			{
+				threatsStructuresErrorView.setVisibility(View.VISIBLE);
+				isThreatsInfoValid = false;
+				isFormValid = false;
+			}
+		}
+		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
+		if(currentReportType != ROC_FINAL && (threatsStructuresSpinner.getSelectedItemPosition() == 1 || threatsStructuresSpinner.getSelectedItemPosition() == 3))
+		{
+			if(threatsStructuresListLinearLayout.getChildCount() == 0)
+			{
+				threatsStructuresErrorView.setVisibility(View.VISIBLE);
+				isThreatsInfoValid = false;
+				isFormValid = false;
+			}
+		}
+
+		// For each of the text fields added, they should not be empty:
+		for(int i = 0; i < threatsStructuresListLinearLayout.getChildCount(); i++)
+		{
+			LinearLayout layout = (LinearLayout) threatsStructuresListLinearLayout.getChildAt(i);
+
+			// Iterate through layout's 2 children, find the textView
+			for(int j = 0; j < layout.getChildCount(); j++)
+			{
+				View childView = layout.getChildAt(j);
+				if(childView instanceof AutoCompleteTextView)
+				{
+					AutoCompleteTextView textView = (AutoCompleteTextView) childView;
+
+					// If it's empty, show an error:
+
+					if(textView.getText().toString().trim().length() == 0)
+					{
+						textView.setError("Structures Threat info cannot be empty.");
+						isFormValid = false;
+						isThreatsInfoValid = false;
+					}
+				}
+			}
+		}
+
+
+		//--------------------------------
+		// threatsInfrastructureSpinner
+		// required if vegFireFieldsRequired
+		//--------------------------------
+		if(vegFireFieldsRequired && threatsInfrastructureSpinner.getSelectedItemPosition() == 0)
+		{
+			threatsInfrastructureErrorView.setVisibility(View.VISIBLE);
+			isFormValid = false;
+			isThreatsInfoValid = false;
+		}
+
+
+		//--------------------------------
+		// threatsInfrastructureListLinearLayout
+		// required
+		//--------------------------------
+		// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
+		if((currentReportType == ROC_FINAL && threatsInfrastructureSpinner.getSelectedItemPosition() == 1))
+		{
+			if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
+			{
+				threatsInfrastructureErrorView.setVisibility(View.VISIBLE);
+				isThreatsInfoValid = false;
+				isFormValid = false;
+			}
+		}
+		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
+		if(currentReportType != ROC_FINAL && (threatsInfrastructureSpinner.getSelectedItemPosition() == 1 || threatsInfrastructureSpinner.getSelectedItemPosition() == 3))
+		{
+			if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
+			{
+				threatsInfrastructureErrorView.setVisibility(View.VISIBLE);
+				isThreatsInfoValid = false;
+				isFormValid = false;
+			}
+		}
+
+		// For each of the text fields added, they should not be empty:
+		for(int i = 0; i < threatsInfrastructureListLinearLayout.getChildCount(); i++)
+		{
+			LinearLayout layout = (LinearLayout) threatsInfrastructureListLinearLayout.getChildAt(i);
+
+			// Iterate through layout's 2 children, find the textView
+			for(int j = 0; j < layout.getChildCount(); j++)
+			{
+				View childView = layout.getChildAt(j);
+				if(childView instanceof AutoCompleteTextView)
+				{
+					AutoCompleteTextView textView = (AutoCompleteTextView) childView;
+
+					// If it's empty, show an error:
+
+					if(textView.getText().toString().trim().length() == 0)
+					{
+						textView.setError("Infrastructure Threat info cannot be empty.");
+						isFormValid = false;
+						isThreatsInfoValid = false;
+					}
+				}
+			}
+		}
+
+		//-----------------------------------------
+		//-----------------------------------------
+		// If there was an error in the threats info section
+		// show the error icon on the header
+		//-----------------------------------------
+		//-----------------------------------------
+		if(!isThreatsInfoValid)
+		{
+			threatsEvacsHeaderErrorView.setVisibility(View.VISIBLE);
+		}
+
+		//================================================
+		// Resource Commitment Fields
+		//================================================
+		boolean isResourceInfoValid = true;
+
+		//--------------------------------
+		// calFireIncidentSpinner
+		// required
+		//--------------------------------
+		if(calFireIncidentSpinner.getSelectedItemPosition() == 0)
+		{
+			calFireIncidentErrorView.setVisibility(View.VISIBLE);
+			isResourceInfoValid = false;
+			isFormValid = false;
+		}
+
+		//-----------------------------------------
+		//-----------------------------------------
+		// If there was an error in the resource info section
+		// show the error icon on the header
+		//-----------------------------------------
+		//-----------------------------------------
+		if(!isResourceInfoValid)
+		{
+			resourceCommitmentHeaderErrorView.setVisibility(View.VISIBLE);
+		}
+
+		//================================================
+		// Other Significant Info Fields
+		//================================================
+
+		boolean isOtherInfoValid = true;
+
+		//--------------------------------
+		// otherInfoListLinearLayout
+		// required
+		//--------------------------------
+
+		// For each of the text fields added, they should not be empty:
+		for(int i = 0; i < otherInfoListLinearLayout.getChildCount(); i++)
+		{
+			LinearLayout layout = (LinearLayout) otherInfoListLinearLayout.getChildAt(i);
+
+			// Iterate through layout's 2 children, find the textView
+			for(int j = 0; j < layout.getChildCount(); j++)
+			{
+				View childView = layout.getChildAt(j);
+				if(childView instanceof AutoCompleteTextView)
+				{
+					AutoCompleteTextView textView = (AutoCompleteTextView) childView;
+
+					// If it's empty, show an error:
+
+					if(textView.getText().toString().trim().length() == 0)
+					{
+						textView.setError("Significant info cannot be empty.");
+						isFormValid = false;
+						isOtherInfoValid = false;
+					}
+				}
+			}
+		}
+
+		//-----------------------------------------
+		//-----------------------------------------
+		// If there was an error in the other info section
+		// show the error icon on the header
+		//-----------------------------------------
+		//-----------------------------------------
+		if(!isOtherInfoValid)
+		{
+			otherInfoHeaderErrorView.setVisibility(View.VISIBLE);
+		}
+
+		//================================================
+		// Email Fields
+		//================================================
+		// No Validation here
+		//================================================
+
+		//-------------------------------------------------------------------------------------------------
+		//-------------------------------------------------------------------------------------------------
+		return isFormValid;
+	}
+
+	// This method turns the form fields into a ReportOnConditionData object
+	private ReportOnConditionData formToReportOnConditionData()
+	{
+		ReportOnConditionData data = new ReportOnConditionData();
+		//================================================
+		// ROC Form Info Fields
+		//================================================
+		// Set current time as creation time
+		data.datecreated = Calendar.getInstance().getTime();
+
+		data.isForNewIncident = true;
+		data.incidentid = -1;
+
+		// If the incidentData exists, set the incident id, and set isForNewIncident to false (indicating that this ROC should not create an incident)
+		if(incidentData != null)
+		{
+			data.incidentid = incidentData.getIncidentId();
+			data.isForNewIncident = false;
+		}
+
+		// If we got valid weather data:
+		data.weatherDataAvailable = gotWeatherData;
+
+
+		// If we're creating a new incident, carefully format the incident name:
+		// The incident name should be prefixed with the user's "org state" and "org prefix"
+		// i.e. Taborda's org state is "CA"
+		// Taborda's org prefix is "TAB"
+		// Therefore, incidents created by users in the Taborda org should be prefixed with "CA TAB"
+
+		if(data.isForNewIncident)
+		{
+			String incidentNameOrgPrefix = "";
+			String incidentNameStatePrefix = "";
+			OrganizationPayload orgPayload = mDataManager.getCurrentOrganziation();
+			if(orgPayload != null)
+			{
+				incidentNameOrgPrefix = orgPayload.getPrefix() + " ";
+				incidentNameStatePrefix = orgPayload.getState() + " ";
+			}
+			// Add the prefix to the incident name:
+			data.incidentname = incidentNameStatePrefix + incidentNameOrgPrefix + incidentNameTextView.getText().toString();
+		}
+		// If we're not creating a new incident, the incident name should already have this formatting
+		else
+		{
+			data.incidentname = incidentNameTextView.getText().toString();
+		}
+
+		data.reportType = reportTypeSpinner.getSelectedItem().toString();
+
+		//================================================
+		// Incident Info Fields
+		//================================================
+
+		data.incidentnumber = incidentNumberTextView.getText().toString();
+		data.incidentTypes = new ArrayList<String>(incidentTypeSelectedItems);
+
+		// Location data:
+		int latDeg = Integer.parseInt(incidentLatitudeDegreesEditText.getText().toString());
+		double latMin = Double.parseDouble(incidentLatitudeMinutesEditText.getText().toString());
+		int lonDeg = Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
+		double lonMin = Double.parseDouble(incidentLongitudeMinutesEditText.getText().toString());
+		data.latitude = toDecimalDegrees(latDeg, latMin);
+		data.longitude = toDecimalDegrees(lonDeg, lonMin);
+		data.incidentState = incidentStateTextView.getText().toString();
+
+		//================================================
+		// ROC Incident Info Fields
+		//================================================
+
+		data.county = rocInitialCountySpinner.getSelectedItem().toString();
+		data.additionalAffectedCounties = rocAdditionalCountiesTextView.getText().toString();
+		data.location = rocLocationTextView.getText().toString();
+		data.dpa = rocDPASpinner.getSelectedItem().toString();
+		data.ownership = rocOwnershipSpinner.getSelectedItem().toString();
+		data.jurisdiction = rocJurisdictionTextView.getText().toString();
+
+
+		// Parsing the date / time strings:
+		SimpleDateFormat startDateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+		try
+		{
+			data.startDate = startDateFormatter.parse(rocStartDateTextView.getText().toString());
+		}
+		catch(Exception e)
+		{
+			Log.e("ROC","Unable to parse start date \"" + rocStartDateTextView.getText().toString() + "\" from form.");
+
+			// If there is a previous ROC, fallback to that ROC's startDate
+			if(lastRocData != null)
+				data.startDate = lastRocData.startDate;
+				// Otherwise, revert to current time
+			else
+				data.startDate = Calendar.getInstance().getTime();
+		}
+
+
+		SimpleDateFormat startTimeFormatter = new SimpleDateFormat("HHmm", Locale.getDefault());
+		try
+		{
+			data.startTime = startTimeFormatter.parse(rocStartTimeTextView.getText().toString());
+		}
+		catch(Exception e)
+		{
+			Log.e("ROC","Unable to parse start time \"" + rocStartTimeTextView.getText().toString() + "\" from form.");
+
+			// If there is a previous ROC, fallback to that ROC's startTime
+			if(lastRocData != null)
+				data.startTime = lastRocData.startTime;
+				// Otherwise, revert to current time
+			else
+				data.startTime = Calendar.getInstance().getTime();
+		}
+
+		//================================================
+		// Vegetation Fire Incident Scope Fields
+		//================================================
+
+		data.acreage = vegFireAcreageEditText.getText().toString();
+		data.spreadRate = vegFireRateOfSpreadSpinner.getSelectedItem().toString();
+
+
+		// Making an array of all checkboxes to iterate over to reduce code
+		CheckBox[] fuelTypeCheckboxes = {
+				vegFireFuelTypeGrassCheckBox,
+				vegFireFuelTypeBrushCheckBox,
+				vegFireFuelTypeTimberCheckBox,
+				vegFireFuelTypeOakWoodlandCheckBox,
+				vegFireFuelTypeOtherCheckBox
+		};
+
+		data.fuelTypes = new ArrayList<String>();
+		for(CheckBox checkBox : fuelTypeCheckboxes)
+		{
+			if(checkBox.isChecked())
+				data.fuelTypes.add(checkBox.getText().toString());
+		}
+
+		// Handle the other fuel type field
+		if (vegFireFuelTypeOtherCheckBox.isChecked())
+		{
+			data.otherFuelTypes = vegFireOtherFuelTypeEditText.getText().toString();
+		}
+		else
+		{
+			data.otherFuelTypes = "";
+		}
+
+		data.percentContained = vegFirePercentContainedEditText.getText().toString();
+
+		//================================================
+		// Weather Information Fields
+		//================================================
+
+		data.temperature = weatherTempEditText.getText().toString();
+		data.relHumidity = weatherRelativeHumidityEditText.getText().toString();
+		data.windSpeed = weatherWindSpeedEditText.getText().toString();
+		data.windDirection = weatherWindDirectionSpinner.getSelectedItem().toString();
+		data.windGusts = weatherGustsEditText.getText().toString();
+
+		//================================================
+		// Threats & Evacuations Fields
+		//================================================
+
+		//----------------------------------------
+		// Evacuations
+		//----------------------------------------
+		if(threatsEvacsSpinner.getSelectedItemPosition() != 0)
+		{
+			data.evacuations = threatsEvacsSpinner.getSelectedItem().toString();
+		}
+		else
+		{
+			data.evacuations = "";
+		}
+		data.evacuationsInProgress = new ArrayList<String>();
+
+		// For each of the text fields added, add the text
+		for(int i = 0; i < threatsEvacsListLinearLayout.getChildCount(); i++)
+		{
+			LinearLayout layout = (LinearLayout) threatsEvacsListLinearLayout.getChildAt(i);
+
+			// Iterate through layout's 2 children, find the textView
+			for(int j = 0; j < layout.getChildCount(); j++)
+			{
+				View childView = layout.getChildAt(j);
+				if(childView instanceof AutoCompleteTextView)
+				{
+					data.evacuationsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
+				}
+			}
+		}
+		//----------------------------------------
+		// Structure Threats
+		//----------------------------------------
+		if(threatsStructuresSpinner.getSelectedItemPosition() != 0)
+		{
+			data.structureThreats = threatsStructuresSpinner.getSelectedItem().toString();
+		}
+		else
+		{
+			data.structureThreats = "";
+		}
+		data.structureThreatsInProgress = new ArrayList<String>();
+
+		// For each of the text fields added, add the text
+		for(int i = 0; i < threatsStructuresListLinearLayout.getChildCount(); i++)
+		{
+			LinearLayout layout = (LinearLayout) threatsStructuresListLinearLayout.getChildAt(i);
+
+			// Iterate through layout's 2 children, find the textView
+			for(int j = 0; j < layout.getChildCount(); j++)
+			{
+				View childView = layout.getChildAt(j);
+				if(childView instanceof AutoCompleteTextView)
+				{
+					data.structureThreatsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
+				}
+			}
+		}
+
+		//----------------------------------------
+		// Infrastructure Threats
+		//----------------------------------------
+		if(threatsInfrastructureSpinner.getSelectedItemPosition() != 0)
+		{
+			data.infrastructureThreats = threatsInfrastructureSpinner.getSelectedItem().toString();
+		}
+		else
+		{
+			data.infrastructureThreats = "";
+		}
+		data.infrastructureThreatsInProgress = new ArrayList<String>();
+
+		// For each of the text fields added, add the text
+		for(int i = 0; i < threatsInfrastructureListLinearLayout.getChildCount(); i++)
+		{
+			LinearLayout layout = (LinearLayout) threatsInfrastructureListLinearLayout.getChildAt(i);
+
+			// Iterate through layout's 2 children, find the textView
+			for(int j = 0; j < layout.getChildCount(); j++)
+			{
+				View childView = layout.getChildAt(j);
+				if(childView instanceof AutoCompleteTextView)
+				{
+					data.infrastructureThreatsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
+				}
+			}
+		}
+
+		//================================================
+		// Resource Commitment Fields
+		//================================================
+
+		data.calfireIncident = calFireIncidentSpinner.getSelectedItem().toString();
+
+		// Making an array of all checkboxes to iterate over to reduce code
+		CheckBox[] resourceCheckboxes = {
+				calFireResourcesNoneCheckBox,
+				calFireResourcesAirCheckBox,
+				calFireResourcesGroundCheckBox,
+				calFireResourcesAirAndGroundCheckBox,
+				calFireResourcesAirAndGroundAugmentedCheckBox,
+				calFireResourcesAgencyRepOrderedCheckBox,
+				calFireResourcesAgencyRepAssignedCheckBox,
+				calFireResourcesContinuedCheckBox,
+				calFireResourcesSignificantAugmentationCheckBox,
+				calFireResourcesVlatOrderCheckBox,
+				calFireResourcesVlatAssignedCheckBox,
+				calFireResourcesNoDivertCheckBox,
+				calFireResourcesLatAssignedCheckBox,
+				calFireResourcesAllReleasedCheckBox
+		};
+
+		data.resourcesAssigned = new ArrayList<String>();
+
+		for(CheckBox checkBox : resourceCheckboxes)
+		{
+			if(checkBox.isChecked())
+				data.resourcesAssigned.add(checkBox.getText().toString());
+		}
+
+		//================================================
+		// Other Significant Info Fields
+		//================================================
+
+		data.otherThreatsAndEvacuationsInProgress = new ArrayList<String>();
+
+		// For each of the text fields added, add the text
+		for(int i = 0; i < otherInfoListLinearLayout.getChildCount(); i++)
+		{
+			LinearLayout layout = (LinearLayout) otherInfoListLinearLayout.getChildAt(i);
+
+			// Iterate through layout's 2 children, find the textView
+			for(int j = 0; j < layout.getChildCount(); j++)
+			{
+				View childView = layout.getChildAt(j);
+				if(childView instanceof AutoCompleteTextView)
+				{
+					data.otherThreatsAndEvacuationsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
+				}
+			}
+		}
+
+		//================================================
+		// Email Fields
+		//================================================
+		data.email = emailTextView.getText().toString();
+
+		//-------------------------------------------------------------------------------------------------
+		//-------------------------------------------------------------------------------------------------
+		data.sendStatus = ReportSendStatus.WAITING_TO_SEND;
+
+		return data;
+	}
+
 	// When the user presses the submit button:
 	OnClickListener submitButtonOnClickListener = new OnClickListener()
 	{
 		@Override
 		public void onClick (View v)
 		{
-			boolean isFormValid = true;
 
-			clearAllFormFieldErrors();
-
-
-			//-------------------------------------------------------------------------------------------------
-			//-------------------------------------------------------------------------------------------------
-			// Performing form data validation (Ensuring all required fields are filled in)
-			//-------------------------------------------------------------------------------------------------
-			//-------------------------------------------------------------------------------------------------
-			//================================================
-			// ROC Form Info Fields
-			//================================================
-			//--------------------------------
-			// incidentName
-			// must not be empty, and must not be all whitespace
-			// TODO- check if there are additional requirements on incident name
-			//--------------------------------
-
-
-			// Check if the incident name is all whitespace:
-			if(incidentNameTextView.getText().toString().trim().length() == 0)
+			if(isFormInfoValid())
 			{
-				incidentNameTextView.setError("Incident name must not be empty.");
-				isFormValid = false;
-			}
+				ReportOnConditionData data = formToReportOnConditionData();
 
-			//--------------------------------
-			// incidentType
-			// at least one incident type is required
-			//--------------------------------
+				Log.e("ROC","ROC Form data yielded the following JSON: " + data.toJSON());
+				data.sendStatus = ReportSendStatus.WAITING_TO_SEND;
 
-			// Check if a report type is selected:
-			if(reportTypeSpinner.getSelectedItemPosition() == 0)
-			{
-				((TextView) reportTypeSpinner.getSelectedView()).setError("You must select a report type.");
-				isFormValid = false;
-			}
-
-			//================================================
-			// Incident Info Fields
-			//================================================
-			boolean isIncidentInfoValid = true;
-			// Only validate the incident fields if we are creating a new incident
-			if(creatingNewIncident)
-			{
-				//--------------------------------
-				// incidentNumberTextView
-				// not required, no validation
-				//--------------------------------
-				//--------------------------------
-				// incidentType
-				// at least one incident type is required
-				//--------------------------------
-				if(incidentTypeSelectedItems.size() == 0)
-				{
-					incidentTypeTextView.setError("You must select at least one incident type.");
-					isIncidentInfoValid = false;
-					isFormValid = false;
-				}
-				//--------------------------------
-				// location
-				// lat / long all required:
-				// lat degrees in [-89, 89]
-				// lat minutes in [0, 60)
-				// lon degrees in [-179, 179]
-				// lon minutes in [0, 60)
-				//--------------------------------
-				//------------------
-				// Latitude Degrees:
-				//------------------
-				try
-				{
-					int latDeg = Integer.parseInt(incidentLatitudeDegreesEditText.getText().toString());
-					if(latDeg < -89 || latDeg > 89)
-						throw new NumberFormatException();
-
-				}
-				catch(Exception e)
-				{
-					incidentLatitudeDegreesEditText.setError("Latitude degrees must be between -89 and 89.");
-					isFormValid = false;
-					isIncidentInfoValid = false;
-				}
-				//------------------
-				// Latitude Minutes:
-				//------------------
-				try
-				{
-					double latMin = Double.parseDouble(incidentLatitudeMinutesEditText.getText().toString());
-					if(latMin < 0 || latMin >= 60)
-						throw new NumberFormatException();
-				}
-				catch(Exception e)
-				{
-					incidentLatitudeMinutesEditText.setError("Minutes must be between 0 and 59");
-					isFormValid = false;
-					isIncidentInfoValid = false;
-				}
-				//------------------
-				// Longitude Degrees:
-				//------------------
-				try
-				{
-					int lonDeg = Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
-					if(lonDeg < -179 || lonDeg > 179)
-						throw new NumberFormatException();
-				}
-				catch(Exception e)
-				{
-					incidentLongitudeDegreesEditText.setError("Longitude degrees must be between -179 and 179");
-					isFormValid = false;
-					isIncidentInfoValid = false;
-				}
-				//------------------
-				// Longitude Minutes:
-				//------------------
-				try
-				{
-					double lonMin = Double.parseDouble(incidentLongitudeMinutesEditText.getText().toString());
-					if(lonMin < 0 || lonMin >= 60)
-						throw new NumberFormatException();
-				}
-				catch(Exception e)
-				{
-					incidentLongitudeMinutesEditText.setError("Minutes must be between 0 and 59.");
-					isFormValid = false;
-					isIncidentInfoValid = false;
-				}
-
-				//--------------------------------
-				// incidentStateTextView
-				// must not be empty or blank
-				//--------------------------------
-				if(incidentStateTextView.getText().toString().trim().length() == 0)
-				{
-					incidentStateTextView.setError("Incident state / province / region cannot be blank.");
-					isFormValid = false;
-					isIncidentInfoValid = false;
-				}
-			}
-			//-----------------------------------------
-			//-----------------------------------------
-			// If there was an error in the incident info section
-			// show the error icon on the header
-			//-----------------------------------------
-			//-----------------------------------------
-			if(!isIncidentInfoValid)
-			{
-				incidentInfoHeaderErrorView.setVisibility(View.VISIBLE);
-			}
-
-			//================================================
-			// ROC Incident Info Fields
-			//================================================
-			boolean isRocIncidentInfoValid = true;
-
-			//--------------------------------
-			// rocInitialCountySpinner
-			// must have something selected
-			//--------------------------------
-			if(rocInitialCountySpinner.getSelectedItemPosition() == 0)
-			{
-				rocCountyErrorView.setVisibility(View.VISIBLE);
-				isRocIncidentInfoValid = false;
-				isFormValid = false;
-			}
-			//--------------------------------
-			// rocAdditionalCountiesTextView
-			// not required, not validated
-			//--------------------------------
-
-			//--------------------------------
-			// rocLocationTextView
-			// required, no validation
-			//--------------------------------
-			if(rocLocationTextView.getText().toString().trim().length() == 0)
-			{
-				rocLocationTextView.setError("General location is required.");
-				isRocIncidentInfoValid = false;
-				isFormValid = false;
-			}
-			//--------------------------------
-			// rocDPASpinner
-			// required
-			//--------------------------------
-			if(rocDPASpinner.getSelectedItemPosition() == 0)
-			{
-				rocDPAErrorView.setVisibility(View.VISIBLE);
-				isRocIncidentInfoValid = false;
-				isFormValid = false;
-			}
-			//--------------------------------
-			// rocOwnershipSpinner
-			// required
-			//--------------------------------
-			if(rocOwnershipSpinner.getSelectedItemPosition() == 0)
-			{
-				rocOwnershipErrorView.setVisibility(View.VISIBLE);
-				isRocIncidentInfoValid = false;
-				isFormValid = false;
-			}
-			//--------------------------------
-			// rocJurisdictionTextView
-			// required, no validation
-			//--------------------------------
-			if(rocJurisdictionTextView.getText().toString().trim().length() == 0)
-			{
-				rocJurisdictionTextView.setError("Jurisdiction is required.");
-				isRocIncidentInfoValid = false;
-				isFormValid = false;
-			}
-			//--------------------------------
-			// rocStartDateTextView
-			// required for NEW
-			//--------------------------------
-			if(currentReportType == ROC_NEW)
-			{
-				if (rocStartTimeTextView.getText().toString().trim().length() == 0)
-				{
-					rocStartTimeTextView.setError("Incident start time is required.");
-					isRocIncidentInfoValid = false;
-					isFormValid = false;
-				}
-				//--------------------------------
-				// rocStartTimeTextView
-				// required
-				//--------------------------------
-				if (rocStartDateTextView.getText().toString().trim().length() == 0)
-				{
-					rocStartDateTextView.setError("Incident start date is required.");
-					isRocIncidentInfoValid = false;
-					isFormValid = false;
-				}
-			}
-
-			//-----------------------------------------
-			//-----------------------------------------
-			// If there was an error in the roc incident info section
-			// show the error icon on the header
-			//-----------------------------------------
-			//-----------------------------------------
-			if(!isRocIncidentInfoValid)
-			{
-				rocIncidentInfoHeaderErrorView.setVisibility(View.VISIBLE);
-			}
-
-			//================================================
-			// Vegetation Fire Incident Scope Fields
-			//================================================
-
-			// All of the fields are required IFF the vegetation types includes "Fire (Vegetation)"
-			boolean vegFireFieldsRequired = false;
-			// Keep track if there was an error in the vegetation fire section
-			boolean isVegFireInfoValid = true;
-
-
-			// TODO - Change to "Vegetation Fire" once we add vegetation fire
-			if(incidentTypeSelectedItems.contains("Fire (Wildland)"))
-			{
-				vegFireFieldsRequired = true;
-				Log.e("ROC","Found veg fire!");
-			}
-			else
-			{
-				Log.e("ROC","Did not find veg fire!");
-			}
-
-			//--------------------------------
-			// vegFireAcreageEditText
-			// required if(vegFireFieldsRequired), should be a double
-			//--------------------------------
-			// Check if the field is empty and required
-			if(vegFireAcreageEditText.getText().toString().trim().length() == 0 && vegFireFieldsRequired)
-			{
-				vegFireAcreageEditText.setError("Acreage is required for Vegetation Fire incidents.");
-				isFormValid = false;
-				isVegFireInfoValid = false;
-			}
-			// Try to parse it as a double
-			else if(vegFireAcreageEditText.getText().toString().trim().length() > 0)
-			{
-				try
-				{
-					double vegFireAcreage = Double.parseDouble(vegFireAcreageEditText.getText().toString());
-
-					// Only accept positive numbers
-					if(vegFireAcreage < 0.0)
-					{
-						vegFireAcreageEditText.setError("Acreage must be greater than 0.");
-						isFormValid = false;
-						isVegFireInfoValid = false;
-					}
-				}
-				catch(Exception e)
-				{
-					vegFireAcreageEditText.setError("Acreage is required.");
-					isFormValid = false;
-					isVegFireInfoValid = false;
-				}
-			}
-
-			//--------------------------------
-			// vegFireRateOfSpreadSpinner
-			// required if(vegFireFieldsRequired)
-			//--------------------------------
-			if(vegFireRateOfSpreadSpinner.getSelectedItemPosition() == 0 && vegFireFieldsRequired)
-			{
-				vegFireRateOfSpreadErrorView.setVisibility(View.VISIBLE);
-			}
-
-			//--------------------------------
-			// Checkboxes:
-			// If (vegFireFieldsRequired), and not FINAL at least one must be checked:
-			//--------------------------------
-			if(vegFireFieldsRequired && currentReportType != ROC_FINAL)
-			{
-				do
-				{
-					if (vegFireFuelTypeGrassCheckBox.isChecked())
-					{
-						break;
-					}
-					else if (vegFireFuelTypeBrushCheckBox.isChecked())
-					{
-						break;
-					}
-					else if (vegFireFuelTypeTimberCheckBox.isChecked())
-					{
-						break;
-					}
-					else if (vegFireFuelTypeOakWoodlandCheckBox.isChecked())
-					{
-						break;
-					}
-					else if (vegFireFuelTypeOtherCheckBox.isChecked())
-					{
-						break;
-					}
-
-					vegFireFuelTypeLabelTextView.setError("At least one fuel type is required for Vegetation Fire incidents.");
-
-					// If none of them are checked, we have an error:
-					isFormValid = false;
-					isVegFireInfoValid = false;
-				}
-				while (false);
-			}
-
-			// If other is checked, the other textbox is required:
-			if(vegFireFuelTypeOtherCheckBox.isChecked())
-			{
-				if(vegFireOtherFuelTypeEditText.getText().toString().trim().length() == 0)
-				{
-					vegFireOtherFuelTypeEditText.setError("Other fuel type required.");
-				}
-			}
-
-			//--------------------------------
-			// vegFirePercentContainedEditText
-			// If (vegFireFieldsRequired), required
-			//--------------------------------
-
-			// Check if the field is empty and required
-			if(vegFirePercentContainedEditText.getText().toString().trim().length() == 0 && vegFireFieldsRequired)
-			{
-				vegFirePercentContainedEditText.setError("Percent Contained is required for Vegetation Fire incidents.");
-				isFormValid = false;
-				isVegFireInfoValid = false;
-			}
-			// Try to parse it as a double
-			else if(vegFirePercentContainedEditText.getText().toString().trim().length() > 0)
-			{
-				try
-				{
-					double vegFirePercentContained = Double.parseDouble(vegFirePercentContainedEditText.getText().toString());
-
-					// Only accept positive numbers
-					if(vegFirePercentContained < 0.0)
-					{
-						vegFirePercentContainedEditText.setError("Percent Contained must be greater than 0.");
-						isFormValid = false;
-						isVegFireInfoValid = false;
-					}
-					else if(vegFirePercentContained > 100.0)
-					{
-						vegFirePercentContainedEditText.setError("Percent Contained must be less than or equal to 100.0");
-						isFormValid = false;
-						isVegFireInfoValid = false;
-					}
-				}
-				catch(Exception e)
-				{
-					vegFirePercentContainedEditText.setError("Percent Contained should be a number.");
-					isFormValid = false;
-					isVegFireInfoValid = false;
-				}
-			}
-
-			//-----------------------------------------
-			//-----------------------------------------
-			// If there was an error in the roc incident info section
-			// show the error icon on the header
-			//-----------------------------------------
-			//-----------------------------------------
-			if(!isVegFireInfoValid)
-			{
-				vegFireIncidentScopeHeaderErrorView.setVisibility(View.VISIBLE);
-			}
-
-			//================================================
-			// Weather Information Fields
-			//================================================
-
-			boolean isWeatherInfoValid = true;
-
-			//--------------------------------
-			// weatherTempEditText
-			// should be a double, not required
-			//--------------------------------
-
-			// If the field is not empty
-			if(weatherTempEditText.getText().toString().trim().length() > 0)
-			{
-				try
-				{
-					double temp = Double.parseDouble(weatherTempEditText.getText().toString());
-				}
-				catch (Exception e)
-				{
-					weatherTempEditText.setError("Temperature should be a number.");
-					isFormValid = false;
-					isWeatherInfoValid = false;
-				}
-			}
-
-			//--------------------------------
-			// weatherRelativeHumidityEditText
-			// should be a double, not required
-			//--------------------------------
-			if(weatherRelativeHumidityEditText.getText().toString().trim().length() > 0)
-			{
-				try
-				{
-					double humidity = Double.parseDouble(weatherRelativeHumidityEditText.getText().toString());
-
-					// Should not be negative:
-					if(humidity < 0.0)
-					{
-						weatherRelativeHumidityEditText.setError("Humidity should be greater than 0.");
-						isFormValid = false;
-						isWeatherInfoValid = false;
-					}
-				}
-				catch (Exception e)
-				{
-					weatherRelativeHumidityEditText.setError("Humidity should be a number.");
-					isFormValid = false;
-					isWeatherInfoValid = false;
-				}
-			}
-
-			//--------------------------------
-			// weatherRelativeHumidityEditText
-			// should be a double, not required
-			//--------------------------------
-			if(weatherWindSpeedEditText.getText().toString().trim().length() > 0)
-			{
-				try
-				{
-					double windSpeed = Double.parseDouble(weatherWindSpeedEditText.getText().toString());
-
-					// Should not be negative:
-					if(windSpeed < 0.0)
-					{
-						weatherWindSpeedEditText.setError("Wind Speed should be greater than 0.");
-						isFormValid = false;
-						isWeatherInfoValid = false;
-					}
-				}
-				catch (Exception e)
-				{
-					weatherWindSpeedEditText.setError("Wind Speed should be a number.");
-					isFormValid = false;
-					isWeatherInfoValid = false;
-				}
-			}
-
-			//--------------------------------
-			// weatherWindDirectionSpinner
-			// no requirements
-			//--------------------------------
-
-
-			//--------------------------------
-			// weatherGustsEditText
-			// should be a double, not required
-			//--------------------------------
-			if(weatherGustsEditText.getText().toString().trim().length() > 0)
-			{
-				try
-				{
-					double gusts = Double.parseDouble(weatherGustsEditText.getText().toString());
-
-					// Should not be negative:
-					if(gusts < 0.0)
-					{
-						weatherGustsEditText.setError("Gusts should be greater than 0.");
-						isFormValid = false;
-						isWeatherInfoValid = false;
-					}
-				}
-				catch (Exception e)
-				{
-					weatherGustsEditText.setError("Gusts should be a number.");
-					isFormValid = false;
-					isWeatherInfoValid = false;
-				}
-			}
-
-
-			//-----------------------------------------
-			//-----------------------------------------
-			// If there was an error in the weather info section
-			// show the error icon on the header
-			//-----------------------------------------
-			//-----------------------------------------
-			if(!isWeatherInfoValid)
-			{
-				weatherInfoHeaderErrorView.setVisibility(View.VISIBLE);
-			}
-
-
-			//================================================
-			// Threats & Evacuations Fields
-			// This info is only required if vegFireFieldsRequired
-			// Apparently, these fields only really apply to vegetation fires
-			//================================================
-
-			boolean isThreatsInfoValid = true;
-
-			//--------------------------------
-			// threatsEvacsSpinner
-			// required if vegFireFieldsRequired
-			//--------------------------------
-			if(vegFireFieldsRequired && threatsEvacsSpinner.getSelectedItemPosition() == 0)
-			{
-				threatsEvacsErrorView.setVisibility(View.VISIBLE);
-				isFormValid = false;
-				isThreatsInfoValid = false;
-			}
-
-
-			//--------------------------------
-			// threatsEvacsListLinearLayout
-			// required
-			//--------------------------------
-			// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
-			if((currentReportType == ROC_FINAL && threatsEvacsSpinner.getSelectedItemPosition() == 1))
-			{
-				if(threatsEvacsListLinearLayout.getChildCount() == 0)
-				{
-					threatsEvacsErrorView.setVisibility(View.VISIBLE);
-					isThreatsInfoValid = false;
-					isFormValid = false;
-				}
-			}
-			// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
-			if(currentReportType != ROC_FINAL && (threatsEvacsSpinner.getSelectedItemPosition() == 1 || threatsEvacsSpinner.getSelectedItemPosition() == 3))
-			{
-				if(threatsEvacsListLinearLayout.getChildCount() == 0)
-				{
-					threatsEvacsErrorView.setVisibility(View.VISIBLE);
-					isThreatsInfoValid = false;
-					isFormValid = false;
-				}
-			}
-
-
-			// For each of the text fields added, they should not be empty:
-			for(int i = 0; i < threatsEvacsListLinearLayout.getChildCount(); i++)
-			{
-				LinearLayout layout = (LinearLayout) threatsEvacsListLinearLayout.getChildAt(i);
-
-				// Iterate through layout's 2 children, find the textView
-				for(int j = 0; j < layout.getChildCount(); j++)
-				{
-					View childView = layout.getChildAt(j);
-					if(childView instanceof AutoCompleteTextView)
-					{
-						AutoCompleteTextView textView = (AutoCompleteTextView) childView;
-
-						// If it's empty, show an error:
-						if(textView.getText().toString().trim().length() == 0)
-						{
-							textView.setError("Evacuation info cannot be empty.");
-							isFormValid = false;
-							isThreatsInfoValid = false;
-						}
-					}
-				}
-			}
-
-
-			//--------------------------------
-			// threatsStructuresSpinner
-			// required if vegFireFieldsRequired
-			//--------------------------------
-			if(vegFireFieldsRequired && threatsStructuresSpinner.getSelectedItemPosition() == 0)
-			{
-				threatsStructuresErrorView.setVisibility(View.VISIBLE);
-				isFormValid = false;
-				isThreatsInfoValid = false;
-			}
-
-
-			//--------------------------------
-			// threatsStructuresListLinearLayout
-			// required
-			//--------------------------------
-			// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
-			if((currentReportType == ROC_FINAL && threatsStructuresSpinner.getSelectedItemPosition() == 1))
-			{
-				if(threatsStructuresListLinearLayout.getChildCount() == 0)
-				{
-					threatsStructuresErrorView.setVisibility(View.VISIBLE);
-					isThreatsInfoValid = false;
-					isFormValid = false;
-				}
-			}
-			// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
-			if(currentReportType != ROC_FINAL && (threatsStructuresSpinner.getSelectedItemPosition() == 1 || threatsStructuresSpinner.getSelectedItemPosition() == 3))
-			{
-				if(threatsStructuresListLinearLayout.getChildCount() == 0)
-				{
-					threatsStructuresErrorView.setVisibility(View.VISIBLE);
-					isThreatsInfoValid = false;
-					isFormValid = false;
-				}
-			}
-
-			// For each of the text fields added, they should not be empty:
-			for(int i = 0; i < threatsStructuresListLinearLayout.getChildCount(); i++)
-			{
-				LinearLayout layout = (LinearLayout) threatsStructuresListLinearLayout.getChildAt(i);
-
-				// Iterate through layout's 2 children, find the textView
-				for(int j = 0; j < layout.getChildCount(); j++)
-				{
-					View childView = layout.getChildAt(j);
-					if(childView instanceof AutoCompleteTextView)
-					{
-						AutoCompleteTextView textView = (AutoCompleteTextView) childView;
-
-						// If it's empty, show an error:
-
-						if(textView.getText().toString().trim().length() == 0)
-						{
-							textView.setError("Structures Threat info cannot be empty.");
-							isFormValid = false;
-							isThreatsInfoValid = false;
-						}
-					}
-				}
-			}
-
-
-			//--------------------------------
-			// threatsInfrastructureSpinner
-			// required if vegFireFieldsRequired
-			//--------------------------------
-			if(vegFireFieldsRequired && threatsInfrastructureSpinner.getSelectedItemPosition() == 0)
-			{
-				threatsInfrastructureErrorView.setVisibility(View.VISIBLE);
-				isFormValid = false;
-				isThreatsInfoValid = false;
-			}
-
-
-			//--------------------------------
-			// threatsInfrastructureListLinearLayout
-			// required
-			//--------------------------------
-			// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
-			if((currentReportType == ROC_FINAL && threatsInfrastructureSpinner.getSelectedItemPosition() == 1))
-			{
-				if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
-				{
-					threatsInfrastructureErrorView.setVisibility(View.VISIBLE);
-					isThreatsInfoValid = false;
-					isFormValid = false;
-				}
-			}
-			// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
-			if(currentReportType != ROC_FINAL && (threatsInfrastructureSpinner.getSelectedItemPosition() == 1 || threatsInfrastructureSpinner.getSelectedItemPosition() == 3))
-			{
-				if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
-				{
-					threatsInfrastructureErrorView.setVisibility(View.VISIBLE);
-					isThreatsInfoValid = false;
-					isFormValid = false;
-				}
-			}
-
-			// For each of the text fields added, they should not be empty:
-			for(int i = 0; i < threatsInfrastructureListLinearLayout.getChildCount(); i++)
-			{
-				LinearLayout layout = (LinearLayout) threatsInfrastructureListLinearLayout.getChildAt(i);
-
-				// Iterate through layout's 2 children, find the textView
-				for(int j = 0; j < layout.getChildCount(); j++)
-				{
-					View childView = layout.getChildAt(j);
-					if(childView instanceof AutoCompleteTextView)
-					{
-						AutoCompleteTextView textView = (AutoCompleteTextView) childView;
-
-						// If it's empty, show an error:
-
-						if(textView.getText().toString().trim().length() == 0)
-						{
-							textView.setError("Infrastructure Threat info cannot be empty.");
-							isFormValid = false;
-							isThreatsInfoValid = false;
-						}
-					}
-				}
-			}
-
-			//-----------------------------------------
-			//-----------------------------------------
-			// If there was an error in the threats info section
-			// show the error icon on the header
-			//-----------------------------------------
-			//-----------------------------------------
-			if(!isThreatsInfoValid)
-			{
-				threatsEvacsHeaderErrorView.setVisibility(View.VISIBLE);
-			}
-
-			//================================================
-			// Resource Commitment Fields
-			//================================================
-			boolean isResourceInfoValid = true;
-
-			//--------------------------------
-			// calFireIncidentSpinner
-			// required
-			//--------------------------------
-			if(calFireIncidentSpinner.getSelectedItemPosition() == 0)
-			{
-				calFireIncidentErrorView.setVisibility(View.VISIBLE);
-				isResourceInfoValid = false;
-				isFormValid = false;
-			}
-
-			//-----------------------------------------
-			//-----------------------------------------
-			// If there was an error in the resource info section
-			// show the error icon on the header
-			//-----------------------------------------
-			//-----------------------------------------
-			if(!isResourceInfoValid)
-			{
-				resourceCommitmentHeaderErrorView.setVisibility(View.VISIBLE);
-			}
-
-			//================================================
-			// Other Significant Info Fields
-			//================================================
-
-			boolean isOtherInfoValid = true;
-
-			//--------------------------------
-			// otherInfoListLinearLayout
-			// required
-			//--------------------------------
-
-			// For each of the text fields added, they should not be empty:
-			for(int i = 0; i < otherInfoListLinearLayout.getChildCount(); i++)
-			{
-				LinearLayout layout = (LinearLayout) otherInfoListLinearLayout.getChildAt(i);
-
-				// Iterate through layout's 2 children, find the textView
-				for(int j = 0; j < layout.getChildCount(); j++)
-				{
-					View childView = layout.getChildAt(j);
-					if(childView instanceof AutoCompleteTextView)
-					{
-						AutoCompleteTextView textView = (AutoCompleteTextView) childView;
-
-						// If it's empty, show an error:
-
-						if(textView.getText().toString().trim().length() == 0)
-						{
-							textView.setError("Significant info cannot be empty.");
-							isFormValid = false;
-							isOtherInfoValid = false;
-						}
-					}
-				}
-			}
-
-			//-----------------------------------------
-			//-----------------------------------------
-			// If there was an error in the other info section
-			// show the error icon on the header
-			//-----------------------------------------
-			//-----------------------------------------
-			if(!isOtherInfoValid)
-			{
-				otherInfoHeaderErrorView.setVisibility(View.VISIBLE);
-			}
-
-			//================================================
-			// Email Fields
-			//================================================
-			// No Validation here
-			//================================================
-
-			//-------------------------------------------------------------------------------------------------
-			//-------------------------------------------------------------------------------------------------
-
-			//---------------------------------------------------------
-			// TEST DEPLOYMENT
-			// Create a temp ROC so we don't have to fill in the form each time
-			//---------------------------------------------------------
-			/*rocData = ReportOnConditionData.fromJSON("{" +
-					"\"incidentid\": 170," +
-					"\"incidentname\": \"CA TAB Regression Test Case Feb\"," +
-					"\"datecreated\": \"2019-04-12T08:49:17.000Z\"," +
-					"\"reportType\": \"NEW\"," +
-					"\"county\": \"Placer\"," +
-					"\"additionalAffectedCounties\": \"Test\"," +
-					"\"incidentState\": \"\"," +
-					"\"startDate\": \"2019-04-13T07:00:00.000Z\"," +
-					"\"startTime\": \"2008-01-01T09:00:00.000Z\"," +
-					"\"location\": \"5827 St Francis Ct, Loomis, CA 95650, USA\"," +
-					"\"dpa\": \"Local\"," +
-					"\"ownership\": \"LRA\"," +
-					"\"jurisdiction\": \"LOCAL\"," +
-					"\"incidentTypes\": [\"Planned Event\"]," +
-					"\"acreage\": \"120 acres\"," +
-					"\"spreadRate\": \"\"," +
-					"\"fuelTypes\": [\"Grass\"]," +
-					"\"otherFuelTypes\": \"\"," +
-					"\"percentContained\": \"60\"," +
-					"\"temperature\": \"52\"," +
-					"\"relHumidity\": \"75\"," +
-					"\"windSpeed\": \"0\"," +
-					"\"windDirection\": \"81\"," +
-					"\"windGusts\": \"\"," +
-					"\"evacuations\": \"No\"," +
-					"\"evacuationsInProgress\": []," +
-					"\"structureThreats\": \"No\"," +
-					"\"structureThreatsInProgress\": []," +
-					"\"infrastructureThreats\": \"No\"," +
-					"\"infrastructureThreatsInProgress\": []," +
-					"\"otherThreatsAndEvacuations\": \"\"," +
-					"\"otherThreatsAndEvacuationsInProgress\": []," +
-					"\"calfireIncident\": \"Yes\"," +
-					"\"resourcesAssigned\": [\"CAL FIRE Ground Resources Assigned\"]," +
-					"\"email\": \"luis.gutierrez@tabordasolutions.com\"," +
-					"\"latitude\": 38.7840634951429," +
-					"\"longitude\": -121.19567871093749," +
-					"\"weatherDataAvailable\": \"\"" +
-					"}");
-
-			if(rocData != null)
-			{
-				isFormValid = false;
-				rocData.datecreated = Calendar.getInstance().getTime();
-				rocData.sendStatus = ReportSendStatus.WAITING_TO_SEND;
-				rocData.reportType = "UPDATE";
-
-				// FIXME - Verify posting ROC works, we won't be able to know until we see it on the webapp, but the webapp doesn't show incident ROCs correctly.
-
-				// Make it create a new incident:
-				//rocData.reportType = "NEW";
-				//rocData.isForNewIncident = true;
-				//rocData.incidentname = "CA TAB new Incident (via Android ROC)- " + rocData.datecreated.getTime();
-				//rocData.incidentid = 0;
 
 				// Adding ROC Data to store and forward table so it is sent to server.
-				mDataManager.addReportOnConditionToStoreAndForward(rocData);
+				mDataManager.addReportOnConditionToStoreAndForward(data);
 				RestClient.postReportOnConditions();
-				mContext.onBackPressed();
-			}*/
-
-			//---------------------------------------------------------
-			//---------------------------------------------------------
-
-
-			if(isFormValid)
-			{
-				//-------------------------------------------------------------------------------------------------
-				//-------------------------------------------------------------------------------------------------
-				// Building the ROC Data object to push to the server:
-				//-------------------------------------------------------------------------------------------------
-				//-------------------------------------------------------------------------------------------------
-				//================================================
-				// ROC Form Info Fields
-				//================================================
-				if(rocData == null)
-					rocData = new ReportOnConditionData();
-
-				// Set current time as creation time
-				rocData.datecreated = Calendar.getInstance().getTime();
-
-				rocData.isForNewIncident = true;
-				rocData.incidentid = -1;
-
-				// If the incidentData exists, set the incident id, and set isForNewIncident to false (indicating that this ROC should not create an incident)
-				if(incidentData != null)
-				{
-					rocData.incidentid = incidentData.getIncidentId();
-					rocData.isForNewIncident = false;
-				}
-
-				// If we got valid weather data:
-				rocData.weatherDataAvailable = gotWeatherData;
-
-
-				// If we're creating a new incident, carefully format the incident name:
-				// The incident name should be prefixed with the user's "org state" and "org prefix"
-				// i.e. Taborda's org state is "CA"
-				// Taborda's org prefix is "TAB"
-				// Therefore, incidents created by users in the Taborda org should be prefixed with "CA TAB"
-
-				if(rocData.isForNewIncident)
-				{
-					String incidentNameOrgPrefix = "";
-					String incidentNameStatePrefix = "";
-					OrganizationPayload orgPayload = mDataManager.getCurrentOrganziation();
-					if(orgPayload != null)
-					{
-						incidentNameOrgPrefix = orgPayload.getPrefix() + " ";
-						incidentNameStatePrefix = orgPayload.getState() + " ";
-					}
-					// Add the prefix to the incident name:
-					rocData.incidentname = incidentNameStatePrefix + incidentNameOrgPrefix + incidentNameTextView.getText().toString();
-				}
-				// If we're not creating a new incident, the incident name should already have this formatting
-				else
-				{
-					rocData.incidentname = incidentNameTextView.getText().toString();
-				}
-
-				rocData.reportType = reportTypeSpinner.getSelectedItem().toString();
-
-				//================================================
-				// Incident Info Fields
-				//================================================
-
-				rocData.incidentnumber = incidentNumberTextView.getText().toString();
-				rocData.incidentTypes = new ArrayList<String>(incidentTypeSelectedItems);
-
-				// Location data:
-				int latDeg = Integer.parseInt(incidentLatitudeDegreesEditText.getText().toString());
-				double latMin = Double.parseDouble(incidentLatitudeMinutesEditText.getText().toString());
-				int lonDeg = Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
-				double lonMin = Double.parseDouble(incidentLongitudeMinutesEditText.getText().toString());
-				rocData.latitude = toDecimalDegrees(latDeg, latMin);
-				rocData.longitude = toDecimalDegrees(lonDeg, lonMin);
-				rocData.incidentState = incidentStateTextView.getText().toString();
-
-				//================================================
-				// ROC Incident Info Fields
-				//================================================
-
-				rocData.county = rocInitialCountySpinner.getSelectedItem().toString();
-				rocData.additionalAffectedCounties = rocAdditionalCountiesTextView.getText().toString();
-				rocData.location = rocLocationTextView.getText().toString();
-				rocData.dpa = rocDPASpinner.getSelectedItem().toString();
-				rocData.ownership = rocOwnershipSpinner.getSelectedItem().toString();
-				rocData.jurisdiction = rocJurisdictionTextView.getText().toString();
-
-
-				// Parsing the date / time strings:
-				SimpleDateFormat startDateFormatter = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-				try
-				{
-					rocData.startDate = startDateFormatter.parse(rocStartDateTextView.getText().toString());
-				}
-				catch(Exception e)
-				{
-					Log.e("ROC","Unable to parse start date \"" + rocStartDateTextView.getText().toString() + "\" from form.");
-
-					// If there is a previous ROC, fallback to that ROC's startDate
-					if(lastRocData != null)
-						rocData.startDate = lastRocData.startDate;
-					// Otherwise, revert to current time
-					else
-						rocData.startDate = Calendar.getInstance().getTime();
-				}
-
-
-				SimpleDateFormat startTimeFormatter = new SimpleDateFormat("HHmm", Locale.getDefault());
-				try
-				{
-					rocData.startTime = startTimeFormatter.parse(rocStartTimeTextView.getText().toString());
-				}
-				catch(Exception e)
-				{
-					Log.e("ROC","Unable to parse start time \"" + rocStartTimeTextView.getText().toString() + "\" from form.");
-
-					// If there is a previous ROC, fallback to that ROC's startTime
-					if(lastRocData != null)
-						rocData.startTime = lastRocData.startTime;
-					// Otherwise, revert to current time
-					else
-						rocData.startTime = Calendar.getInstance().getTime();
-				}
-
-				//================================================
-				// Vegetation Fire Incident Scope Fields
-				//================================================
-
-				rocData.acreage = vegFireAcreageEditText.getText().toString();
-				rocData.spreadRate = vegFireRateOfSpreadSpinner.getSelectedItem().toString();
-
-
-				// Making an array of all checkboxes to iterate over to reduce code
-				CheckBox[] fuelTypeCheckboxes = {
-						vegFireFuelTypeGrassCheckBox,
-						vegFireFuelTypeBrushCheckBox,
-						vegFireFuelTypeTimberCheckBox,
-						vegFireFuelTypeOakWoodlandCheckBox,
-						vegFireFuelTypeOtherCheckBox
-				};
-
-				rocData.fuelTypes = new ArrayList<String>();
-				for(CheckBox checkBox : fuelTypeCheckboxes)
-				{
-					if(checkBox.isChecked())
-						rocData.fuelTypes.add(checkBox.getText().toString());
-				}
-
-				// Handle the other fuel type field
-				if (vegFireFuelTypeOtherCheckBox.isChecked())
-				{
-					rocData.otherFuelTypes = vegFireOtherFuelTypeEditText.getText().toString();
-				}
-				else
-				{
-					rocData.otherFuelTypes = "";
-				}
-
-				rocData.percentContained = vegFirePercentContainedEditText.getText().toString();
-
-				//================================================
-				// Weather Information Fields
-				//================================================
-
-				rocData.temperature = weatherTempEditText.getText().toString();
-				rocData.relHumidity = weatherRelativeHumidityEditText.getText().toString();
-				rocData.windSpeed = weatherWindSpeedEditText.getText().toString();
-				rocData.windDirection = weatherWindDirectionSpinner.getSelectedItem().toString();
-				rocData.windGusts = weatherGustsEditText.getText().toString();
-
-				//================================================
-				// Threats & Evacuations Fields
-				//================================================
-
-				//----------------------------------------
-				// Evacuations
-				//----------------------------------------
-				if(threatsEvacsSpinner.getSelectedItemPosition() != 0)
-				{
-					rocData.evacuations = threatsEvacsSpinner.getSelectedItem().toString();
-				}
-				else
-				{
-					rocData.evacuations = "";
-				}
-				rocData.evacuationsInProgress = new ArrayList<String>();
-
-				// For each of the text fields added, add the text
-				for(int i = 0; i < threatsEvacsListLinearLayout.getChildCount(); i++)
-				{
-					LinearLayout layout = (LinearLayout) threatsEvacsListLinearLayout.getChildAt(i);
-
-					// Iterate through layout's 2 children, find the textView
-					for(int j = 0; j < layout.getChildCount(); j++)
-					{
-						View childView = layout.getChildAt(j);
-						if(childView instanceof AutoCompleteTextView)
-						{
-							rocData.evacuationsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
-						}
-					}
-				}
-				//----------------------------------------
-				// Structure Threats
-				//----------------------------------------
-				if(threatsStructuresSpinner.getSelectedItemPosition() != 0)
-				{
-					rocData.structureThreats = threatsStructuresSpinner.getSelectedItem().toString();
-				}
-				else
-				{
-					rocData.structureThreats = "";
-				}
-				rocData.structureThreatsInProgress = new ArrayList<String>();
-
-				// For each of the text fields added, add the text
-				for(int i = 0; i < threatsStructuresListLinearLayout.getChildCount(); i++)
-				{
-					LinearLayout layout = (LinearLayout) threatsStructuresListLinearLayout.getChildAt(i);
-
-					// Iterate through layout's 2 children, find the textView
-					for(int j = 0; j < layout.getChildCount(); j++)
-					{
-						View childView = layout.getChildAt(j);
-						if(childView instanceof AutoCompleteTextView)
-						{
-							rocData.structureThreatsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
-						}
-					}
-				}
-
-				//----------------------------------------
-				// Infrastructure Threats
-				//----------------------------------------
-				if(threatsInfrastructureSpinner.getSelectedItemPosition() != 0)
-				{
-					rocData.infrastructureThreats = threatsInfrastructureSpinner.getSelectedItem().toString();
-				}
-				else
-				{
-					rocData.infrastructureThreats = "";
-				}
-				rocData.infrastructureThreatsInProgress = new ArrayList<String>();
-
-				// For each of the text fields added, add the text
-				for(int i = 0; i < threatsInfrastructureListLinearLayout.getChildCount(); i++)
-				{
-					LinearLayout layout = (LinearLayout) threatsInfrastructureListLinearLayout.getChildAt(i);
-
-					// Iterate through layout's 2 children, find the textView
-					for(int j = 0; j < layout.getChildCount(); j++)
-					{
-						View childView = layout.getChildAt(j);
-						if(childView instanceof AutoCompleteTextView)
-						{
-							rocData.infrastructureThreatsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
-						}
-					}
-				}
-
-				//================================================
-				// Resource Commitment Fields
-				//================================================
-
-				rocData.calfireIncident = calFireIncidentSpinner.getSelectedItem().toString();
-
-				// Making an array of all checkboxes to iterate over to reduce code
-				CheckBox[] resourceCheckboxes = {
-						calFireResourcesNoneCheckBox,
-						calFireResourcesAirCheckBox,
-						calFireResourcesGroundCheckBox,
-						calFireResourcesAirAndGroundCheckBox,
-						calFireResourcesAirAndGroundAugmentedCheckBox,
-						calFireResourcesAgencyRepOrderedCheckBox,
-						calFireResourcesAgencyRepAssignedCheckBox,
-						calFireResourcesContinuedCheckBox,
-						calFireResourcesSignificantAugmentationCheckBox,
-						calFireResourcesVlatOrderCheckBox,
-						calFireResourcesVlatAssignedCheckBox,
-						calFireResourcesNoDivertCheckBox,
-						calFireResourcesLatAssignedCheckBox,
-						calFireResourcesAllReleasedCheckBox
-				};
-
-				rocData.resourcesAssigned = new ArrayList<String>();
-
-				for(CheckBox checkBox : resourceCheckboxes)
-				{
-					if(checkBox.isChecked())
-						rocData.resourcesAssigned.add(checkBox.getText().toString());
-				}
-
-				//================================================
-				// Other Significant Info Fields
-				//================================================
-
-				rocData.otherThreatsAndEvacuationsInProgress = new ArrayList<String>();
-
-				// For each of the text fields added, add the text
-				for(int i = 0; i < otherInfoListLinearLayout.getChildCount(); i++)
-				{
-					LinearLayout layout = (LinearLayout) otherInfoListLinearLayout.getChildAt(i);
-
-					// Iterate through layout's 2 children, find the textView
-					for(int j = 0; j < layout.getChildCount(); j++)
-					{
-						View childView = layout.getChildAt(j);
-						if(childView instanceof AutoCompleteTextView)
-						{
-							rocData.otherThreatsAndEvacuationsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
-						}
-					}
-				}
-
-				//================================================
-				// Email Fields
-				//================================================
-				rocData.email = emailTextView.getText().toString();
-
-				//-------------------------------------------------------------------------------------------------
-				//-------------------------------------------------------------------------------------------------
-
-				Log.e("ROC","ROC Form data yielded the following JSON: " + rocData.toJSON());
-
-				rocData.sendStatus = ReportSendStatus.WAITING_TO_SEND;
-
-				// Adding ROC Data to store and forward table so it is sent to server.
-				mDataManager.addReportOnConditionToStoreAndForward(rocData);
-
-
-				RestClient.postReportOnConditions();
-
 
 				mContext.getSupportFragmentManager().beginTransaction().remove(rocFragment).commit();
 				mContext.onBackPressed();

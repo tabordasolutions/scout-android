@@ -750,12 +750,7 @@ public class RestClient
 			{
 				String content = (responseBody != null) ? new String(responseBody) : "error";
 
-
-				Log.e("hullo","-------------");
-				Log.e("hullo", content);
-				Log.e("hullo","-------------");
 				IncidentMessage message = mBuilder.create().fromJson(content, IncidentMessage.class);
-				//FIXME: insert incidents in whatever order they were given to us by server
 				HashMap<String, IncidentPayload> incidents = new HashMap<String, IncidentPayload>();
 				for (IncidentPayload incident : message.getIncidents())
 				{
@@ -1120,6 +1115,8 @@ public class RestClient
 			return;
 		}
 
+		boolean createdNewIncident = false;
+
 		for (ReportOnConditionData roc: rocs)
 		{
 			// Don't send ones that have already been sent
@@ -1163,6 +1160,8 @@ public class RestClient
 						int orgId = mDataManager.getCurrentOrganziation().getOrgid();
 
 						url = "reports/" + orgId + "/IncidentAndROC";
+
+						createdNewIncident = true;
 					}
 					else
 					{
@@ -1179,6 +1178,11 @@ public class RestClient
 					Log.e("ROC","Exception was raised while trying to send ROC payload. Exception: " + e);
 				}
 			}
+		}
+
+		if(createdNewIncident)
+		{
+			getAllIncidents(mDataManager.getUserId());
 		}
 	}
 

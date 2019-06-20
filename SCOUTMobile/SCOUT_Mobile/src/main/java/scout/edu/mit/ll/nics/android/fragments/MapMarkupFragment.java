@@ -886,7 +886,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 				{
 
 					@Override
-					public void onInfoWindowClick(Marker marker)
+					public void onInfoWindowClick (Marker marker)
 					{
 						try
 						{
@@ -907,7 +907,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 //									main.onNavigationItemSelected(NavigationOptions.GENERALMESSAGE.getValue(), -1);
 								}
 							}
-						} catch (Exception e)
+						}
+						catch (Exception e)
 						{
 							e.printStackTrace();
 						}
@@ -943,7 +944,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			{
 
 				@Override
-				public void onItemClick(AdapterView<?> parent, final View view, int position, long id)
+				public void onItemClick (AdapterView<?> parent, final View view, int position, long id)
 				{
 					MarkupFeature feature = (MarkupFeature) parent.getItemAtPosition(position);
 
@@ -954,7 +955,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 						if (shape.getType().equals(MarkupType.marker) || shape.getType().equals(MarkupType.label))
 						{
 							mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(shape.getPoints().get(0), 13));
-						} else
+						}
+						else
 						{
 							LatLngBounds.Builder t = LatLngBounds.builder();
 							for (LatLng point : shape.getPoints())
@@ -981,7 +983,8 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			if (mDataManager.getSelectedCollabRoom().getName().equals(getString(R.string.no_selection)))
 			{
 				mIncidentFocusButton.setVisibility(View.INVISIBLE);
-			} else
+			}
+			else
 			{
 				mIncidentFocusButton.setVisibility(View.VISIBLE);
 			}
@@ -990,7 +993,7 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			{
 
 				@Override
-				public void onClick(View v)
+				public void onClick (View v)
 				{
 					if (extentBuilder != null)
 					{
@@ -998,17 +1001,20 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 						{
 							LatLngBounds bounds = extentBuilder.build();
 							mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 10));
-						} catch (Exception e)
+						}
+						catch (Exception e)
 						{
 							if (mDataManager.getIncidentPositionLatitude() == 0 && mDataManager.getIncidentPositionLongitude() == 0)
 							{
 								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mDataManager.getMDTLatitude(), mDataManager.getMDTLongitude()), 12));
-							} else
+							}
+							else
 							{
 								mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mDataManager.getIncidentPositionLatitude(), mDataManager.getIncidentPositionLongitude()), 12));
 							}
 						}
-					} else
+					}
+					else
 					{
 						mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mDataManager.getIncidentPositionLatitude(), mDataManager.getIncidentPositionLongitude()), 12));
 					}
@@ -1033,53 +1039,56 @@ public class MapMarkupFragment extends Fragment implements OnMapClickListener, O
 			m1.start();*/
 			//===================
 
-			mExpandMapViewButton.setOnClickListener(new OnClickListener()
+			if(mExpandMapViewButton != null)
 			{
-				@Override
-				public void onClick(View v)
+				mExpandMapViewButton.setOnClickListener(new OnClickListener()
 				{
-					// Toggle the current expanded map status
-					mExpandMapViewMaximized = !mExpandMapViewMaximized;
-
-					float from = 0.0f;
-					float to = 1.0f;
-
-					if (mExpandMapViewMaximized)
+					@Override
+					public void onClick (View v)
 					{
-						from = 1.0f;
-						to = 0.0f;
-					}
+						// Toggle the current expanded map status
+						mExpandMapViewMaximized = !mExpandMapViewMaximized;
 
-					ValueAnimator animator = ValueAnimator.ofFloat(from, to);
-					animator.setDuration(200);
-					//animator.setStartDelay(0);
-					animator.setInterpolator(new LinearInterpolator());
-					animator.addUpdateListener(
-							new ValueAnimator.AnimatorUpdateListener()
-							{
-								@Override
-								public void onAnimationUpdate(ValueAnimator animation)
+						float from = 0.0f;
+						float to = 1.0f;
+
+						if (mExpandMapViewMaximized)
+						{
+							from = 1.0f;
+							to = 0.0f;
+						}
+
+						ValueAnimator animator = ValueAnimator.ofFloat(from, to);
+						animator.setDuration(200);
+						//animator.setStartDelay(0);
+						animator.setInterpolator(new LinearInterpolator());
+						animator.addUpdateListener(
+								new ValueAnimator.AnimatorUpdateListener()
 								{
-									float t = (Float) animation.getAnimatedValue();
+									@Override
+									public void onAnimationUpdate (ValueAnimator animation)
+									{
+										float t = (Float) animation.getAnimatedValue();
 
-									// Setting the weight of the mapview
-									float weight = t * 0.35f;
-									int height = mMarkupContainer.getLayoutParams().height;
-									int width = mMarkupContainer.getLayoutParams().width;
+										// Setting the weight of the mapview
+										float weight = t * 0.35f;
+										int height = mMarkupContainer.getLayoutParams().height;
+										int width = mMarkupContainer.getLayoutParams().width;
 
-									LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height, weight);
-									mMarkupContainer.setLayoutParams(params);
+										LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height, weight);
+										mMarkupContainer.setLayoutParams(params);
 
-									// Rotating the button (so the down arrow is pointing up)
-									float angle = (1 - t) * 180f;
-									mExpandMapViewButton.setRotation(angle);
+										// Rotating the button (so the down arrow is pointing up)
+										float angle = (1 - t) * 180f;
+										mExpandMapViewButton.setRotation(angle);
+									}
 								}
-							}
 
-					);
-					animator.start();
-				}
-			});
+						);
+						animator.start();
+					}
+				});
+			}
 
 			try
 			{
