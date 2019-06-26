@@ -227,14 +227,20 @@
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="5"
+                                android:layout_weight="3"
                                 android:orientation="horizontal">
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text=" "
+                                    android:textSize="18sp"/>
                                 <EditText
                                     android:id="@+id/rocIncidentLatitudeDegrees"
                                     android:layout_width="0dp"
                                     android:layout_weight="7"
                                     android:layout_height="wrap_content"
-                                    android:hint="(required)"
+                                    android:hint="@string/roc_location_hint"
                                     android:inputType="number|numberDecimal|numberSigned"
                                     android:textColor="@drawable/edit_text_selector"
                                     android:textSize="18sp"/>
@@ -246,17 +252,39 @@
                                     android:textSize="18sp"/>
                             </LinearLayout>
 
-                        <LinearLayout
+                            <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_weight="3"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+                                    <EditText
+                                        android:id="@+id/rocIncidentLatitudeMinutes"
+                                        android:layout_width="0dp"
+                                        android:layout_weight="7"
+                                        android:layout_height="wrap_content"
+                                        android:hint="@string/roc_location_hint"
+                                        android:inputType="number|numberDecimal"
+                                        android:textColor="@drawable/edit_text_selector"
+                                        android:textSize="18sp"/>
+                                    <TextView
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:text="."
+                                        android:textSize="18sp"/>
+                             </LinearLayout>
+
+                            <LinearLayout
                                 android:layout_width="0dp"
-                                android:layout_weight="5"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="5"
                                 android:orientation="horizontal">
                                 <EditText
-                                    android:id="@+id/rocIncidentLatitudeMinutes"
+                                    android:id="@+id/rocIncidentLatitudeMinutesFraction"
                                     android:layout_width="0dp"
                                     android:layout_weight="7"
                                     android:layout_height="wrap_content"
-                                    android:hint="(required)"
+                                    android:hint="@string/roc_location_hint"
                                     android:inputType="number|numberDecimal"
                                     android:textColor="@drawable/edit_text_selector"
                                     android:textSize="18sp"/>
@@ -277,21 +305,30 @@
                         android:layout_marginTop="5dp"
                         android:text="Longitude:"
                         android:textSize="18sp"/>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
+
+
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_weight="5"
+                            android:layout_weight="3"
                             android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="-"
+                                android:textSize="18sp"/>
                             <EditText
                                 android:id="@+id/rocIncidentLongitudeDegrees"
                                 android:layout_width="0dp"
                                 android:layout_weight="7"
                                 android:layout_height="wrap_content"
-                                android:hint="(required)"
+                                android:hint="@string/roc_location_hint"
                                 android:inputType="number|numberDecimal|numberSigned"
                                 android:textColor="@drawable/edit_text_selector"
                                 android:textSize="18sp"/>
@@ -303,10 +340,9 @@
                                 android:textSize="18sp"/>
                         </LinearLayout>
 
-
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_weight="5"
+                            android:layout_weight="3"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal">
                             <EditText
@@ -314,7 +350,29 @@
                                 android:layout_width="0dp"
                                 android:layout_weight="7"
                                 android:layout_height="wrap_content"
-                                android:hint="(required)"
+                                android:hint="@string/roc_location_hint"
+                                android:inputType="number|numberDecimal"
+                                android:textColor="@drawable/edit_text_selector"
+                                android:textSize="18sp"/>
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="."
+                                android:textSize="18sp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="5"
+                            android:orientation="horizontal">
+                            <EditText
+                                android:id="@+id/rocIncidentLongitudeMinutesFraction"
+                                android:layout_width="0dp"
+                                android:layout_weight="7"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/roc_location_hint"
                                 android:inputType="number|numberDecimal"
                                 android:textColor="@drawable/edit_text_selector"
                                 android:textSize="18sp"/>
@@ -325,6 +383,7 @@
                                 android:text="'"
                                 android:textSize="18sp"/>
                         </LinearLayout>
+
                     </LinearLayout>
 
                     <LinearLayout
@@ -356,87 +415,6 @@
                     </LinearLayout>
 
 
-
-                <!-- Retaining old location layout in case we want to revert
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Location:"
-                        android:textSize="18sp"/>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="4"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginTop="5dp"
-                                android:text="Latitude:"
-                                android:textSize="18sp"/>
-                            <EditText
-                                android:id="@+id/rocIncidentLatitude"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
-                                android:inputType="numberSigned|numberDecimal"
-                                android:hint="(required)"
-
-                                android:textSize="18sp"/>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="4"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginStart="10dp"
-                                android:layout_marginTop="5dp"
-                                android:text="Longitude:"
-                                android:textSize="18sp"/>
-                            <EditText
-                                android:id="@+id/rocIncidentLongitude"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="10dp"
-                                android:inputType="numberSigned|numberDecimal"
-                                android:hint="(required)"
-                                android:textSize="18sp"/>
-                        </LinearLayout>
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_weight="1"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical">
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="28sp"></LinearLayout>
-                            <ImageButton
-                                android:id="@+id/rocLocateButton2"
-                                android:layout_width="38dp"
-                                android:layout_height="34dp"
-                                android:layout_weight="0"
-                                android:adjustViewBounds="true"
-                                android:contentDescription="My GPS Location"
-                                android:focusable="true"
-                                android:maxHeight="32dp"
-                                android:maxWidth="32dp"
-                                android:minHeight="32dip"
-                                android:minWidth="32dip"
-                                android:src="@drawable/myloc"/>
-                        </LinearLayout>
-                    </LinearLayout>-->
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -555,6 +533,116 @@
                         android:completionThreshold="1"
                         android:hint="(required)"
                         android:textSize="18sp"/>
+
+
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Street:"
+                        android:textSize="18sp"/>
+                    <EditText
+                        android:id="@+id/rocLocationStreet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:textColor="@color/common_signin_btn_text_dark"
+                        android:hint="(required)"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Cross Street:"
+                        android:textSize="18sp"/>
+                    <EditText
+                        android:id="@+id/rocLocationCrossStreet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:textColor="@color/common_signin_btn_text_dark"
+                        android:hint="(required)"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Nearest Community:"
+                        android:textSize="18sp"/>
+                    <EditText
+                        android:id="@+id/rocLocationNearestCommunity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:completionThreshold="1"
+                        android:textColor="@color/common_signin_btn_text_dark"
+                        android:hint="(required)"
+                        android:textSize="18sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Miles from Nearest Community:"
+                        android:textSize="18sp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:id="@+id/rocLocationDistanceFromNearestCommunity"
+                            android:layout_width="0dp"
+                            android:layout_weight="5"
+                            android:layout_height="wrap_content"
+                            android:hint="(required)"
+                            android:inputType="number"
+                            android:textColor="@color/common_signin_btn_text_dark"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="miles"
+                            android:textSize="18sp"/>
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Direction from Nearest Community:"
+                        android:textSize="18sp"/>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <ImageView
+                            android:id="@+id/rocLocationDirectionFromNearestCommunityError"
+                            android:visibility="gone"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                        <Spinner
+                            android:id="@+id/rocLocationDirectionFromNearestCommunity"
+                            android:entries="@array/roc_location_miles_from_nearest_community_options"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"/>
+                    </RelativeLayout>
+
+
+
+
+
+
+
+
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -753,7 +841,6 @@
                             android:src="@drawable/red_exclamation_point"/>
                         <Spinner
                             android:id="@+id/rocVegFireRateOfSpread"
-                            android:entries="@array/roc_rate_of_spread_spinner_options"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:textSize="18sp">
@@ -1133,7 +1220,39 @@
                         android:layout_marginTop="10dp"
                         android:text="Evacuations in progress for:"
                         android:textSize="18sp"/>
-                    <!-- We programmatically add AutoCompleteTextViews to this sections -->
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        >
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rocThreatsEvacuationsListError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:text="At least one evacuation in progress is required"
+                            android:textColor="#F00"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="5"
+                            android:textSize="18sp"/>
+                        <ImageView
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                    </LinearLayout>
+
+                    <!-- We programmatically add AutoCompleteTextViews to this section -->
                     <LinearLayout
                         android:id="@+id/rocThreatsEvacuationsList"
                         android:layout_width="match_parent"
@@ -1195,7 +1314,33 @@
                         android:layout_marginTop="10dp"
                         android:text="Structures Threat in progress for:"
                         android:textSize="18sp"/>
-                    <!-- We programmatically add AutoCompleteTextViews to this sections -->
+
+                    <LinearLayout
+                        android:id="@+id/rocThreatsStructuresListError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:text="At least one structure threat in progress is required"
+                            android:textColor="#F00"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="5"
+                            android:textSize="18sp"/>
+                        <ImageView
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                    </LinearLayout>
+
+                    <!-- We programmatically add AutoCompleteTextViews to this section -->
                     <LinearLayout
                         android:id="@+id/rocThreatsStructuresList"
                         android:layout_width="match_parent"
@@ -1257,7 +1402,33 @@
                         android:layout_marginTop="10dp"
                         android:text="Infrastructure Threat in progress for:"
                         android:textSize="18sp"/>
-                    <!-- We programmatically add AutoCompleteTextViews to this sections -->
+
+                    <LinearLayout
+                        android:id="@+id/rocThreatsInfrastructureListError"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+                        <TextView
+                            android:text="At least one infrastructure threat in progress is required"
+                            android:textColor="#F00"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="5"
+                            android:textSize="18sp"/>
+                        <ImageView
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:paddingRight="15dp"
+                            android:clickable="false"
+                            android:focusableInTouchMode="false"
+                            android:focusable="false"
+                            android:src="@drawable/red_exclamation_point"/>
+                    </LinearLayout>
+
+                    <!-- We programmatically add AutoCompleteTextViews to this section -->
                     <LinearLayout
                         android:id="@+id/rocThreatsInfrastructureList"
                         android:layout_width="match_parent"

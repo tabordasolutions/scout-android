@@ -3,6 +3,9 @@
     <!-- ======================================================================================================================================================================== -->
     <!-- Incident Info Section -->
     <!-- ======================================================================================================================================================================== -->
+
+    <string name="roc_location_hint"><font size="12">(required)</font></string>
+
     <string-array name="roc_incident_type_checkbox_options">
         <item>Aircraft Accident</item>
         <item>Blizzard</item>
@@ -162,24 +165,26 @@
         <item>LRA / FRA</item>
         <item>DOD</item>
     </string-array>
-    <!-- ======================================================================================================================================================================== -->
-    <!-- Vegetation Fire Incident Scope Section -->
-    <!-- ======================================================================================================================================================================== -->
 
-    <string-array name="roc_rate_of_spread_spinner_options">
-        <item>Choose an option</item>
-        <item>Slow rate of spread</item>
-        <item>Moderate rate of spread</item>
-        <item>Dangerous rate of spread</item>
-        <item>Critical rate of spread</item>
-        <item>Forward spread has been stopped</item>
+    <string-array name="roc_location_miles_from_nearest_community_options">
+        <item>Choose an option (required)</item>
+        <item>N</item>
+        <item>NNE</item>
+        <item>NE</item>
+        <item>ENE</item>
+        <item>E</item>
+        <item>ESE</item>
+        <item>SE</item>
+        <item>SSE</item>
+        <item>S</item>
+        <item>SSW</item>
+        <item>SW</item>
+        <item>WSW</item>
+        <item>W</item>
+        <item>WNW</item>
+        <item>NW</item>
+        <item>NNW</item>
     </string-array>
-
-    <string-array name="roc_rate_of_spread_spinner_options_final">
-        <item>Choose an option</item>
-        <item>Forward spread has been stopped</item>
-    </string-array>
-
 
     <!-- ======================================================================================================================================================================== -->
     <!-- Weather Information Section -->

@@ -58,6 +58,11 @@ public class ReportOnConditionData
 	public String reportType;
 	public String county;
 	public String additionalAffectedCounties;
+	public String street;
+	public String crossStreet;
+	public String nearestCommunity;
+	public String milesFromNearestCommunity;
+	public String directionFromNearestCommunity;
 	public Date startDate;
 	public Date startTime;
 	public String location;
@@ -456,6 +461,11 @@ public class ReportOnConditionData
 			report.county = rocPayload.optString("county","");
 			report.additionalAffectedCounties = rocPayload.optString("additionalAffectedCounties","");
 			report.location = rocPayload.optString("location","");
+			report.street = rocPayload.optString("street","");
+			report.crossStreet = rocPayload.optString("crossStreet","");
+			report.nearestCommunity = rocPayload.optString("nearestCommunity","");
+			report.milesFromNearestCommunity = rocPayload.optString("milesFromNearestCommunity","");
+			report.directionFromNearestCommunity = rocPayload.optString("directionFromNearestCommunity","");
 
 			report.dpa = rocPayload.optString("dpa","");
 			// not a bug, the json schema reuses "sra" as ownership field
@@ -678,6 +688,12 @@ public class ReportOnConditionData
 			rocPayload.put("county", county);
 			rocPayload.put("additionalAffectedCounties", additionalAffectedCounties);
 			rocPayload.put("location", location);
+			rocPayload.put("street", street);
+			rocPayload.put("crossStreet", crossStreet);
+			rocPayload.put("nearestCommunity", nearestCommunity);
+			rocPayload.put("milesFromNearestCommunity", milesFromNearestCommunity);
+			rocPayload.put("directionFromNearestCommunity", directionFromNearestCommunity);
+
 
 			rocPayload.put("dpa", dpa);
 			// not a bug, the json schema reuses "sra" as ownership field
@@ -898,9 +914,15 @@ public class ReportOnConditionData
 			obj.put("reportType", reportType);
 			obj.put("county", county);
 			obj.put("additionalAffectedCounties", additionalAffectedCounties);
+			obj.put("location", location);
+			obj.put("street", street);
+			obj.put("crossStreet", crossStreet);
+			obj.put("nearestCommunity", nearestCommunity);
+			obj.put("milesFromNearestCommunity", milesFromNearestCommunity);
+			obj.put("directionFromNearestCommunity", directionFromNearestCommunity);
+
 			obj.put("startDate", dateFormatter.format(startDate));
 			obj.put("startTime", dateFormatter.format(startTime));
-			obj.put("location", location);
 			obj.put("dpa", dpa);
 			obj.put("ownership", ownership);
 			obj.put("jurisdiction", jurisdiction);
@@ -984,9 +1006,14 @@ public class ReportOnConditionData
 			data.reportType = obj.getString("reportType");
 			data.county = obj.getString("county");
 			data.additionalAffectedCounties = obj.getString("additionalAffectedCounties");
+			data.location = obj.getString("location");
+			data.street = obj.getString("street");
+			data.crossStreet = obj.getString("crossStreet");
+			data.nearestCommunity = obj.getString("nearestCommunity");
+			data.milesFromNearestCommunity = obj.getString("milesFromNearestCommunity");
+			data.directionFromNearestCommunity = obj.getString("directionFromNearestCommunity");
 			data.startDate = dateFormatter.parse(obj.getString("startDate"));
 			data.startTime = dateFormatter.parse(obj.getString("startTime"));
-			data.location = obj.getString("location");
 			data.dpa = obj.getString("dpa");
 			data.ownership = obj.getString("ownership");
 			data.jurisdiction = obj.getString("jurisdiction");

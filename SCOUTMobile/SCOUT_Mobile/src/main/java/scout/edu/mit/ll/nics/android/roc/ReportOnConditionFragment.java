@@ -148,13 +148,13 @@ public class ReportOnConditionFragment extends Fragment
 	AutoCompleteTextView incidentNumberTextView;
 	TextView incidentTypeTextView;
 	Spinner incidentTypeSpinner;
-	//EditText incidentLatitudeEditText;
-	//EditText incidentLongitudeEditText;
 	// Decimal Degree Minutes Edit Text:
 	EditText incidentLatitudeDegreesEditText;
 	EditText incidentLatitudeMinutesEditText;
+	EditText incidentLatitudeMinutesFractionEditText;
 	EditText incidentLongitudeDegreesEditText;
 	EditText incidentLongitudeMinutesEditText;
+	EditText incidentLongitudeMinutesFractionEditText;
 	ImageButton incidentLocateButton;
 	ProgressBar incidentLocateProgressBar;
 	AutoCompleteTextView incidentStateTextView;
@@ -167,6 +167,11 @@ public class ReportOnConditionFragment extends Fragment
 	Spinner rocInitialCountySpinner;
 	AutoCompleteTextView rocAdditionalCountiesTextView;
 	AutoCompleteTextView rocLocationTextView;
+	EditText rocLocationStreetEditText;
+	EditText rocLocationCrossStreetEditText;
+	EditText rocLocationNearestCommunity;
+	EditText rocLocationDistanceFromNearestCommunityEditText;
+	Spinner rocLocationDirectionFromNearestCommunitySpinner;
 	Spinner rocDPASpinner;
 	Spinner rocOwnershipSpinner;
 	AutoCompleteTextView rocJurisdictionTextView;
@@ -178,6 +183,7 @@ public class ReportOnConditionFragment extends Fragment
 	ImageView rocCountyErrorView;
 	ImageView rocDPAErrorView;
 	ImageView rocOwnershipErrorView;
+	ImageView rocLocationDirectionFromNearestCommunityErrorView;
 	//================================================
 	// Vegetation Fire Incident Scope Fields
 	//================================================
@@ -224,6 +230,11 @@ public class ReportOnConditionFragment extends Fragment
 	ImageView threatsEvacsErrorView;
 	ImageView threatsStructuresErrorView;
 	ImageView threatsInfrastructureErrorView;
+
+	LinearLayout threatsEvacsListErrorView;
+	LinearLayout threatsStructuresListErrorView;
+	LinearLayout threatsInfrastructureListErrorView;
+
 	//================================================
 	// Resource Commitment Fields
 	//================================================
@@ -301,23 +312,15 @@ public class ReportOnConditionFragment extends Fragment
 	// The ROC report type that the current fragment state represents
 	private int currentReportType = ROC_NONE;
 
-	//private DamageReportPayload mCurrentPayload;
-	//private DamageReportData mCurrentData;
-	//private long mReportId;
-
-
 	// Can be called when viewing an ROC
 	// Executes a network request to pull the latest ROCs from the server
 	// Then fills the form with the latest ROC data
 	public void refreshRequested()
 	{
-		// Call this whenever we invoke a programmatic refresh
+		// NOTE: Call this whenever we invoke a programmatic refresh
 		// swipeRefreshLayout.setRefreshing(true);
 
 		Log.e("ROC","ROC - swipeRefreshLayout - onRefresh called");
-
-
-		// todo - hide all of the fields
 
 		// ------------------------------------------------------------------------
 		// Hiding all of the form fields
@@ -394,53 +397,6 @@ public class ReportOnConditionFragment extends Fragment
 
 				mDataManager.pullLatestReportOnConditionForIncident(rocData.incidentname, callback, callback);
 		// --------------------------------------------
-
-/*
-		// Building the success and error callbacks:
-		Handler.Callback successCallback = new Handler.Callback()
-		{
-			@Override
-			public boolean handleMessage (Message msg)
-			{
-				getActivity().runOnUiThread(new Runnable()
-				{
-					@Override
-					public void run ()
-					{
-						swipeRefreshLayout.setRefreshing(false);
-						// TODO - get latest ROC data
-						// and set the form to view it.
-						//ReportOnConditionData rocData = (incidentData != null) ? mDataManager.getLastReportOnCondition(incidentData.getIncidentId()) : null;
-						// gotIncidentROCData(rocData);
-					}
-				});
-				return true;
-			}
-		};
-
-		Handler.Callback errorCallback = new Handler.Callback()
-		{
-			@Override
-			public boolean handleMessage (Message msg)
-			{
-				getActivity().runOnUiThread(new Runnable()
-				{
-					@Override
-					public void run ()
-					{
-
-						// Indicate that we've finished refreshing
-						swipeRefreshLayout.setRefreshing(false);
-						// TODO - set refresh text as:
-						//messageTextView.setText("There was an error retrieving incident ROC data. Please try again.");
-					}
-				});
-				return true;
-			}
-		};
-
-		mDataManager.pullLatestReportOnConditionForIncident(mDataManager.getActiveIncidentName(), successCallback, errorCallback);*/
-
 	}
 
 
@@ -582,11 +538,6 @@ public class ReportOnConditionFragment extends Fragment
 		mRootView = inflater.inflate(R.layout.fragment_reportonconditionview, container, false);
 		mDataManager = DataManager.getInstance(getActivity());
 
-		// Setting the View's ID
-		// Per the Android documentation: onSaveInstanceState will only be called for a view it has an id set
-//		mRootView.setId(R.id.rocViewId);
-
-
 		// Defer assigning the rest of the member variables until onResume.
 		// The way they should be set up depends on what incident is active, etc.. (which may change between onResume calls)
 
@@ -617,10 +568,6 @@ public class ReportOnConditionFragment extends Fragment
 			}
 		}*/
 
-//		getSupportFragmentManager().beginTransaction().replace(android.R.id.content, test, "your_fragment_tag").commit();
-//	} else {
-//	TestFragment test = (TestFragment) getSupportFragmentManager().findFragmentByTag("your_fragment_tag");
-//}
 		return mRootView;
 	}
 
@@ -724,9 +671,14 @@ public class ReportOnConditionFragment extends Fragment
 		// ------------------------------------------------
 		// Converting incident lat/long to degrees and minutes:
 		incidentLatitudeDegreesEditText.setText(String.valueOf(getDegree(incidentData.getLat())));
-		incidentLatitudeMinutesEditText.setText(String.valueOf(getMinutes(incidentData.getLat())));
-		incidentLongitudeDegreesEditText.setText(String.valueOf(getDegree(incidentData.getLon())));
-		incidentLongitudeMinutesEditText.setText(String.valueOf(getMinutes(incidentData.getLon())));
+		incidentLatitudeMinutesEditText.setText(String.valueOf(getMinutesInteger(incidentData.getLat())));
+		incidentLatitudeMinutesFractionEditText.setText(stringGetFraction(String.valueOf(getMinutesFraction(incidentData.getLat()))));
+		// NOTE - we multiply the value by -1 because the UI has a hardcoded "-" sign in front of it
+		// (all longitudes in california are in the -120 range, and the client doesn't want users to have to manually enter the "-" sign)
+		incidentLongitudeDegreesEditText.setText(String.valueOf(-1 * getDegree(incidentData.getLon())));
+		incidentLongitudeMinutesEditText.setText(String.valueOf(getMinutesInteger(incidentData.getLon())));
+		incidentLongitudeMinutesFractionEditText.setText(stringGetFraction(String.valueOf(getMinutesFraction(incidentData.getLon()))));
+
 		// ------------------------------------------------
 		// Incident Number
 		// ------------------------------------------------
@@ -786,7 +738,7 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			currentIncidentLastRocSubmitted = ROC_NON_FINAL;
 			currentReportType = ROC_NONE;
-			// TODO - handle unknown report type.
+			// TODO - handle unknown report type, this is undefined behavior at the moment
 			return;
 		}
 
@@ -856,9 +808,14 @@ public class ReportOnConditionFragment extends Fragment
 		incidentTypeTextView.setText(incidentTypeString);
 		// Converting incident lat/long to degrees and minutes:
 		incidentLatitudeDegreesEditText.setText(String.valueOf(getDegree(rocData.latitude)));
-		incidentLatitudeMinutesEditText.setText(String.valueOf(getMinutes(rocData.latitude)));
-		incidentLongitudeDegreesEditText.setText(String.valueOf(getDegree(rocData.longitude)));
-		incidentLongitudeMinutesEditText.setText(String.valueOf(getMinutes(rocData.longitude)));
+		incidentLatitudeMinutesEditText.setText(String.valueOf(getMinutesInteger(rocData.latitude)));
+		incidentLatitudeMinutesFractionEditText.setText(stringGetFraction(String.valueOf(getMinutesFraction(rocData.latitude))));
+
+		// NOTE - we multiply the value by -1 because the UI has a hardcoded "-" sign in front of it
+		// (all longitudes in california are in the -120 range, and the client doesn't want users to have to manually enter the "-" sign)
+		incidentLongitudeDegreesEditText.setText(String.valueOf(-1 * getDegree(rocData.longitude)));
+		incidentLongitudeMinutesEditText.setText(String.valueOf(getMinutesInteger(rocData.longitude)));
+		incidentLongitudeMinutesFractionEditText.setText(stringGetFraction(String.valueOf(getMinutesFraction(rocData.longitude))));
 
 		incidentStateTextView.setText(rocData.incidentState);
 
@@ -871,6 +828,12 @@ public class ReportOnConditionFragment extends Fragment
 		Log.e("ROC","ROC - setupFormForViewingMode - additional counties = \"" + rocData.additionalAffectedCounties + "\"");
 		rocAdditionalCountiesTextView.setText(rocData.additionalAffectedCounties);
 		rocLocationTextView.setText(rocData.location);
+		rocLocationStreetEditText.setText(rocData.street);
+		rocLocationCrossStreetEditText.setText(rocData.crossStreet);
+		rocLocationNearestCommunity.setText(rocData.nearestCommunity);
+		rocLocationDistanceFromNearestCommunityEditText.setText(rocData.milesFromNearestCommunity);
+		setSpinnerValue(rocData.directionFromNearestCommunity, rocLocationDirectionFromNearestCommunitySpinner);
+
 		setSpinnerValue(rocData.dpa, rocDPASpinner);
 		setSpinnerValue(rocData.ownership, rocOwnershipSpinner);
 		rocJurisdictionTextView.setText(rocData.jurisdiction);
@@ -985,7 +948,7 @@ public class ReportOnConditionFragment extends Fragment
 			for (int j = 0; j < dataList.get(i).size(); j++)
 			{
 				// Setting the button's onclick, so that it adds new text fields to the list:
-				addButtons[i].setOnClickListener(newAddFieldListener(layouts[i], addButtons[i], null, null));
+				addButtons[i].setOnClickListener(newAddFieldListener(layouts[i], addButtons[i], null, null, null));
 
 				// Call the addButton's onClick (this creates and adds a new linearLayout to the list)
 				addButtons[i].callOnClick();
@@ -1111,8 +1074,10 @@ public class ReportOnConditionFragment extends Fragment
 		incidentTypeSpinner.setVisibility(View.GONE);
 		incidentLatitudeDegreesEditText.setEnabled(false);
 		incidentLatitudeMinutesEditText.setEnabled(false);
+		incidentLatitudeMinutesFractionEditText.setEnabled(false);
 		incidentLongitudeDegreesEditText.setEnabled(false);
 		incidentLongitudeMinutesEditText.setEnabled(false);
+		incidentLongitudeMinutesFractionEditText.setEnabled(false);
 		incidentStateTextView.setEnabled(false);
 
 		// Hide the locate button
@@ -1126,6 +1091,11 @@ public class ReportOnConditionFragment extends Fragment
 		rocInitialCountySpinner.setEnabled(false);
 		rocAdditionalCountiesTextView.setEnabled(false);
 		rocLocationTextView.setEnabled(false);
+		rocLocationStreetEditText.setEnabled(false);
+		rocLocationCrossStreetEditText.setEnabled(false);
+		rocLocationNearestCommunity.setEnabled(false);
+		rocLocationDistanceFromNearestCommunityEditText.setEnabled(false);
+		rocLocationDirectionFromNearestCommunitySpinner.setEnabled(false);
 		rocDPASpinner.setEnabled(false);
 		rocOwnershipSpinner.setEnabled(false);
 		rocJurisdictionTextView.setEnabled(false);
@@ -1529,6 +1499,69 @@ public class ReportOnConditionFragment extends Fragment
 		emailHeader.setVisibility(View.GONE);
 	}
 
+	// Called whenever the report type is changed, or the incident type is changed
+	public void setupVegFireRateOfSpreadSpinnerForReportTypeAndIncidentType()
+	{
+		String requiredSuffix = "";
+
+		// If the incident type is a vegetation fire, rate of spread is required.
+		// We're going to add the suffix "(required)", to let the user know.
+		if (isIncidentVegetationFire())
+		{
+			requiredSuffix = " (required)";
+		}
+
+		String[] rateOfSpreadSpinnerOptions;
+
+		// ( SLOW / MODERATE / DANGEROUS / CRITICAL / STOPPED ) if NEW or UPDATE
+		// ( STOPPED ) if FINAL
+		if(currentReportType == ROC_FINAL)
+		{
+			rateOfSpreadSpinnerOptions = new String[]{"Choose an option" + requiredSuffix, "Forward spread has been stopped"};
+		}
+		else
+		{
+			rateOfSpreadSpinnerOptions = new String[]{"Choose an option" + requiredSuffix, "Slow rate of spread", "Moderate rate of spread", "Dangerous rate of spread","Critical rate of spread","Forward spread has been stopped"};
+		}
+
+
+		setSpinnerOptions(vegFireRateOfSpreadSpinner, rateOfSpreadSpinnerOptions);
+		vegFireRateOfSpreadSpinner.setSelection(0);
+	}
+
+	// Called whenever the report type is changed, or the incident type is changed
+	public void setupThreatsSectionForReportTypeAndIncidentType()
+	{
+		String requiredSuffix = "";
+
+		// If the incident type is a vegetation fire, these options are required.
+		// We're going to add the suffix "(required)", to let the user know.
+		if(isIncidentVegetationFire())
+		{
+			requiredSuffix = " (required)";
+		}
+
+		String[] threatsSpinnerOptions;
+
+		// ( YES / NO / MITIGATED ) if NEW or UPDATE
+		// ( NO / MITIGATED ) if FINAL
+		if(currentReportType == ROC_FINAL)
+		{
+			threatsSpinnerOptions = new String[] {"Choose an option" + requiredSuffix, "No","Mitigated"};
+		}
+		else
+		{
+			threatsSpinnerOptions = new String[] {"Choose an option" + requiredSuffix, "Yes", "No","Mitigated"};
+		}
+
+		setSpinnerOptions(threatsEvacsSpinner, threatsSpinnerOptions);
+		setSpinnerOptions(threatsStructuresSpinner, threatsSpinnerOptions);
+		setSpinnerOptions(threatsInfrastructureSpinner, threatsSpinnerOptions);
+		threatsEvacsSpinner.setSelection(0);
+		threatsStructuresSpinner.setSelection(0);
+		threatsInfrastructureSpinner.setSelection(0);
+	}
+
 
 	public void setupFormForCurrentReportType()
 	{
@@ -1583,53 +1616,30 @@ public class ReportOnConditionFragment extends Fragment
 		}
 
 		//----------------------------------------------------------------------------
-		// Setting up the threats & evacs spinners to have the correct options
+		// Setting up the other info section
 		//----------------------------------------------------------------------------
-		// ( YES / NO / MITIGATED ) if NEW or UPDATE
-		// ( NO / MITIGATED ) if FINAL
-		String[] threatsSpinnerOptions;
+
 		if(currentReportType == ROC_FINAL)
 		{
-			threatsSpinnerOptions = new String[] {"Choose an option (required)", "No","Mitigated"};
 			// Make the other sig info section not have auto complete
 			otherInfoAddButton.setOnClickListener(newAddFieldListener(
 					otherInfoListLinearLayout,
 					otherInfoAddButton,
 					null,
+					null,
 					null));
 		}
 		else
 		{
-			threatsSpinnerOptions = new String[] {"Choose an option (required)", "Yes", "No","Mitigated"};
 			// Make the other sig info section have autocomplete
 			otherInfoAddButton.setOnClickListener(newAddFieldListener(
 					otherInfoListLinearLayout,
 					otherInfoAddButton,
 					otherSignificantInfoCannedMessages,
+					null,
 					null));
 		}
 
-		// Making the threats evacs section have the correct behavior:
-
-
-		//----------------------------------------------------------------------------
-		// Setting up the correct spread rate options for FINAL
-		// (FINAL should only have "Forward spread has been stopped")
-		//----------------------------------------------------------------------------
-
-
-		String[] spreadRateOptions;
-
-		if(currentReportType != ROC_FINAL)
-		{
-			spreadRateOptions = mContext.getResources().getStringArray(R.array.roc_rate_of_spread_spinner_options);
-		}
-		else
-		{
-			spreadRateOptions = mContext.getResources().getStringArray(R.array.roc_rate_of_spread_spinner_options_final);
-		}
-
-		vegFireRateOfSpreadSpinner.setAdapter(new ArrayAdapter<String> (mContext, android.R.layout.simple_spinner_dropdown_item, spreadRateOptions));
 
 
 
@@ -1702,14 +1712,9 @@ public class ReportOnConditionFragment extends Fragment
 		}
 
 		//----------------------------------------------------------------------------
-		// Setting up the Threats & Evacs Section
+		// Setting up fields that depend on the incident type
 		//----------------------------------------------------------------------------
-		setSpinnerOptions(threatsEvacsSpinner, threatsSpinnerOptions);
-		setSpinnerOptions(threatsStructuresSpinner, threatsSpinnerOptions);
-		setSpinnerOptions(threatsInfrastructureSpinner, threatsSpinnerOptions);
-		threatsEvacsSpinner.setSelection(0);
-		threatsStructuresSpinner.setSelection(0);
-		threatsInfrastructureSpinner.setSelection(0);
+		incidentTypeChanged();
 	}
 
 	// Executed each time the reportTypeSpinner's selected item changes
@@ -1781,8 +1786,11 @@ public class ReportOnConditionFragment extends Fragment
 			incidentTypeSpinner.setVisibility(View.GONE);
 			incidentLatitudeDegreesEditText.setEnabled(false);
 			incidentLatitudeMinutesEditText.setEnabled(false);
+			incidentLatitudeMinutesFractionEditText.setEnabled(false);
 			incidentLongitudeDegreesEditText.setEnabled(false);
 			incidentLongitudeMinutesEditText.setEnabled(false);
+			incidentLongitudeMinutesFractionEditText.setEnabled(false);
+
 
 
 			incidentLocateButton.setEnabled(false);
@@ -1799,8 +1807,10 @@ public class ReportOnConditionFragment extends Fragment
 			incidentTypeSpinner.setVisibility(View.VISIBLE);
 			incidentLatitudeDegreesEditText.setEnabled(true);
 			incidentLatitudeMinutesEditText.setEnabled(true);
+			incidentLatitudeMinutesFractionEditText.setEnabled(true);
 			incidentLongitudeDegreesEditText.setEnabled(true);
 			incidentLongitudeMinutesEditText.setEnabled(true);
+			incidentLongitudeMinutesFractionEditText.setEnabled(true);
 			incidentLocateButton.setEnabled(true);
 			incidentLocateButton.setVisibility(View.VISIBLE);
 			incidentLocateProgressBar.setVisibility(View.GONE);
@@ -1835,6 +1845,7 @@ public class ReportOnConditionFragment extends Fragment
 			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
 			{
 				threatsEvacsErrorView.setVisibility(View.GONE);
+				threatsEvacsListErrorView.setVisibility(View.GONE);
 				rocFragment.threatsEvacsSpinnerChanged(position);
 			}
 
@@ -1850,6 +1861,7 @@ public class ReportOnConditionFragment extends Fragment
 			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
 			{
 				threatsStructuresErrorView.setVisibility(View.GONE);
+				threatsStructuresListErrorView.setVisibility(View.GONE);
 				rocFragment.threatsStructuresChanged(position);
 			}
 
@@ -1865,6 +1877,7 @@ public class ReportOnConditionFragment extends Fragment
 			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
 			{
 				threatsInfrastructureErrorView.setVisibility(View.GONE);
+				threatsInfrastructureListErrorView.setVisibility(View.GONE);
 				rocFragment.threatsInfrastructureChanged(position);
 			}
 
@@ -1879,7 +1892,7 @@ public class ReportOnConditionFragment extends Fragment
 			@Override
 			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
 			{
-				incidentTypeTextView.setError(null);
+				Log.e("ROC","ROCIncidentType - incidentTypeSpinner - onItemSelected - should be calling rocFragment.incidentTypeChanged.");
 				rocFragment.incidentTypeChanged();
 			}
 
@@ -1929,6 +1942,13 @@ public class ReportOnConditionFragment extends Fragment
 			// Additional Affected Counties
 			rocAdditionalCountiesTextView.setText(lastRocData.additionalAffectedCounties);
 
+			rocLocationStreetEditText.setText(lastRocData.street);
+			rocLocationCrossStreetEditText.setText(lastRocData.crossStreet);
+			rocLocationNearestCommunity.setText(lastRocData.nearestCommunity);
+			rocLocationDistanceFromNearestCommunityEditText.setText(lastRocData.milesFromNearestCommunity);
+			setSpinnerValue(lastRocData.directionFromNearestCommunity, rocLocationDirectionFromNearestCommunitySpinner);
+
+
 			// Fuel Types Checkboxes
 			if(lastRocData.fuelTypes.contains("Grass"))
 			{
@@ -1957,25 +1977,71 @@ public class ReportOnConditionFragment extends Fragment
 
 	}
 
+
+	// Returns whether the incident is a vegetation fire or not
+	public boolean isIncidentVegetationFire()
+	{
+		// TODO - Change to "Vegetation Fire" once we add vegetation fire incident type
+		return incidentTypeSelectedItems.contains("Fire (Wildland)");
+	}
+
 	// Executed each time the report type is changed
 	// This is responsible for;
 	// a) Ensuring repot type spinner stays on item 0
 	// b) Ensuring the if vegetation fire is selected, we make vegetation fire fields mandatory
-	protected void incidentTypeChanged()
+	public void incidentTypeChanged()
 	{
+		incidentTypeTextView.setError(null);
 		incidentTypeSpinner.setSelection(0);
 
-		// TODO - Change to "Vegetation Fire" once we add vegetation fire incident type
-		if(incidentTypeSelectedItems.contains("Fire (Wildland)"))
+		Log.e("ROC","ROCIncidentType - incidentTypeChanged: " + incidentTypeSelectedItems);
+
+		if(isIncidentVegetationFire())
 		{
+			Log.e("ROC","ROCIncidentType - Vegetation Fire found");
+
+
+			// TODO - Set the hint as required for the following fields:
 			vegFireAcreageEditText.setHint("(required)");
+			//vegFireRateOfSpreadSpinner;
+			vegFireFuelTypeLabelTextView.setHint("(required)");
+			vegFireFuelTypeLabelTextView.setText("Fuel Types: (required)");
 			vegFirePercentContainedEditText.setHint("(required)");
+			//threatsEvacsLabelTextView;
+			//threatsStructuresLabelTextView;
+			//threatsInfrastructureLabelTextView;
+
 		}
 		else
 		{
+			Log.e("ROC","ROCIncidentType - Not a vegetation fire");
+
+
+			// TODO - Remove the hint as required for the following fields:
 			vegFireAcreageEditText.setHint("");
+			//vegFireRateOfSpreadSpinner;
+			vegFireFuelTypeLabelTextView.setText("Fuel Types:");
 			vegFirePercentContainedEditText.setHint("");
+			//threatsEvacsLabelTextView;
+			//threatsStructuresLabelTextView;
+			//threatsInfrastructureLabelTextView;
+
 		}
+
+		// In case:
+		// the incident is now a Vegetation Fire:
+		// or
+		// the incident is no longer a Vegetation Fire:
+
+		// Re-set up the rate of spread spinner.
+		// (The options available depend on the current report type)
+		// (Whether the field is required depends on if the incident is a vegetation fire)
+		setupVegFireRateOfSpreadSpinnerForReportTypeAndIncidentType();
+
+		// Re-set up the threat section.
+		// (The fields are required IFF the incident is a vegetation fire)
+		setupThreatsSectionForReportTypeAndIncidentType();
+
 	}
 
 
@@ -1993,7 +2059,8 @@ public class ReportOnConditionFragment extends Fragment
 				threatsEvacsAddButton,
 				threatsEvacsYesCannedMessages,
 				threatsEvacsMitigatedCannedMessages,
-				threatsEvacsErrorView);
+				threatsEvacsErrorView,
+				threatsEvacsListErrorView);
 	}
 
 	public void threatsStructuresChanged(int position)
@@ -2010,7 +2077,8 @@ public class ReportOnConditionFragment extends Fragment
 				threatsStructuresAddButton,
 				threatsStructuresYesCannedMessages,
 				threatsStructuresMitigatedCannedMessages,
-				threatsStructuresErrorView);
+				threatsStructuresErrorView,
+				threatsStructuresListErrorView);
 
 	}
 
@@ -2028,11 +2096,12 @@ public class ReportOnConditionFragment extends Fragment
 				threatsInfrastructureAddButton,
 				threatsInfrastructureYesCannedMessages,
 				threatsInfrastructureMitigatedCannedMessages,
-				threatsInfrastructureErrorView);
+				threatsInfrastructureErrorView,
+				threatsInfrastructureListErrorView);
 	}
 
 	// This method is responsible for setting up a threats & evacs subsection
-	private void setupThreatSubsection(String option, TextView label, LinearLayout subsection, ImageButton button, String[] yesCannedMessages, String[] mitigatedCannedMessages, ImageView errorView)
+	private void setupThreatSubsection(String option, TextView label, LinearLayout subsection, ImageButton button, String[] yesCannedMessages, String[] mitigatedCannedMessages, ImageView errorView, LinearLayout listErrorView)
 	{
 		final int OPTION_NONE = 0;
 		final int OPTION_YES = 1;
@@ -2071,7 +2140,7 @@ public class ReportOnConditionFragment extends Fragment
 		// Clear the list
 		subsection.removeAllViews();
 
-		String[] autoCompleteOptions ;
+		String[] autoCompleteOptions;
 
 		// If the selected option is YES, show the correct options:
 		if(selectedOption == OPTION_YES)
@@ -2084,7 +2153,7 @@ public class ReportOnConditionFragment extends Fragment
 			autoCompleteOptions = mitigatedCannedMessages;
 		}
 
-		button.setOnClickListener(newAddFieldListener(subsection, button, autoCompleteOptions, errorView));
+		button.setOnClickListener(newAddFieldListener(subsection, button, autoCompleteOptions, errorView, listErrorView));
 	}
 
 
@@ -2189,8 +2258,11 @@ public class ReportOnConditionFragment extends Fragment
 		//incidentLongitudeEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLongitude);
 		incidentLatitudeDegreesEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLatitudeDegrees);
 		incidentLatitudeMinutesEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLatitudeMinutes);
+		incidentLatitudeMinutesFractionEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLatitudeMinutesFraction);
 		incidentLongitudeDegreesEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLongitudeDegrees);
 		incidentLongitudeMinutesEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLongitudeMinutes);
+		incidentLongitudeMinutesFractionEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLongitudeMinutesFraction);
+
 		incidentLocateButton = (ImageButton) mRootView.findViewById(R.id.rocLocateButton);
 		incidentLocateProgressBar = (ProgressBar) mRootView.findViewById(R.id.rocLocationDataProgressBar);
 		incidentStateTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocIncidentState);
@@ -2205,15 +2277,17 @@ public class ReportOnConditionFragment extends Fragment
 		}
 		// Add the header text to the top of the spinner options
 		String headerText = "Choose Incident Type(s)";
-		incidentTypeSpinner.setAdapter(new IncidentTypeSpinnerAdapter<String>(mContext, headerText, incidentTypeSpinnerItems, incidentTypeSelectedItems, incidentTypeTextView));
+		incidentTypeSpinner.setAdapter(new IncidentTypeSpinnerAdapter<String>(mContext, headerText, incidentTypeSpinnerItems, incidentTypeSelectedItems, incidentTypeTextView, this));
 
 		// Setting up the location button
 		incidentLocateButton.setOnClickListener(locateButtonListener);
 		// Setting up the fields to listen for focuschange, so they query location-based form data when no longer focused
 		incidentLatitudeDegreesEditText.setOnFocusChangeListener(coordsFocusChangeListener);
 		incidentLatitudeMinutesEditText.setOnFocusChangeListener(coordsFocusChangeListener);
+		incidentLatitudeMinutesFractionEditText.setOnFocusChangeListener(coordsFocusChangeListener);
 		incidentLongitudeDegreesEditText.setOnFocusChangeListener(coordsFocusChangeListener);
 		incidentLongitudeMinutesEditText.setOnFocusChangeListener(coordsFocusChangeListener);
+		incidentLongitudeMinutesFractionEditText.setOnFocusChangeListener(coordsFocusChangeListener);
 
 		//-----------------------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------------------
@@ -2224,6 +2298,12 @@ public class ReportOnConditionFragment extends Fragment
 		rocInitialCountySpinner = (Spinner) mRootView.findViewById(R.id.rocCounty);
 		rocAdditionalCountiesTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocAdditionalCounties);
 		rocLocationTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocLocation);
+		rocLocationStreetEditText = (EditText) mRootView.findViewById(R.id.rocLocationStreet);
+		rocLocationCrossStreetEditText = (EditText) mRootView.findViewById(R.id.rocLocationCrossStreet);
+		rocLocationNearestCommunity = (EditText) mRootView.findViewById(R.id.rocLocationNearestCommunity);
+		rocLocationDistanceFromNearestCommunityEditText = (EditText) mRootView.findViewById(R.id.rocLocationDistanceFromNearestCommunity);
+		rocLocationDirectionFromNearestCommunitySpinner = (Spinner) mRootView.findViewById(R.id.rocLocationDirectionFromNearestCommunity);
+
 		rocDPASpinner = (Spinner) mRootView.findViewById(R.id.rocDPA);
 		rocOwnershipSpinner = (Spinner) mRootView.findViewById(R.id.rocOwnership);
 		rocJurisdictionTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocJurisdiction);
@@ -2232,12 +2312,14 @@ public class ReportOnConditionFragment extends Fragment
 		rocStartDateTextView = (TextView) mRootView.findViewById(R.id.rocStartDate);
 		// Retrieving the Error View field objects
 		rocCountyErrorView = (ImageView) mRootView.findViewById(R.id.rocCountyError);
+		rocLocationDirectionFromNearestCommunityErrorView = (ImageView) mRootView.findViewById(R.id.rocLocationDirectionFromNearestCommunityError);
 		rocDPAErrorView = (ImageView) mRootView.findViewById(R.id.rocDPAError);
 		rocOwnershipErrorView = (ImageView) mRootView.findViewById(R.id.rocOwnershipError);
 
 		// Make interacting with the spinners hide the error views
 		setupSpinnerErrorView(rocInitialCountySpinner,rocCountyErrorView);
 		setupSpinnerErrorView(rocDPASpinner,rocDPAErrorView);
+		setupSpinnerErrorView(rocLocationDirectionFromNearestCommunitySpinner, rocLocationDirectionFromNearestCommunityErrorView);
 		setupSpinnerErrorView(rocOwnershipSpinner,rocOwnershipErrorView);
 
 		// Setting the Date and Time fields to use appropriate date and time picker dialogs
@@ -2280,7 +2362,7 @@ public class ReportOnConditionFragment extends Fragment
 					public void onTimeSet(TimePicker view, int hour, int minute)
 					{
 						// They want the format to be hhmm (i.e. 2300)
-						String time = String.format("%02d%02d",hour,minute,Locale.US);
+						String time = String.format(Locale.US,"%02d%02d",hour,minute);
 						rocStartTimeTextView.setText(time);
 					}
 				}, hour, minute, true);
@@ -2348,6 +2430,9 @@ public class ReportOnConditionFragment extends Fragment
 		threatsEvacsErrorView = (ImageView) mRootView.findViewById(R.id.rocThreatsEvacuationsError);
 		threatsStructuresErrorView = (ImageView) mRootView.findViewById(R.id.rocThreatsStructuresError);
 		threatsInfrastructureErrorView = (ImageView) mRootView.findViewById(R.id.rocThreatsInfrastructureError);
+		threatsEvacsListErrorView = (LinearLayout) mRootView.findViewById(R.id.rocThreatsEvacuationsListError);
+		threatsStructuresListErrorView = (LinearLayout) mRootView.findViewById(R.id.rocThreatsStructuresListError);
+		threatsInfrastructureListErrorView = (LinearLayout) mRootView.findViewById(R.id.rocThreatsInfrastructureListError);
 
 		//-----------------------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------------------
@@ -2357,7 +2442,7 @@ public class ReportOnConditionFragment extends Fragment
 		otherInfoListLinearLayout = (LinearLayout) mRootView.findViewById(R.id.rocOtherInfoList);
 		otherInfoAddButton = (ImageButton) mRootView.findViewById(R.id.rocOtherInfoAddButton);
 		// Setting up the add threat buttons
-		otherInfoAddButton.setOnClickListener(newAddFieldListener(otherInfoListLinearLayout, otherInfoAddButton , otherSignificantInfoCannedMessages, null));
+		otherInfoAddButton.setOnClickListener(newAddFieldListener(otherInfoListLinearLayout, otherInfoAddButton , otherSignificantInfoCannedMessages, null, null));
 
 		//-----------------------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------------------
@@ -2366,10 +2451,6 @@ public class ReportOnConditionFragment extends Fragment
 		//-----------------------------------------------------------------------------------------
 		// Retrieving all of the field objects
 		calFireIncidentSpinner = (Spinner) mRootView.findViewById(R.id.rocCalFireIncident);
-		//calFireResourcesNoneCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesNone);
-		//calFireResourcesAirCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesAir);
-		//calFireResourcesGroundCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesGround);
-		//calFireResourcesAllReleasedCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesAllReleased);
 		calFireResourcesNoneCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesNone);
 		calFireResourcesAirCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesAir);
 		calFireResourcesGroundCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesGround);
@@ -2491,17 +2572,22 @@ public class ReportOnConditionFragment extends Fragment
 			double lon = data.getDouble("longitude");
 
 			// Converting to DDM:
-			// TODO - Should validate lat / long somewhere
 			incidentLatitudeDegreesEditText.setText(String.format(Locale.US,"%d",(int)getDegree(lat)));
-			incidentLatitudeMinutesEditText.setText(String.format(Locale.US,"%f",getMinutes(lat)));
-			incidentLongitudeDegreesEditText.setText(String.format(Locale.US,"%d",(int)getDegree(lon)));
-			incidentLongitudeMinutesEditText.setText(String.format(Locale.US,"%f",getMinutes(lon)));
+			incidentLatitudeMinutesEditText.setText(String.format(Locale.US,"%d",getMinutesInteger(lat)));
+			incidentLatitudeMinutesFractionEditText.setText(stringGetFraction(String.format(Locale.US,"%f",getMinutesFraction(lat))));
+			// NOTE - we multiply the value by -1 because the UI has a hardcoded "-" sign in front of it
+			// (all longitudes in california are in the -120 range, and the client doesn't want users to have to manually enter the "-" sign)
+			incidentLongitudeDegreesEditText.setText(String.format(Locale.US,"%d",-1 * (int)getDegree(lon)));
+			incidentLongitudeMinutesEditText.setText(String.format(Locale.US,"%d",getMinutesInteger(lon)));
+			incidentLongitudeMinutesFractionEditText.setText(stringGetFraction(String.format(Locale.US,"%f",getMinutesFraction(lon))));
 
 			// Removing the errors:
 			incidentLatitudeDegreesEditText.setError(null);
 			incidentLatitudeMinutesEditText.setError(null);
+			incidentLatitudeMinutesFractionEditText.setError(null);
 			incidentLongitudeDegreesEditText.setError(null);
 			incidentLongitudeMinutesEditText.setError(null);
+			incidentLongitudeMinutesFractionEditText.setError(null);
 		}
 		catch(Exception e)
 		{
@@ -2683,8 +2769,10 @@ public class ReportOnConditionFragment extends Fragment
 		// Decimal Degree Minutes Edit Text:
 		incidentLatitudeDegreesEditText.setText("");
 		incidentLatitudeMinutesEditText.setText("");
+		incidentLatitudeMinutesFractionEditText.setText("");
 		incidentLongitudeDegreesEditText.setText("");
 		incidentLongitudeMinutesEditText.setText("");
+		incidentLongitudeMinutesFractionEditText.setText("");
 		incidentStateTextView.setText("");
 		// State Variables
 		incidentTypeSelectedItems.clear();
@@ -2694,6 +2782,11 @@ public class ReportOnConditionFragment extends Fragment
 		rocInitialCountySpinner.setSelection(0);
 		rocAdditionalCountiesTextView.setText("");
 		rocLocationTextView.setText("");
+		rocLocationStreetEditText.setText("");
+		rocLocationCrossStreetEditText.setText("");
+		rocLocationNearestCommunity.setText("");
+		rocLocationDistanceFromNearestCommunityEditText.setText("");
+		rocLocationDirectionFromNearestCommunitySpinner.setSelection(0);
 		rocDPASpinner.setSelection(0);
 		rocOwnershipSpinner.setSelection(0);
 		rocJurisdictionTextView.setText("");
@@ -2701,6 +2794,7 @@ public class ReportOnConditionFragment extends Fragment
 		rocStartDateTextView.setText("");
 		// Input Validation Error Views
 		rocCountyErrorView.setVisibility(View.GONE);
+		rocLocationDirectionFromNearestCommunityErrorView.setVisibility(View.GONE);
 		rocDPAErrorView.setVisibility(View.GONE);
 		rocOwnershipErrorView.setVisibility(View.GONE);
 		//================================================
@@ -2748,6 +2842,9 @@ public class ReportOnConditionFragment extends Fragment
 		threatsEvacsErrorView.setVisibility(View.GONE);
 		threatsStructuresErrorView.setVisibility(View.GONE);
 		threatsInfrastructureErrorView.setVisibility(View.GONE);
+		threatsEvacsListErrorView.setVisibility(View.GONE);
+		threatsStructuresListErrorView.setVisibility(View.GONE);
+		threatsInfrastructureListErrorView.setVisibility(View.GONE);
 		//================================================
 		// CAL FIRE Resources Fields
 		//================================================
@@ -2885,7 +2982,7 @@ public class ReportOnConditionFragment extends Fragment
 
 	// Creates an OnClickListener that adds a new AutoCompleteTextView field to a LinearLayout every time the ImageButton is pressed
 	// When the user clicks the "add" button, the "errorView" will be hidden
-	private OnClickListener newAddFieldListener(LinearLayout l, ImageButton b, String[] c, ImageView errorView)
+	private OnClickListener newAddFieldListener(LinearLayout l, ImageButton b, String[] c, ImageView errorView, LinearLayout listErrorView)
 	{
 		OnClickListener listener = (new OnClickListener()
 		{
@@ -2893,14 +2990,16 @@ public class ReportOnConditionFragment extends Fragment
 			ImageButton button;
 			String[] autoCompleteArray;
 			ImageView errorView;
+			LinearLayout listErrorView;
 
 			// Acts as constructor for anonymous class
-			public OnClickListener init(LinearLayout l, ImageButton b, String[] c, ImageView e)
+			public OnClickListener init(LinearLayout l, ImageButton b, String[] c, ImageView e, LinearLayout listE)
 			{
 				layout = l;
 				button = b;
 				autoCompleteArray = c;
 				errorView = e;
+				listErrorView = listE;
 				return this;
 			}
 
@@ -2911,6 +3010,12 @@ public class ReportOnConditionFragment extends Fragment
 				if(errorView != null)
 				{
 					errorView.setVisibility(View.GONE);
+				}
+
+				// If the list error view has been assigned, hide it when interacting with the form
+				if(listErrorView != null)
+				{
+					listErrorView.setVisibility(View.GONE);
 				}
 
 				LinearLayout newLayout = new LinearLayout(mContext);
@@ -2959,7 +3064,7 @@ public class ReportOnConditionFragment extends Fragment
 
 				layout.addView(newLayout);
 			}
-		}).init(l, b, c, errorView);
+		}).init(l, b, c, errorView, listErrorView);
 
 		return listener;
 	}
@@ -3036,9 +3141,55 @@ public class ReportOnConditionFragment extends Fragment
 		return (int) Math.ceil(decimalDegrees);
 	}
 
-	private double getMinutes(double decimalDegrees)
+	private int getMinutesInteger(double decimalDegrees)
 	{
-		return 60.0 * (Math.abs(decimalDegrees - getDegree(decimalDegrees)));
+		return (int) Math.floor(60.0 * (Math.abs(decimalDegrees - getDegree(decimalDegrees))));
+	}
+
+	private double getMinutesFraction(double decimalDegrees)
+	{
+		return (60.0 * (Math.abs(decimalDegrees - getDegree(decimalDegrees)))) % 1.0;
+	}
+
+	// Takes a string representing a fraction and returns only the portion to the right of the last decimal point
+	// i.e.: takes the string: "0.12345" and returns "12345"
+	private String stringGetFraction(String str)
+	{
+		if(str == null)
+			return "0";
+
+		// Get the index of the decimal point, if it exists:
+		int decimalPointIndex = str.lastIndexOf('.');
+
+		// If a decimal point was not found
+		if(decimalPointIndex == -1)
+		{
+			// This means the string passed represents a whole number, making the fractional part = 0
+			// Return the fractional part of a whole number, which is always "0"
+			return "0";
+		}
+
+		// If the decimal point index is the last character in the string, that means we have a string like "123."
+		if(decimalPointIndex == str.length() - 1)
+		{
+			// That makes the number a whole number (i.e. "2."), making the fractional part = 0
+			// Return the fractional part of a whole number, which is always "0"
+			return "0";
+		}
+
+
+		int start = decimalPointIndex + 1;
+		int end = str.length();
+
+		// We want to truncate to 4 decimal places
+		if(end > start + 4)
+		{
+			end = start + 4;
+		}
+
+		// Return the substring to the right of the decimal point, but no more than 4 digits
+		// (we want to truncate to 4 digits
+		return str.substring(start,end);
 	}
 
 	private boolean isValidLatLong(int latDeg, double latMin, int lonDeg, double lonMin)
@@ -3170,9 +3321,17 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			// Building the latitude / longitude from whatever is in the fields:
 			int latDegrees = Integer.parseInt(incidentLatitudeDegreesEditText.getText().toString());
-			double latMinutes = Double.parseDouble(incidentLatitudeMinutesEditText.getText().toString());
-			int lonDegrees = Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
-			double lonMinutes = Double.parseDouble(incidentLongitudeMinutesEditText.getText().toString());
+			int latMinutesWholePortion = Integer.parseInt(incidentLatitudeMinutesEditText.getText().toString());
+			double latMinutesFractionPortion = Double.parseDouble("0." + incidentLatitudeMinutesFractionEditText.getText().toString());
+
+			// NOTE - we multiply the value by -1 because the UI has a hardcoded "-" sign in front of it
+			// (all longitudes in california are in the -120 range, and the client doesn't want users to have to manually enter the "-" sign)
+			int lonDegrees = -1 * Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
+			int lonMinutesWholePortion = Integer.parseInt(incidentLongitudeMinutesEditText.getText().toString());
+			double lonMinutesFractionPortion = Double.parseDouble("0." + incidentLongitudeMinutesFractionEditText.getText().toString());
+
+			double latMinutes = latMinutesWholePortion + latMinutesFractionPortion;
+			double lonMinutes = lonMinutesWholePortion + lonMinutesFractionPortion;
 
 			// Do some data validation:
 			if(!isValidLatLong(latDegrees, latMinutes, lonDegrees, lonMinutes))
@@ -3192,9 +3351,11 @@ public class ReportOnConditionFragment extends Fragment
 			Log.w("ROCFragment","Warning: exception was raised attempting to convert user input lat/long."
 					+ " Exception: " + e + "Lat: "
 					+ incidentLatitudeDegreesEditText.getText().toString() + " deg, "
-					+ incidentLatitudeMinutesEditText.getText().toString() + "  min. Lon: "
+					+ incidentLatitudeMinutesEditText.getText().toString() + " . "
+					+ incidentLatitudeMinutesFractionEditText.getText().toString() + " min. Lon: "
 					+ incidentLongitudeDegreesEditText.getText().toString() + " deg, "
-					+ incidentLongitudeMinutesEditText.getText().toString() + " min.");
+					+ incidentLongitudeMinutesEditText.getText().toString() + " . "
+					+ incidentLongitudeMinutesFractionEditText.getText().toString() + " min.");
 		}
 
 		JSONObject coords = null;
@@ -3279,6 +3440,7 @@ public class ReportOnConditionFragment extends Fragment
 		emailHeaderErrorView.setVisibility(View.GONE);
 		// Hide any other error views that must be shown manually
 		rocCountyErrorView.setVisibility(View.GONE);
+		rocLocationDirectionFromNearestCommunityErrorView.setVisibility(View.GONE);
 		rocDPAErrorView.setVisibility(View.GONE);
 		rocOwnershipErrorView.setVisibility(View.GONE);
 		vegFireRateOfSpreadErrorView.setVisibility(View.GONE);
@@ -3286,6 +3448,9 @@ public class ReportOnConditionFragment extends Fragment
 		threatsEvacsErrorView.setVisibility(View.GONE);
 		threatsInfrastructureErrorView.setVisibility(View.GONE);
 		threatsStructuresErrorView.setVisibility(View.GONE);
+		threatsEvacsListErrorView.setVisibility(View.GONE);
+		threatsStructuresListErrorView.setVisibility(View.GONE);
+		threatsInfrastructureListErrorView.setVisibility(View.GONE);
 		calFireIncidentErrorView.setVisibility(View.GONE);
 
 
@@ -3298,12 +3463,15 @@ public class ReportOnConditionFragment extends Fragment
 		incidentTypeTextView.setError(null);
 		incidentLatitudeDegreesEditText.setError(null);
 		incidentLatitudeMinutesEditText.setError(null);
+		incidentLatitudeMinutesFractionEditText.setError(null);
 		incidentLongitudeDegreesEditText.setError(null);
 		incidentLongitudeMinutesEditText.setError(null);
+		incidentLongitudeMinutesFractionEditText.setError(null);
 		incidentStateTextView.setError(null);
 		incidentInfoHeaderErrorView.setVisibility(View.GONE);
 		rocCountyErrorView.setVisibility(View.GONE);
 		rocLocationTextView.setError(null);
+		rocLocationDirectionFromNearestCommunityErrorView.setVisibility(View.GONE);
 		rocDPAErrorView.setVisibility(View.GONE);
 		rocOwnershipErrorView.setVisibility(View.GONE);
 		rocJurisdictionTextView.setError(null);
@@ -3324,6 +3492,9 @@ public class ReportOnConditionFragment extends Fragment
 		threatsEvacsErrorView.setVisibility(View.GONE);
 		threatsStructuresErrorView.setVisibility(View.GONE);
 		threatsInfrastructureErrorView.setVisibility(View.GONE);
+		threatsEvacsListErrorView.setVisibility(View.GONE);
+		threatsStructuresListErrorView.setVisibility(View.GONE);
+		threatsInfrastructureListErrorView.setVisibility(View.GONE);
 		threatsEvacsHeaderErrorView.setVisibility(View.GONE);
 		calFireIncidentErrorView.setVisibility(View.GONE);
 		resourceCommitmentHeaderErrorView.setVisibility(View.GONE);
@@ -3425,7 +3596,7 @@ public class ReportOnConditionFragment extends Fragment
 				isIncidentInfoValid = false;
 			}
 			//------------------
-			// Latitude Minutes:
+			// Latitude Minutes (whole number portion):
 			//------------------
 			try
 			{
@@ -3439,12 +3610,35 @@ public class ReportOnConditionFragment extends Fragment
 				isFormValid = false;
 				isIncidentInfoValid = false;
 			}
+
+			//------------------
+			// Latitude Minutes (fraction portion):
+			// Can be any positive integer (any integer with an added decimal on the left is a valid double)
+			// i.e. "12934142" with an added decimal becomes "0.12934142", which is valid
+			//------------------
+			try
+			{
+				double lonMinutesFractionPortion = Double.parseDouble("0." + incidentLatitudeMinutesFractionEditText.getText().toString());
+
+
+				if(lonMinutesFractionPortion < 0)
+					throw new NumberFormatException();
+			}
+			catch(Exception e)
+			{
+				incidentLatitudeMinutesFractionEditText.setError("Minutes decimal portion must be positive");
+				isFormValid = false;
+				isIncidentInfoValid = false;
+			}
+
 			//------------------
 			// Longitude Degrees:
 			//------------------
 			try
 			{
-				int lonDeg = Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
+				// NOTE - we multiply the value by -1 because the UI has a hardcoded "-" sign in front of it
+				// (all longitudes in california are in the -120 range, and the client doesn't want users to have to manually enter the "-" sign)
+				int lonDeg = -1 * Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
 				if(lonDeg < -179 || lonDeg > 179)
 					throw new NumberFormatException();
 			}
@@ -3455,7 +3649,7 @@ public class ReportOnConditionFragment extends Fragment
 				isIncidentInfoValid = false;
 			}
 			//------------------
-			// Longitude Minutes:
+			// Longitude Minutes (whole number portion):
 			//------------------
 			try
 			{
@@ -3466,6 +3660,25 @@ public class ReportOnConditionFragment extends Fragment
 			catch(Exception e)
 			{
 				incidentLongitudeMinutesEditText.setError("Minutes must be between 0 and 59.");
+				isFormValid = false;
+				isIncidentInfoValid = false;
+			}
+
+			//------------------
+			// Longitude Minutes (fraction portion):
+			// Can be any positive integer (any integer with an added decimal on the left is a valid double)
+			// i.e. "12934142" with an added decimal becomes "0.12934142", which is valid
+			//------------------
+			try
+			{
+				double lonMinutesFractionPortion = Double.parseDouble("0." + incidentLongitudeMinutesFractionEditText.getText().toString());
+
+				if(lonMinutesFractionPortion < 0)
+					throw new NumberFormatException();
+			}
+			catch(Exception e)
+			{
+				incidentLongitudeMinutesFractionEditText.setError("Minutes decimal portion must be positive");
 				isFormValid = false;
 				isIncidentInfoValid = false;
 			}
@@ -3519,6 +3732,56 @@ public class ReportOnConditionFragment extends Fragment
 		if(rocLocationTextView.getText().toString().trim().length() == 0)
 		{
 			rocLocationTextView.setError("General location is required.");
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocLocationStreetEditText
+		// required, no validation
+		//--------------------------------
+		if(rocLocationStreetEditText.getText().toString().trim().length() == 0)
+		{
+			rocLocationStreetEditText.setError("Street is required.");
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocLocationCrossStreetEditText
+		// required, no validation
+		//--------------------------------
+		if(rocLocationCrossStreetEditText.getText().toString().trim().length() == 0)
+		{
+			rocLocationCrossStreetEditText.setError("Cross Street is required.");
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocLocationNearestCommunity
+		// required, no validation
+		//--------------------------------
+		if(rocLocationNearestCommunity.getText().toString().trim().length() == 0)
+		{
+			rocLocationNearestCommunity.setError("Nearest Community is required.");
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocLocationDistanceFromNearestCommunityEditText
+		// required, no validation
+		//--------------------------------
+		if(rocLocationDistanceFromNearestCommunityEditText.getText().toString().trim().length() == 0)
+		{
+			rocLocationDistanceFromNearestCommunityEditText.setError("Distance from Nearest Community is required.");
+			isRocIncidentInfoValid = false;
+			isFormValid = false;
+		}
+		//--------------------------------
+		// rocLocationDirectionFromNearestCommunitySpinner
+		// required
+		//--------------------------------
+		if(rocLocationDirectionFromNearestCommunitySpinner.getSelectedItemPosition() == 0)
+		{
+			rocLocationDirectionFromNearestCommunityErrorView.setVisibility(View.VISIBLE);
 			isRocIncidentInfoValid = false;
 			isFormValid = false;
 		}
@@ -3596,9 +3859,7 @@ public class ReportOnConditionFragment extends Fragment
 		// Keep track if there was an error in the vegetation fire section
 		boolean isVegFireInfoValid = true;
 
-
-		// TODO - Change to "Vegetation Fire" once we add vegetation fire
-		if(incidentTypeSelectedItems.contains("Fire (Wildland)"))
+		if(isIncidentVegetationFire())
 		{
 			vegFireFieldsRequired = true;
 			Log.e("ROC","Found veg fire!");
@@ -3902,7 +4163,7 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			if(threatsEvacsListLinearLayout.getChildCount() == 0)
 			{
-				threatsEvacsErrorView.setVisibility(View.VISIBLE);
+				threatsEvacsListErrorView.setVisibility(View.VISIBLE);
 				isThreatsInfoValid = false;
 				isFormValid = false;
 			}
@@ -3912,7 +4173,7 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			if(threatsEvacsListLinearLayout.getChildCount() == 0)
 			{
-				threatsEvacsErrorView.setVisibility(View.VISIBLE);
+				threatsEvacsListErrorView.setVisibility(View.VISIBLE);
 				isThreatsInfoValid = false;
 				isFormValid = false;
 			}
@@ -3965,7 +4226,7 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			if(threatsStructuresListLinearLayout.getChildCount() == 0)
 			{
-				threatsStructuresErrorView.setVisibility(View.VISIBLE);
+				threatsStructuresListErrorView.setVisibility(View.VISIBLE);
 				isThreatsInfoValid = false;
 				isFormValid = false;
 			}
@@ -3975,7 +4236,7 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			if(threatsStructuresListLinearLayout.getChildCount() == 0)
 			{
-				threatsStructuresErrorView.setVisibility(View.VISIBLE);
+				threatsStructuresListErrorView.setVisibility(View.VISIBLE);
 				isThreatsInfoValid = false;
 				isFormValid = false;
 			}
@@ -4028,7 +4289,7 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
 			{
-				threatsInfrastructureErrorView.setVisibility(View.VISIBLE);
+				threatsInfrastructureListErrorView.setVisibility(View.VISIBLE);
 				isThreatsInfoValid = false;
 				isFormValid = false;
 			}
@@ -4038,7 +4299,7 @@ public class ReportOnConditionFragment extends Fragment
 		{
 			if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
 			{
-				threatsInfrastructureErrorView.setVisibility(View.VISIBLE);
+				threatsInfrastructureListErrorView.setVisibility(View.VISIBLE);
 				isThreatsInfoValid = false;
 				isFormValid = false;
 			}
@@ -4224,10 +4485,21 @@ public class ReportOnConditionFragment extends Fragment
 		data.incidentTypes = new ArrayList<String>(incidentTypeSelectedItems);
 
 		// Location data:
+		// Building the latitude / longitude from whatever is in the fields:
 		int latDeg = Integer.parseInt(incidentLatitudeDegreesEditText.getText().toString());
-		double latMin = Double.parseDouble(incidentLatitudeMinutesEditText.getText().toString());
-		int lonDeg = Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
-		double lonMin = Double.parseDouble(incidentLongitudeMinutesEditText.getText().toString());
+		int latMinutesWholePortion = Integer.parseInt(incidentLatitudeMinutesEditText.getText().toString());
+		double latMinutesFractionPortion = Double.parseDouble("0." + incidentLatitudeMinutesFractionEditText.getText().toString());
+
+		// NOTE - we multiply the value by -1 because the UI has a hardcoded "-" sign in front of it
+		// (all longitudes in california are in the -120 range, and the client doesn't want users to have to manually enter the "-" sign)
+		int lonDeg = -1 * Integer.parseInt(incidentLongitudeDegreesEditText.getText().toString());
+		int lonMinutesWholePortion = Integer.parseInt(incidentLongitudeMinutesEditText.getText().toString());
+		double lonMinutesFractionPortion = Double.parseDouble("0." + incidentLongitudeMinutesFractionEditText.getText().toString());
+
+		double latMin = latMinutesWholePortion + latMinutesFractionPortion;
+		double lonMin = lonMinutesWholePortion + lonMinutesFractionPortion;
+
+
 		data.latitude = toDecimalDegrees(latDeg, latMin);
 		data.longitude = toDecimalDegrees(lonDeg, lonMin);
 		data.incidentState = incidentStateTextView.getText().toString();
@@ -4239,6 +4511,11 @@ public class ReportOnConditionFragment extends Fragment
 		data.county = rocInitialCountySpinner.getSelectedItem().toString();
 		data.additionalAffectedCounties = rocAdditionalCountiesTextView.getText().toString();
 		data.location = rocLocationTextView.getText().toString();
+		data.street = rocLocationStreetEditText.getText().toString();
+		data.crossStreet = rocLocationCrossStreetEditText.getText().toString();
+		data.nearestCommunity = rocLocationNearestCommunity.getText().toString();
+		data.milesFromNearestCommunity = rocLocationDistanceFromNearestCommunityEditText.getText().toString();
+		data.directionFromNearestCommunity = rocLocationDirectionFromNearestCommunitySpinner.getSelectedItem().toString();
 		data.dpa = rocDPASpinner.getSelectedItem().toString();
 		data.ownership = rocOwnershipSpinner.getSelectedItem().toString();
 		data.jurisdiction = rocJurisdictionTextView.getText().toString();
@@ -4516,172 +4793,4 @@ public class ReportOnConditionFragment extends Fragment
 			mContext.onBackPressed();
 		}
 	};
-
-
-
-	//========================================================================================================
-	//========================================================================================================
-	// A custom Adapter to show a checkbox list
-	//========================================================================================================
-	//========================================================================================================
-
-	private static class IncidentTypeSpinnerAdapter<T> extends BaseAdapter
-	{
-		static class SpinnerItem<T>
-		{
-			private String text;
-			private T item;
-
-			SpinnerItem(T t, String s)
-			{
-				item = t;
-				text = s;
-			}
-
-			@Override
-			public String toString ()
-			{
-				return text;
-			}
-		}
-
-
-		private Context context;
-		private Set<T> selected_items;
-		private List<SpinnerItem<T>> all_items;
-		private String headerText;
-		// The textView to update with the selected contents
-		private TextView textView;
-		// The spinner that uses this adapter
-
-		IncidentTypeSpinnerAdapter(Context c, String h, List<SpinnerItem<T>> l, Set<T> s, TextView t)
-		{
-			context = c;
-			headerText = h;
-			all_items = l;
-			selected_items = s;
-			textView = t;
-		}
-
-		@Override
-		public int getCount()
-		{
-			return all_items.size() + 1;
-		}
-
-		@Override
-		public Object getItem(int position)
-		{
-			if(position < 1)
-			{
-				return null;
-			}
-
-			return all_items.get(position - 1);
-		}
-
-		@Override
-		public long getItemId(int position)
-		{
-			return 0;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
-			final ViewHolder holder;
-			if(convertView == null)
-			{
-				LayoutInflater layoutInflater = LayoutInflater.from(context);
-				convertView = layoutInflater.inflate(R.layout.roc_incident_type_spinner_item, parent, false);
-				holder = new ViewHolder();
-				holder.mTextView = (TextView) convertView.findViewById(R.id.text);
-				holder.mCheckBox = (CheckBox) convertView.findViewById(R.id.checkbox);
-				convertView.setTag(holder);
-			}
-			else
-			{
-				holder = (ViewHolder) convertView.getTag();
-			}
-
-
-			if(position < 1)
-			{
-				holder.mCheckBox.setVisibility(View.GONE);
-				holder.mTextView.setText(headerText);
-
-				holder.mTextView.setOnClickListener(null);
-				holder.mTextView.setClickable(false);
-				holder.mTextView.setFocusable(false);
-				holder.mTextView.setFocusableInTouchMode(false);
-			}
-			else
-			{
-				final int listPos = position - 1;
-				holder.mCheckBox.setVisibility(View.VISIBLE);
-				holder.mTextView.setText(all_items.get(listPos).text);
-
-				final T item = all_items.get(listPos).item;
-				boolean isSelected = selected_items.contains(item);
-
-				holder.mCheckBox.setOnCheckedChangeListener(null);
-				holder.mCheckBox.setChecked(isSelected);
-
-				holder.mCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
-				{
-					@Override
-					public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
-					{
-						if(isChecked)
-						{
-							selected_items.add(item);
-						}
-						else
-						{
-							selected_items.remove(item);
-						}
-
-						// If the textView is set, set the textView's text to show the selected items, one per line
-						if(textView != null)
-						{
-							String textViewText = "";
-							boolean first = true;
-							for (T item : selected_items)
-							{
-								textViewText += (first ? "" : ",\n") + item;
-								first = false;
-							}
-
-							textView.setText(textViewText);
-						}
-					}
-				});
-
-				// Enabling the textview as clickable
-				holder.mTextView.setClickable(false);
-				holder.mTextView.setFocusable(false);
-				holder.mTextView.setFocusableInTouchMode(false);
-
-				holder.mTextView.setOnClickListener(new View.OnClickListener()
-				{
-					@Override
-					public void onClick(View view)
-					{
-						holder.mCheckBox.toggle();
-					}
-				});
-			}
-
-			return convertView;
-		}
-
-		private class ViewHolder
-		{
-			private TextView mTextView;
-			private CheckBox mCheckBox;
-		}
-
-
-
-	}
 }
