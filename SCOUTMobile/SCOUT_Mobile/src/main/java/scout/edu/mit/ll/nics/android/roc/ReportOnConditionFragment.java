@@ -2725,6 +2725,8 @@ public class ReportOnConditionFragment extends Fragment
 				return;
 			}
 
+			// Clearing the focused view, in case we are collapsing the currently focused view
+			clearFocus();
 
 			boolean collapse = section.getVisibility() == View.VISIBLE;
 
@@ -4759,12 +4761,24 @@ public class ReportOnConditionFragment extends Fragment
 		return data;
 	}
 
+	// This method removes focus from all fields
+	private void clearFocus()
+	{
+		View currentlyFocusedView = mContext.getCurrentFocus();
+		if(currentlyFocusedView != null)
+		{
+			currentlyFocusedView.clearFocus();
+		}
+	}
+
 	// When the user presses the submit button:
 	OnClickListener submitButtonOnClickListener = new OnClickListener()
 	{
 		@Override
 		public void onClick (View v)
 		{
+			// Clearing focus so the view doesn't scroll
+			clearFocus();
 
 			if(isFormInfoValid())
 			{
