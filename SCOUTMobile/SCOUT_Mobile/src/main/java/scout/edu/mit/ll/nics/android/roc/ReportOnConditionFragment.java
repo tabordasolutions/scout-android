@@ -2299,7 +2299,9 @@ public class ReportOnConditionFragment extends Fragment
 		rocAdditionalCountiesTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocAdditionalCounties);
 		rocLocationTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocLocation);
 		rocLocationStreetEditText = (EditText) mRootView.findViewById(R.id.rocLocationStreet);
+		rocLocationStreetEditText.setOnFocusChangeListener(validateFocusChangeLister);
 		rocLocationCrossStreetEditText = (EditText) mRootView.findViewById(R.id.rocLocationCrossStreet);
+		rocLocationCrossStreetEditText.setOnFocusChangeListener(validateFocusChangeLister);
 		rocLocationNearestCommunity = (EditText) mRootView.findViewById(R.id.rocLocationNearestCommunity);
 		rocLocationDistanceFromNearestCommunityEditText = (EditText) mRootView.findViewById(R.id.rocLocationDistanceFromNearestCommunity);
 		rocLocationDirectionFromNearestCommunitySpinner = (Spinner) mRootView.findViewById(R.id.rocLocationDirectionFromNearestCommunity);
@@ -3110,6 +3112,10 @@ public class ReportOnConditionFragment extends Fragment
 		});
 	}
 
+	private void makeAutoValidTextField(EditText editText) {
+
+	}
+
 	private ArrayAdapter<String> newAutoCompleteAdapter(String[] autoCompleteOptions)
 	{
 		return new ArrayAdapter<String>(mContext, R.layout.auto_complete_list_item, R.id.item, autoCompleteOptions);
@@ -3304,6 +3310,19 @@ public class ReportOnConditionFragment extends Fragment
 			if(!hasFocus)
 			{
 				requestIncidentLocationDetailsForFormCoords();
+			}
+		}
+	};
+
+	// Anytime a field looses focus we should validate the form so that the user always knows the form state.
+	private View.OnFocusChangeListener validateFocusChangeLister = new View.OnFocusChangeListener() {
+		@Override
+		public void onFocusChange (View v, boolean hasFocus)
+		{
+			// If the user has finished editing the fields:
+			if(!hasFocus)
+			{
+				isFormInfoValid();
 			}
 		}
 	};
