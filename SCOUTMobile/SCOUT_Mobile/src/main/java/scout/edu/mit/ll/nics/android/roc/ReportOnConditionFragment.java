@@ -2298,20 +2298,35 @@ public class ReportOnConditionFragment extends Fragment
 		rocInitialCountySpinner = (Spinner) mRootView.findViewById(R.id.rocCounty);
 		rocAdditionalCountiesTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocAdditionalCounties);
 		rocLocationTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocLocation);
+		rocLocationTextView.setOnFocusChangeListener(validateFocusChangeLister);
+
 		rocLocationStreetEditText = (EditText) mRootView.findViewById(R.id.rocLocationStreet);
 		rocLocationStreetEditText.setOnFocusChangeListener(validateFocusChangeLister);
+
 		rocLocationCrossStreetEditText = (EditText) mRootView.findViewById(R.id.rocLocationCrossStreet);
 		rocLocationCrossStreetEditText.setOnFocusChangeListener(validateFocusChangeLister);
-		rocLocationNearestCommunity = (EditText) mRootView.findViewById(R.id.rocLocationNearestCommunity);
-		rocLocationDistanceFromNearestCommunityEditText = (EditText) mRootView.findViewById(R.id.rocLocationDistanceFromNearestCommunity);
-		rocLocationDirectionFromNearestCommunitySpinner = (Spinner) mRootView.findViewById(R.id.rocLocationDirectionFromNearestCommunity);
+		rocLocationCrossStreetEditText.setOnFocusChangeListener(validateFocusChangeLister);
 
+		rocLocationNearestCommunity = (EditText) mRootView.findViewById(R.id.rocLocationNearestCommunity);
+		rocLocationNearestCommunity.setOnFocusChangeListener(validateFocusChangeLister);
+
+		rocLocationDistanceFromNearestCommunityEditText = (EditText) mRootView.findViewById(R.id.rocLocationDistanceFromNearestCommunity);
+		rocLocationDistanceFromNearestCommunityEditText.setOnFocusChangeListener(validateFocusChangeLister);
+
+		rocLocationDirectionFromNearestCommunitySpinner = (Spinner) mRootView.findViewById(R.id.rocLocationDirectionFromNearestCommunity);
 		rocDPASpinner = (Spinner) mRootView.findViewById(R.id.rocDPA);
 		rocOwnershipSpinner = (Spinner) mRootView.findViewById(R.id.rocOwnership);
 		rocJurisdictionTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocJurisdiction);
+		rocJurisdictionTextView.setOnFocusChangeListener(validateFocusChangeLister);
+
 		rocStartDateTimeLayout = (LinearLayout) mRootView.findViewById(R.id.rocDateTimeLayout);
+
 		rocStartTimeTextView = (TextView) mRootView.findViewById(R.id.rocStartTime);
+		rocStartTimeTextView.setOnFocusChangeListener(validateFocusChangeLister);
+
 		rocStartDateTextView = (TextView) mRootView.findViewById(R.id.rocStartDate);
+		rocStartDateTextView.setOnFocusChangeListener(validateFocusChangeLister);
+
 		// Retrieving the Error View field objects
 		rocCountyErrorView = (ImageView) mRootView.findViewById(R.id.rocCountyError);
 		rocLocationDirectionFromNearestCommunityErrorView = (ImageView) mRootView.findViewById(R.id.rocLocationDirectionFromNearestCommunityError);
@@ -2380,16 +2395,30 @@ public class ReportOnConditionFragment extends Fragment
 		//-----------------------------------------------------------------------------------------
 		// Retrieving all of the field objects
 		vegFireAcreageEditText = (EditText) mRootView.findViewById(R.id.rocVegFireAcreage);
+		vegFireAcreageEditText.setOnFocusChangeListener(validateFocusChangeLister);
+
 		vegFireRateOfSpreadSpinner = (Spinner) mRootView.findViewById(R.id.rocVegFireRateOfSpread);
 		vegFireFuelTypeLabelTextView = (TextView) mRootView.findViewById(R.id.rocVegFireFuelTypeLabel);
+		vegFireFuelTypeLabelTextView.setOnFocusChangeListener(validateFocusChangeLister);
+
 		vegFireFuelTypeGrassCheckBox = (CheckBox) mRootView.findViewById(R.id.rocVegFireFuelTypeGrass);
+		vegFireFuelTypeGrassCheckBox.setOnFocusChangeListener(validateFocusChangeLister);
+
 		vegFireFuelTypeBrushCheckBox = (CheckBox) mRootView.findViewById(R.id.rocVegFireFuelTypeBrush);
+		vegFireFuelTypeBrushCheckBox.setOnFocusChangeListener(validateFocusChangeLister);
+
 		vegFireFuelTypeTimberCheckBox = (CheckBox) mRootView.findViewById(R.id.rocVegFireFuelTypeTimber);
+		vegFireFuelTypeTimberCheckBox.setOnFocusChangeListener(validateFocusChangeLister);
+
 		vegFireFuelTypeOakWoodlandCheckBox = (CheckBox) mRootView.findViewById(R.id.rocVegFireFuelTypeOakWoodland);
+		vegFireFuelTypeOakWoodlandCheckBox.setOnFocusChangeListener(validateFocusChangeLister);
+
 		vegFireFuelTypeOtherCheckBox = (CheckBox) mRootView.findViewById(R.id.rocVegFireFuelTypeOther);
 		vegFireOtherFuelTypeLabelTextView = (TextView) mRootView.findViewById(R.id.rocVegFireFuelTypeOtherLabel);
 		vegFireOtherFuelTypeEditText = (EditText) mRootView.findViewById(R.id.rocVegFireFuelTypeOtherText);
 		vegFirePercentContainedEditText = (EditText) mRootView.findViewById(R.id.rocVegFirePercentContained);
+		vegFirePercentContainedEditText.setOnFocusChangeListener(validateFocusChangeLister);
+
 		// Retrieving the Error View field objects
 		vegFireRateOfSpreadErrorView = (ImageView) mRootView.findViewById(R.id.rocVegFireRateOfSpreadError);
 
@@ -3291,6 +3320,7 @@ public class ReportOnConditionFragment extends Fragment
 			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
 			{
 				errorView.setVisibility(View.GONE);
+				isFormInfoValid();
 			}
 
 			@Override
