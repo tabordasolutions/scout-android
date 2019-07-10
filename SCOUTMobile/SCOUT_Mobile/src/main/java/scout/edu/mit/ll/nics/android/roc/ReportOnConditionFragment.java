@@ -3140,11 +3140,7 @@ public class ReportOnConditionFragment extends Fragment
 			}
 		});
 	}
-
-	private void makeAutoValidTextField(EditText editText) {
-
-	}
-
+	
 	private ArrayAdapter<String> newAutoCompleteAdapter(String[] autoCompleteOptions)
 	{
 		return new ArrayAdapter<String>(mContext, R.layout.auto_complete_list_item, R.id.item, autoCompleteOptions);
