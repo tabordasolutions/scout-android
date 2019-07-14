@@ -131,6 +131,8 @@ public class ReportOnConditionFragment extends Fragment
 	private LinearLayout emailSection;
 	private ImageView emailHeaderErrorView;
 
+	private boolean shouldValidate;
+
 	//================================================
 	// ROC Form Info Fields
 	//================================================
@@ -683,6 +685,7 @@ public class ReportOnConditionFragment extends Fragment
 		// Incident Number
 		// ------------------------------------------------
 		incidentNumberTextView.setText(incidentData.getIncidentNumber());
+		incidentNumberTextView.setHint(R.string.incident_number_hint);
 		// ------------------------------------------------
 		// Incident State
 		// ------------------------------------------------
@@ -709,6 +712,7 @@ public class ReportOnConditionFragment extends Fragment
 	// Sets all of the form fields as the values from the rocData
 	protected void setAllFormFieldsFromRoc(ReportOnConditionData rocData)
 	{
+		shouldValidate = false;
 		if(rocData == null)
 			return;
 
@@ -806,6 +810,7 @@ public class ReportOnConditionFragment extends Fragment
 			}
 		}
 		incidentTypeTextView.setText(incidentTypeString);
+		incidentTypeTextView.setHint(R.string.incident_type_box_hint);
 		// Converting incident lat/long to degrees and minutes:
 		incidentLatitudeDegreesEditText.setText(String.valueOf(getDegree(rocData.latitude)));
 		incidentLatitudeMinutesEditText.setText(String.valueOf(getMinutesInteger(rocData.latitude)));
@@ -1053,6 +1058,7 @@ public class ReportOnConditionFragment extends Fragment
 
 		// --------- Setting the field values ---------
 		emailTextView.setText(rocData.email);
+		shouldValidate = true;
 	}
 
 	// Sets all fields as read-only for viewing mode
@@ -1502,6 +1508,7 @@ public class ReportOnConditionFragment extends Fragment
 	// Called whenever the report type is changed, or the incident type is changed
 	public void setupVegFireRateOfSpreadSpinnerForReportTypeAndIncidentType()
 	{
+		shouldValidate = false;
 		String requiredSuffix = "";
 
 		// If the incident type is a vegetation fire, rate of spread is required.
@@ -1527,11 +1534,13 @@ public class ReportOnConditionFragment extends Fragment
 
 		setSpinnerOptions(vegFireRateOfSpreadSpinner, rateOfSpreadSpinnerOptions);
 		vegFireRateOfSpreadSpinner.setSelection(0);
+		shouldValidate = true;
 	}
 
 	// Called whenever the report type is changed, or the incident type is changed
 	public void setupThreatsSectionForReportTypeAndIncidentType()
 	{
+		shouldValidate = false;
 		String requiredSuffix = "";
 
 		// If the incident type is a vegetation fire, these options are required.
@@ -1560,6 +1569,7 @@ public class ReportOnConditionFragment extends Fragment
 		threatsEvacsSpinner.setSelection(0);
 		threatsStructuresSpinner.setSelection(0);
 		threatsInfrastructureSpinner.setSelection(0);
+		shouldValidate = true;
 	}
 
 
@@ -1991,6 +2001,7 @@ public class ReportOnConditionFragment extends Fragment
 	// b) Ensuring the if vegetation fire is selected, we make vegetation fire fields mandatory
 	public void incidentTypeChanged()
 	{
+		shouldValidate = false;
 		incidentTypeTextView.setError(null);
 		incidentTypeSpinner.setSelection(0);
 
@@ -2041,7 +2052,7 @@ public class ReportOnConditionFragment extends Fragment
 		// Re-set up the threat section.
 		// (The fields are required IFF the incident is a vegetation fire)
 		setupThreatsSectionForReportTypeAndIncidentType();
-
+		shouldValidate = true;
 	}
 
 
@@ -2793,6 +2804,9 @@ public class ReportOnConditionFragment extends Fragment
 
 	private void clearAllFormFields()
 	{
+		// We don't want field validation while the fields are clearing
+		shouldValidate = false;
+
 		//================================================
 		// Incident Info Fields
 		//================================================
@@ -2905,6 +2919,9 @@ public class ReportOnConditionFragment extends Fragment
 		//================================================
 		emailTextView.setText("");
 		//================================================
+
+		// All fields have been cleared, now we can respect the validation logic
+		shouldValidate = true;
 	}
 
 
@@ -3316,7 +3333,9 @@ public class ReportOnConditionFragment extends Fragment
 			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
 			{
 				errorView.setVisibility(View.GONE);
-				isFormInfoValid();
+				if (shouldValidate) {
+					isFormInfoValid();
+				}
 			}
 
 			@Override

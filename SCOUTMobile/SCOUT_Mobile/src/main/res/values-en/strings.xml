@@ -296,4 +296,16 @@
     <string name="invalid_session_title">Warning</string>
 	<string name="invalid_session_relogin">Re-Login</string>
 	<string name="invalid_session_okay">Okay</string>
+	<!-- SECTION: ROC -->
+	<string name="roc_view">View ROC</string>
+	<string name="roc_create">Create ROC</string>
+	<string name="incident_number_hint">State Agency ID 6 digit incident number (e.g. CASCU001234)</string>
+	<string name="incident_type_box_hint">Select back button to close box </string>
+	<string name="lattitude_longitude_hint">Example: 41° 9.13\', -78° 34.15\'</string>
+	<string name="current_location_hint">Use current location</string>
+	<string name="location_hint">Geo-referenced location based on lat/long</string>
+	<string name="dpa_hint">Direct Protection Area</string>
+	<string name="jurisdiction_hint">For non-CAL FIRE incidents, enter name of responsible agency</string>
+	<string name="email_hint">ROC emailed to form creator only</string>
+
 </resources>

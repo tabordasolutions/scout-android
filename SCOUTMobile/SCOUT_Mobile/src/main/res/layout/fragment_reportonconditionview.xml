@@ -531,7 +531,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:completionThreshold="1"
-                        android:hint="(required)"
+                        android:hint="@string/location_hint"
                         android:textSize="18sp"/>
 
 
@@ -648,7 +648,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="DPA:"
+                        android:text="DPA (Direct Protection Area):"
                         android:textSize="18sp"/>
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -715,7 +715,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:completionThreshold="1"
-                        android:hint="(required)"
+                        android:hint="@string/jurisdiction_hint"
                         android:textSize="18sp"/>
 
                     <LinearLayout
@@ -743,7 +743,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:text="Time:"
+                            android:text="Start Time:"
                             android:textSize="18sp"/>
                         <TextView
                             android:id="@+id/rocStartTime"
@@ -1569,7 +1569,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:text="CAL FIRE Incident:"
+                        android:text="Is this a CAL FIRE Incident?:"
                         android:textSize="18sp"/>
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -1812,7 +1812,7 @@
                         android:paddingLeft="10dp"
                         android:paddingRight="10dp"
                         android:paddingTop="10dp"
-                        android:text="Email"
+                        android:text="@string/email_hint"
                         android:textSize="20sp"/>
                     <ImageView
                         android:id="@+id/rocEmailHeaderError"
