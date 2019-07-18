@@ -516,10 +516,7 @@ public class ReportOnConditionData
 			report.relHumidity = rocPayload.optString("relHumidity","");
 			report.windSpeed = rocPayload.optString("windSpeed","");
 			report.windDirection = rocPayload.optString("windDirection","");
-
-			// TODO - WindGusts are currently not in JSON payload, add this once they have been added
-			report.windGusts = "";// FIXME - this is wrong
-			//report.windGusts = getDoubleFromJsonString("windGusts");
+			report.windGusts = rocPayload.optString("windGust", "");
 
 			//================================================
 			// Threats & Evacuations Fields
@@ -723,9 +720,7 @@ public class ReportOnConditionData
 			rocPayload.put("relHumidity", relHumidity);
 			rocPayload.put("windSpeed", windSpeed);
 			rocPayload.put("windDirection", windDirection);
-
-			// TODO - WindGusts are currently not in JSON payload, add this once they have been added
-			//report.windGusts = getDoubleFromJsonString("windGusts");
+			rocPayload.put("windGust", windGusts);
 
 			//================================================
 			// Threats & Evacuations Fields

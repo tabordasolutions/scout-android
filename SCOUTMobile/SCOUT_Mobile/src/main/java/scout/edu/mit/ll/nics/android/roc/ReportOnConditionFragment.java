@@ -2689,9 +2689,8 @@ public class ReportOnConditionFragment extends Fragment
 						failedToGetWeatherData = true;
 					if (!setUIStringSpinner(data, "windDirection", weatherWindDirectionSpinner, weatherWindDirectionError))
 						failedToGetWeatherData = true;
-
-					// TODO setUIStringField(data, "windGusts", weatherGustsEditText);
-					// FIXME-  then update the following field to 5:
+					if(!setUIStringField(data, "windGust", weatherGustsEditText))
+						failedToGetWeatherData = true;
 
 					// If none of the weather requests failed
 					if (!failedToGetWeatherData)
