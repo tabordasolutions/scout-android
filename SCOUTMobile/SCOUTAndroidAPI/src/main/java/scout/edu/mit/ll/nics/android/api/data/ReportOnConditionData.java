@@ -87,9 +87,7 @@ public class ReportOnConditionData
 	public ArrayList<String> structureThreatsInProgress;
 	public String infrastructureThreats;
 	public ArrayList<String> infrastructureThreatsInProgress;
-	// Whether we have other threats & evacs (this field was removed from the form)
-	//public String otherThreatsAndEvacuations;
-	public ArrayList<String> otherThreatsAndEvacuationsInProgress;
+	public ArrayList<String> otherSignificantInfo;
 	public String calfireIncident;
 	public ArrayList<String> resourcesAssigned;
 	public String email;
@@ -265,7 +263,6 @@ public class ReportOnConditionData
 	// If the array has more than one value, the array value will be a JSON array containing strings
 	static private ArrayList<String> parseStringArrayFromJson(JSONObject obj, String str) throws JSONException
 	{
-		//otherThreatsAndEvacuations
 		if(obj == null)
 		{
 			return null;
@@ -558,11 +555,9 @@ public class ReportOnConditionData
 			// Other Significant Info Fields
 			//================================================
 
-			//report.otherThreatsAndEvacuations = rocPayload.getString("otherThreatsAndEvacuations");
-			report.otherThreatsAndEvacuationsInProgress = parseStringArrayFromJson(rocPayload.optJSONObject("otherThreatsAndEvacuationsInProgress"),"otherThreatsAndEvacuations");
-			if(report.otherThreatsAndEvacuationsInProgress == null)
-			{
-				report.otherThreatsAndEvacuationsInProgress = new ArrayList<String>();
+			report.otherSignificantInfo = parseStringArrayFromJson(rocPayload, "otherSignificantInfo");
+			if(report.otherSignificantInfo == null) {
+				report.otherSignificantInfo = new ArrayList<String>();
 			}
 
 			//================================================
@@ -753,8 +748,7 @@ public class ReportOnConditionData
 			// Other Significant Info Fields
 			//================================================
 
-			//rocPayload.put("otherThreatsAndEvacuations", otherThreatsAndEvacuations);
-			rocPayload.put("otherThreatsAndEvacuationsInProgress", new JSONObject().put("otherThreatsAndEvacuations",arrayListToJsonArray(otherThreatsAndEvacuationsInProgress)));
+			rocPayload.put("otherSignificantInfo", otherSignificantInfo);
 
 			//================================================
 			// Email Fields
@@ -939,8 +933,7 @@ public class ReportOnConditionData
 			obj.put("structureThreatsInProgress", stringArrayListToJson(structureThreatsInProgress));
 			obj.put("infrastructureThreats", infrastructureThreats);
 			obj.put("infrastructureThreatsInProgress", stringArrayListToJson(infrastructureThreatsInProgress));
-			//obj.put("otherThreatsAndEvacuations", otherThreatsAndEvacuations);
-			obj.put("otherThreatsAndEvacuationsInProgress", stringArrayListToJson(otherThreatsAndEvacuationsInProgress));
+			obj.put("otherSignificantInfo", stringArrayListToJson(otherSignificantInfo));
 			obj.put("calfireIncident", calfireIncident);
 			obj.put("resourcesAssigned", stringArrayListToJson(resourcesAssigned));
 			obj.put("email", email);
@@ -1030,8 +1023,7 @@ public class ReportOnConditionData
 			data.structureThreatsInProgress = stringArrayFromJson(obj.getJSONArray("structureThreatsInProgress"));
 			data.infrastructureThreats = obj.getString("infrastructureThreats");
 			data.infrastructureThreatsInProgress = stringArrayFromJson(obj.getJSONArray("infrastructureThreatsInProgress"));
-			//data.otherThreatsAndEvacuations = obj.getString("otherThreatsAndEvacuations");
-			data.otherThreatsAndEvacuationsInProgress = stringArrayFromJson(obj.getJSONArray("otherThreatsAndEvacuationsInProgress"));
+			data.otherSignificantInfo = stringArrayFromJson(obj.getJSONArray("otherSignificantInfo"));
 			data.calfireIncident = obj.getString("calfireIncident");
 			data.resourcesAssigned = stringArrayFromJson(obj.getJSONArray("resourcesAssigned"));
 			data.email = obj.getString("email");

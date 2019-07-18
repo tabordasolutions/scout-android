@@ -944,7 +944,7 @@ public class ReportOnConditionFragment extends Fragment
 		dataList.add(rocData.evacuationsInProgress);
 		dataList.add(rocData.structureThreatsInProgress);
 		dataList.add(rocData.infrastructureThreatsInProgress);
-		dataList.add(rocData.otherThreatsAndEvacuationsInProgress);
+		dataList.add(rocData.otherSignificantInfo);
 
 		// For each of the 4 different LinearLayout lists
 		// Add a child LinearLayout per String in the data
@@ -1148,7 +1148,7 @@ public class ReportOnConditionFragment extends Fragment
 		dataList.add(rocData.evacuationsInProgress);
 		dataList.add(rocData.structureThreatsInProgress);
 		dataList.add(rocData.infrastructureThreatsInProgress);
-		dataList.add(rocData.otherThreatsAndEvacuationsInProgress);
+		dataList.add(rocData.otherSignificantInfo);
 
 		// For each of the 4 different LinearLayout lists
 		// Disable it, and hide the remove button
@@ -4794,7 +4794,7 @@ public class ReportOnConditionFragment extends Fragment
 		// Other Significant Info Fields
 		//================================================
 
-		data.otherThreatsAndEvacuationsInProgress = new ArrayList<String>();
+		data.otherSignificantInfo = new ArrayList<String>();
 
 		// For each of the text fields added, add the text
 		for(int i = 0; i < otherInfoListLinearLayout.getChildCount(); i++)
@@ -4807,7 +4807,7 @@ public class ReportOnConditionFragment extends Fragment
 				View childView = layout.getChildAt(j);
 				if(childView instanceof AutoCompleteTextView)
 				{
-					data.otherThreatsAndEvacuationsInProgress.add(((AutoCompleteTextView) childView).getText().toString());
+					data.otherSignificantInfo.add(((AutoCompleteTextView) childView).getText().toString());
 				}
 			}
 		}
