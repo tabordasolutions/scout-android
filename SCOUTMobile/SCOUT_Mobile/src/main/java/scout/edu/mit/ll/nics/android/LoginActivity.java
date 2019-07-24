@@ -496,7 +496,7 @@ public class LoginActivity extends ActionBarActivity implements OnCheckedChangeL
 		public void onReceive(Context context, Intent intent) {
 			
 			if(!mIncidentsReceived) {
-				mIncidentsReceived = intent.getAction().equals(Intents.nics_SUCCESSFUL_GET_ALL_INCIDENT_INFO);
+				mIncidentsReceived = true;//intent.getAction().equals(Intents.nics_SUCCESSFUL_GET_ALL_INCIDENT_INFO);
 			}
 			
 			if(!mOrganizaitonsRecieved) {
@@ -525,6 +525,8 @@ public class LoginActivity extends ActionBarActivity implements OnCheckedChangeL
 						mLoginStatusView.setVisibility(View.GONE);
 						
 						mDataManager.requestWfsLayers();
+					} else {
+						Log.v("TAG", "no loading");
 					}
 				}
 			});

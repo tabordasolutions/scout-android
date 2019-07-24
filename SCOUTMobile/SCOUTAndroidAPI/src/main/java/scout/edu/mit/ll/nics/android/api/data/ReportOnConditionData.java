@@ -748,7 +748,7 @@ public class ReportOnConditionData
 			// Other Significant Info Fields
 			//================================================
 
-			rocPayload.put("otherSignificantInfo", otherSignificantInfo);
+			rocPayload.put("otherSignificantInfo", arrayListToJsonArray(otherSignificantInfo));
 
 			//================================================
 			// Email Fields

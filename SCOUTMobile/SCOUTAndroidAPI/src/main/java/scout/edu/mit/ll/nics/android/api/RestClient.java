@@ -765,6 +765,7 @@ public class RestClient
 				Intent intent = new Intent();
 				intent.setAction(Intents.nics_SUCCESSFUL_GET_ALL_INCIDENT_INFO);
 				intent.putExtra("payload", message.toJsonString());
+				intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
 				mContext.sendBroadcast(intent);
 
 				Log.e("nicsRest", "Successfully received incident information.");
