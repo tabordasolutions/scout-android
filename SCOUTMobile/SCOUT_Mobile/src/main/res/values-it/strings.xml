@@ -45,8 +45,9 @@
 	<string name="roc_view">View ROC</string>
 	<string name="roc_create">Create ROC</string>
 	<string name="incident_number_hint">State Agency ID 6 digit incident number (e.g. CASCU001234)</string>
+	<string name="incident_name_hint">Any changes to incident name will result in form resetting</string>
 	<string name="incident_type_box_hint">Select back button to close box </string>
-	<string name="lattitude_longitude_hint">Example: 41° 9.13\', -78° 34.15\'</string>
+	<string name="lattitude_longitude_hint">Example: 41° 9.13\', -78° 34.15\' (negative sign automatically populated)</string>
 	<string name="current_location_hint">Use current location</string>
 	<string name="location_hint">Geo-referenced location based on lat/long</string>
 	<string name="dpa_hint">Direct Protection Area</string>

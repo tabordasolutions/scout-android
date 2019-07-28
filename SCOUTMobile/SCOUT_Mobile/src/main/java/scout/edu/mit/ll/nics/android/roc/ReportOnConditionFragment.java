@@ -30,10 +30,13 @@
  */
 package scout.edu.mit.ll.nics.android.roc;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -137,6 +140,7 @@ public class ReportOnConditionFragment extends Fragment
 	// ROC Form Info Fields
 	//================================================
 	TextView incidentNameLabel;
+	ImageButton incidentNameInfoButton;
 	AutoCompleteTextView incidentNameTextView;
 	ProgressBar loadingIncidentInfoProgressBar;
 	TextView messageTextView;
@@ -148,7 +152,9 @@ public class ReportOnConditionFragment extends Fragment
 	// Incident Info Fields
 	//================================================
 	AutoCompleteTextView incidentNumberTextView;
+	ImageButton incidentNumberInfoButton;
 	TextView incidentTypeTextView;
+	ImageButton incidentTypeInfoButton;
 	Spinner incidentTypeSpinner;
 	// Decimal Degree Minutes Edit Text:
 	EditText incidentLatitudeDegreesEditText;
@@ -157,7 +163,9 @@ public class ReportOnConditionFragment extends Fragment
 	EditText incidentLongitudeDegreesEditText;
 	EditText incidentLongitudeMinutesEditText;
 	EditText incidentLongitudeMinutesFractionEditText;
+	ImageButton incidentLatLongLocationInfoButton;
 	ImageButton incidentLocateButton;
+	ImageButton incidentLocateInfoButton;
 	ProgressBar incidentLocateProgressBar;
 	AutoCompleteTextView incidentStateTextView;
 	// State Variables
@@ -169,6 +177,7 @@ public class ReportOnConditionFragment extends Fragment
 	Spinner rocInitialCountySpinner;
 	AutoCompleteTextView rocAdditionalCountiesTextView;
 	AutoCompleteTextView rocLocationTextView;
+	ImageButton incidentLocationInfoButton;
 	EditText rocLocationStreetEditText;
 	EditText rocLocationCrossStreetEditText;
 	EditText rocLocationNearestCommunity;
@@ -177,6 +186,7 @@ public class ReportOnConditionFragment extends Fragment
 	Spinner rocDPASpinner;
 	Spinner rocOwnershipSpinner;
 	AutoCompleteTextView rocJurisdictionTextView;
+	ImageButton incidentJurisdictionInfoButton;
 	// The layout containing the start time and start date fields
 	LinearLayout rocStartDateTimeLayout;
 	TextView rocStartTimeTextView;
@@ -2251,6 +2261,7 @@ public class ReportOnConditionFragment extends Fragment
 		// Retrieving all of the field objects
 		reportTypeSpinner = (Spinner) mRootView.findViewById(R.id.rocReportType);
 		incidentNameLabel = (TextView) mRootView.findViewById(R.id.rocIncidentNameLabel);
+		incidentNameInfoButton = (ImageButton) mRootView.findViewById(R.id.incidentNameInfoButton);
 		incidentNameTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocIncidentName);
 		reportTypeLayout = (LinearLayout) mRootView.findViewById(R.id.rocReportTypeSection);
 		loadingIncidentInfoProgressBar = (ProgressBar) mRootView.findViewById(R.id.rocLoadingIncidentData);
@@ -2263,8 +2274,11 @@ public class ReportOnConditionFragment extends Fragment
 		//-----------------------------------------------------------------------------------------
 		// Retrieving all of the field objects
 		incidentNumberTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocIncidentNumber);
+		incidentNumberInfoButton = (ImageButton) mRootView.findViewById(R.id.incidentInfoButton);
 		incidentTypeTextView = (TextView) mRootView.findViewById(R.id.rocIncidentTypeTextView);
+		incidentTypeInfoButton = (ImageButton) mRootView.findViewById(R.id.incidentTypeInfoButton);
 		incidentTypeSpinner = (Spinner) mRootView.findViewById(R.id.rocIncidentTypeSpinner);
+		incidentLatLongLocationInfoButton = (ImageButton) mRootView.findViewById(R.id.latLongLocationInfoButton);
 		//incidentLatitudeEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLatitude);
 		//incidentLongitudeEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLongitude);
 		incidentLatitudeDegreesEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLatitudeDegrees);
@@ -2275,6 +2289,7 @@ public class ReportOnConditionFragment extends Fragment
 		incidentLongitudeMinutesFractionEditText = (EditText) mRootView.findViewById(R.id.rocIncidentLongitudeMinutesFraction);
 
 		incidentLocateButton = (ImageButton) mRootView.findViewById(R.id.rocLocateButton);
+		incidentLocateInfoButton = (ImageButton) mRootView.findViewById(R.id.rocLocateInfoButton);
 		incidentLocateProgressBar = (ProgressBar) mRootView.findViewById(R.id.rocLocationDataProgressBar);
 		incidentStateTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocIncidentState);
 		// Setting up the incident type spinner using a custom SpinnerAdapter class
@@ -2309,6 +2324,7 @@ public class ReportOnConditionFragment extends Fragment
 		rocInitialCountySpinner = (Spinner) mRootView.findViewById(R.id.rocCounty);
 		rocAdditionalCountiesTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocAdditionalCounties);
 		rocLocationTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocLocation);
+		incidentLocationInfoButton = (ImageButton) mRootView.findViewById(R.id.incidentLocationInfoButton);
 		rocLocationTextView.setOnFocusChangeListener(validateFocusChangeLister);
 
 		rocLocationStreetEditText = (EditText) mRootView.findViewById(R.id.rocLocationStreet);
@@ -2329,6 +2345,7 @@ public class ReportOnConditionFragment extends Fragment
 		rocOwnershipSpinner = (Spinner) mRootView.findViewById(R.id.rocOwnership);
 		rocJurisdictionTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocJurisdiction);
 		rocJurisdictionTextView.setOnFocusChangeListener(validateFocusChangeLister);
+		incidentJurisdictionInfoButton = (ImageButton) mRootView.findViewById(R.id.incidentJurisdictionInfoButton);
 
 		rocStartDateTimeLayout = (LinearLayout) mRootView.findViewById(R.id.rocDateTimeLayout);
 
@@ -2538,6 +2555,19 @@ public class ReportOnConditionFragment extends Fragment
 
 		//-----------------------------------------------------------------------------------------
 		//-----------------------------------------------------------------------------------------
+
+		//-----------------------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------------------
+		// Info Buttons
+		//-----------------------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------------------
+		incidentNumberInfoButton.setOnClickListener(incidentNumberInfoButtonOnClickListener);
+		incidentNameInfoButton.setOnClickListener(incidentNameInfoButtonOnClickListener);
+		incidentTypeInfoButton.setOnClickListener(incidentTypeInfoButtonOnClickListener);
+		incidentLatLongLocationInfoButton.setOnClickListener(incidentLatLongLocationInfoButtonOnClickListener);
+		incidentLocateInfoButton.setOnClickListener(incidentLocateInfoButtonOnClickListener);
+		incidentLocationInfoButton.setOnClickListener(incidentLocationInfoButtonOnClickListener);
+		incidentJurisdictionInfoButton.setOnClickListener(incidentJurisdictionInfoButtonOnClickListener);
 	}
 
 	private boolean setUIStringField( JSONObject data,String paramName, EditText editText)
@@ -4870,4 +4900,68 @@ public class ReportOnConditionFragment extends Fragment
 			mContext.onBackPressed();
 		}
 	};
+
+	//================================================
+	// Info Button On Click Listeners
+	//================================================
+
+	OnClickListener incidentNumberInfoButtonOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			alertView(mContext.getString(R.string.incident_number_hint));
+		}
+	};
+
+	OnClickListener incidentNameInfoButtonOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			alertView(mContext.getString(R.string.incident_name_hint));
+		}
+	};
+
+	OnClickListener incidentTypeInfoButtonOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			alertView(mContext.getString(R.string.incident_type_box_hint));
+		}
+	};
+
+	OnClickListener incidentLatLongLocationInfoButtonOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			alertView(mContext.getString(R.string.lattitude_longitude_hint));
+		}
+	};
+
+	OnClickListener incidentLocateInfoButtonOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			alertView(mContext.getString(R.string.current_location_hint));
+		}
+	};
+
+	OnClickListener incidentLocationInfoButtonOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			alertView(mContext.getString(R.string.location_hint));
+		}
+	};
+
+	OnClickListener incidentJurisdictionInfoButtonOnClickListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			alertView(mContext.getString(R.string.jurisdiction_hint));
+		}
+	};
+
+	private void alertView(String message ) {
+		AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+		dialog.setTitle( "Information" )
+				.setIcon(R.drawable.ic_launcher)
+				.setMessage(message)
+				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialoginterface, int i) {
+					}
+				}).show();
+	}
 }
