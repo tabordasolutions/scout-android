@@ -1948,7 +1948,7 @@ public class ReportOnConditionFragment extends Fragment
 			JSONObject coords = null;
 
 			// Request location-based data using those form fields:
-			requestIncidentLocationDetailsForFormCoords();
+			// requestIncidentLocationDetailsForFormCoords();
 		}
 
 
@@ -2646,12 +2646,24 @@ public class ReportOnConditionFragment extends Fragment
 			// Converting to DDM:
 			incidentLatitudeDegreesEditText.setText(String.format(Locale.US,"%d",(int)getDegree(lat)));
 			incidentLatitudeMinutesEditText.setText(String.format(Locale.US,"%d",getMinutesInteger(lat)));
-			incidentLatitudeMinutesFractionEditText.setText(stringGetFraction(String.format(Locale.US,"%f",getMinutesFraction(lat))));
+
+			String latFraction = stringGetFraction(String.format(Locale.US,"%f",getMinutesFraction(lat)));
+			if (!latFraction.equals("0000")) {
+				incidentLatitudeMinutesFractionEditText.setText(latFraction);
+			}
+
 			// NOTE - we multiply the value by -1 because the UI has a hardcoded "-" sign in front of it
 			// (all longitudes in california are in the -120 range, and the client doesn't want users to have to manually enter the "-" sign)
 			incidentLongitudeDegreesEditText.setText(String.format(Locale.US,"%d",-1 * (int)getDegree(lon)));
 			incidentLongitudeMinutesEditText.setText(String.format(Locale.US,"%d",getMinutesInteger(lon)));
-			incidentLongitudeMinutesFractionEditText.setText(stringGetFraction(String.format(Locale.US,"%f",getMinutesFraction(lon))));
+
+			String longFraction = String.format(Locale.US,"%f", getMinutesFraction(lon));
+			String longFractionString = stringGetFraction(longFraction);
+
+			if (!longFractionString.equals("0000")) {
+				incidentLongitudeMinutesFractionEditText.setText(longFractionString);
+			}
+
 
 			// Removing the errors:
 			incidentLatitudeDegreesEditText.setError(null);

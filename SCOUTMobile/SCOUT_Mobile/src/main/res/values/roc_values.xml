@@ -11,8 +11,8 @@
         <item>Blizzard</item>
         <item>Civil Unrest</item>
         <item>Earthquake</item>
-        <item>Fire (Structure)</item>
-        <item>Fire (Wildland)</item><!-- TODO - Change to "Vegetation Fire" once we add that incident type -->
+        <item>Structure Fire</item>
+        <item>Vegetation Fire</item>
         <item>Flood</item>
         <item>Hazardous Materials</item>
         <item>Hurricane</item>
