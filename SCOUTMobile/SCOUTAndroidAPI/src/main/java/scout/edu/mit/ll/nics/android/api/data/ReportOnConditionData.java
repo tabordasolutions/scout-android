@@ -105,7 +105,7 @@ public class ReportOnConditionData
 		switch(id)
 		{
 			case 1:
-				return "Fire (Wildland)";
+				return "Vegetation Fire";
 			case 2:
 				return "Mass Casualty";
 			case 3:
@@ -113,7 +113,7 @@ public class ReportOnConditionData
 			case 4:
 				return "Terrorist Threat / Attack";
 			case 5:
-				return "Fire (Structure)";
+				return "Structure Fire";
 			case 6:
 				return "Hazardous Materials";
 			case 7:
@@ -142,9 +142,6 @@ public class ReportOnConditionData
 				return "Civil Unrest";
 			case 19:
 				return "Flood";
-// TODO - Add once we add Vegetation Fire incident type.
-			/*			case 20:
-				return "Vegetation Fire";*/
 			default:
 				return null;
 		}
@@ -171,7 +168,6 @@ public class ReportOnConditionData
 				return i;
 			}
 		}
-
 		// If we didn't find the value, return -1
 		return -1;
 	}

@@ -2001,8 +2001,7 @@ public class ReportOnConditionFragment extends Fragment
 	// Returns whether the incident is a vegetation fire or not
 	public boolean isIncidentVegetationFire()
 	{
-		// TODO - Change to "Vegetation Fire" once we add vegetation fire incident type
-		return incidentTypeSelectedItems.contains("Fire (Wildland)");
+		return incidentTypeSelectedItems.contains("Vegetation Fire");
 	}
 
 	// Executed each time the report type is changed
