@@ -1968,6 +1968,11 @@ public class ReportOnConditionFragment extends Fragment
 			rocLocationDistanceFromNearestCommunityEditText.setText(lastRocData.milesFromNearestCommunity);
 			setSpinnerValue(lastRocData.directionFromNearestCommunity, rocLocationDirectionFromNearestCommunitySpinner);
 
+			setSpinnerValue(lastRocData.dpa, rocDPASpinner);
+			setSpinnerValue(lastRocData.ownership, rocOwnershipSpinner);
+			rocJurisdictionTextView.setText(lastRocData.jurisdiction);
+			setSpinnerValue(lastRocData.county, rocInitialCountySpinner);
+
 
 			// Fuel Types Checkboxes
 			if(lastRocData.fuelTypes.contains("Grass"))
