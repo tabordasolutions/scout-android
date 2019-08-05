@@ -4279,8 +4279,8 @@ public class ReportOnConditionFragment extends Fragment
 				isFormValid = false;
 			}
 		}
-		// If it's not ROC_FINAL, and spinner is YES, at least one child is required:
-		if(currentReportType != ROC_FINAL && (threatsEvacsSpinner.getSelectedItemPosition() == 1))
+		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
+		if(currentReportType != ROC_FINAL && (threatsEvacsSpinner.getSelectedItemPosition() == 1 || threatsEvacsSpinner.getSelectedItemPosition() == 3))
 		{
 			if(threatsEvacsListLinearLayout.getChildCount() == 0)
 			{
@@ -4342,8 +4342,8 @@ public class ReportOnConditionFragment extends Fragment
 				isFormValid = false;
 			}
 		}
-		// If it's not ROC_FINAL, and spinner is YES, at least one child is required:
-		if(currentReportType != ROC_FINAL && (threatsStructuresSpinner.getSelectedItemPosition() == 1))
+		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
+		if(currentReportType != ROC_FINAL && (threatsStructuresSpinner.getSelectedItemPosition() == 1 || threatsStructuresSpinner.getSelectedItemPosition() == 3))
 		{
 			if(threatsStructuresListLinearLayout.getChildCount() == 0)
 			{
@@ -4405,8 +4405,8 @@ public class ReportOnConditionFragment extends Fragment
 				isFormValid = false;
 			}
 		}
-		// If it's not ROC_FINAL, and spinner is YES, at least one child is required:
-		if(currentReportType != ROC_FINAL && (threatsInfrastructureSpinner.getSelectedItemPosition() == 1))
+		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
+		if(currentReportType != ROC_FINAL && (threatsInfrastructureSpinner.getSelectedItemPosition() == 1 || threatsInfrastructureSpinner.getSelectedItemPosition() == 3))
 		{
 			if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
 			{
