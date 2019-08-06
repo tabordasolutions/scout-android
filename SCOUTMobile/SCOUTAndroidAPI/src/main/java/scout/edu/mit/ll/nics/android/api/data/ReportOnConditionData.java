@@ -64,7 +64,7 @@ public class ReportOnConditionData
 	public String milesFromNearestCommunity;
 	public String directionFromNearestCommunity;
 	public Date startDate;
-	public Date startTime;
+	public String startTime;
 	public String location;
 	public String dpa;
 	public String ownership;
@@ -480,11 +480,11 @@ public class ReportOnConditionData
 			String startTime = rocPayload.optString("starttime","");
 			if(!startTime.equals(""))
 			{
-				report.startTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(startTime);
+				report.startTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault()).parse(startTime).toString();
 			}
 			else
 			{
-				report.startTime = new Date(70,1,1);
+				report.startTime = new Date(70,1,1).toString();
 			}
 
 			//================================================
@@ -997,7 +997,7 @@ public class ReportOnConditionData
 			data.milesFromNearestCommunity = obj.getString("milesFromNearestCommunity");
 			data.directionFromNearestCommunity = obj.getString("directionFromNearestCommunity");
 			data.startDate = dateFormatter.parse(obj.getString("startDate"));
-			data.startTime = dateFormatter.parse(obj.getString("startTime"));
+			data.startTime = dateFormatter.parse(obj.getString("startTime")).toString();
 			data.dpa = obj.getString("dpa");
 			data.ownership = obj.getString("ownership");
 			data.jurisdiction = obj.getString("jurisdiction");

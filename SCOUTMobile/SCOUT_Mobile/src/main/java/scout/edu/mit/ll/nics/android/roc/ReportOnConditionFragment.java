@@ -1948,7 +1948,7 @@ public class ReportOnConditionFragment extends Fragment
 			JSONObject coords = null;
 
 			// Request location-based data using those form fields:
-			// requestIncidentLocationDetailsForFormCoords();
+			 requestIncidentLocationDetailsForFormCoords();
 		}
 
 
@@ -2718,11 +2718,11 @@ public class ReportOnConditionFragment extends Fragment
 					setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView);
 					setUIStringField(data, "state", incidentStateTextView);
 
-					setUIStringSpinner(data, "sra", rocOwnershipSpinner, rocOwnershipErrorView);
-					setUIStringSpinner(data, "dpa", rocDPASpinner, rocDPAErrorView);
-
-					setUIStringField(data, "jurisdiction", rocJurisdictionTextView);
-
+					if(reportTypeSpinner.getSelectedItem().toString().equals("NEW")) {
+						setUIStringSpinner(data, "sra", rocOwnershipSpinner, rocOwnershipErrorView);
+						setUIStringSpinner(data, "dpa", rocDPASpinner, rocDPAErrorView);
+						setUIStringField(data, "jurisdiction", rocJurisdictionTextView);
+					}
 
 					// Keep track if we failed to get any weather field:
 					boolean failedToGetWeatherData = false;
@@ -4270,7 +4270,7 @@ public class ReportOnConditionFragment extends Fragment
 		// required
 		//--------------------------------
 		// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
-		if((currentReportType == ROC_FINAL && threatsEvacsSpinner.getSelectedItemPosition() == 1))
+		if((currentReportType == ROC_FINAL && threatsEvacsSpinner.getSelectedItem().toString().toLowerCase().equals("mitigated")))
 		{
 			if(threatsEvacsListLinearLayout.getChildCount() == 0)
 			{
@@ -4280,7 +4280,7 @@ public class ReportOnConditionFragment extends Fragment
 			}
 		}
 		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
-		if(currentReportType != ROC_FINAL && (threatsEvacsSpinner.getSelectedItemPosition() == 1 || threatsEvacsSpinner.getSelectedItemPosition() == 3))
+		if(currentReportType != ROC_FINAL && (threatsEvacsSpinner.getSelectedItem().toString().toLowerCase().equals("yes") || threatsEvacsSpinner.getSelectedItem().toString().toLowerCase().equals("mitigated")))
 		{
 			if(threatsEvacsListLinearLayout.getChildCount() == 0)
 			{
@@ -4333,7 +4333,7 @@ public class ReportOnConditionFragment extends Fragment
 		// required
 		//--------------------------------
 		// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
-		if((currentReportType == ROC_FINAL && threatsStructuresSpinner.getSelectedItemPosition() == 1))
+		if((currentReportType == ROC_FINAL && threatsStructuresSpinner.getSelectedItem().toString().toLowerCase().equals("mitigated")))
 		{
 			if(threatsStructuresListLinearLayout.getChildCount() == 0)
 			{
@@ -4343,7 +4343,7 @@ public class ReportOnConditionFragment extends Fragment
 			}
 		}
 		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
-		if(currentReportType != ROC_FINAL && (threatsStructuresSpinner.getSelectedItemPosition() == 1 || threatsStructuresSpinner.getSelectedItemPosition() == 3))
+		if(currentReportType != ROC_FINAL && (threatsStructuresSpinner.getSelectedItem().toString().toLowerCase().equals("yes") || threatsStructuresSpinner.getSelectedItem().toString().toLowerCase().equals("mitigated")))
 		{
 			if(threatsStructuresListLinearLayout.getChildCount() == 0)
 			{
@@ -4396,7 +4396,7 @@ public class ReportOnConditionFragment extends Fragment
 		// required
 		//--------------------------------
 		// If it's a ROC_FINAL, and spinner is MITIGATED, at least one child is required:
-		if((currentReportType == ROC_FINAL && threatsInfrastructureSpinner.getSelectedItemPosition() == 1))
+		if((currentReportType == ROC_FINAL && threatsInfrastructureSpinner.getSelectedItem().toString().toLowerCase().equals("mitigated")))
 		{
 			if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
 			{
@@ -4406,7 +4406,7 @@ public class ReportOnConditionFragment extends Fragment
 			}
 		}
 		// If it's not ROC_FINAL, and spinner is YES or MITIGATED, at least one child is required:
-		if(currentReportType != ROC_FINAL && (threatsInfrastructureSpinner.getSelectedItemPosition() == 1 || threatsInfrastructureSpinner.getSelectedItemPosition() == 3))
+		if(currentReportType != ROC_FINAL && (threatsInfrastructureSpinner.getSelectedItem().toString().toLowerCase().equals("yes") || threatsInfrastructureSpinner.getSelectedItem().toString().toLowerCase().equals("mitigated")))
 		{
 			if(threatsInfrastructureListLinearLayout.getChildCount() == 0)
 			{
@@ -4654,18 +4654,19 @@ public class ReportOnConditionFragment extends Fragment
 		SimpleDateFormat startTimeFormatter = new SimpleDateFormat("HHmm", Locale.getDefault());
 		try
 		{
-			data.startTime = startTimeFormatter.parse(rocStartTimeTextView.getText().toString());
+			data.startTime = rocStartTimeTextView.getText().toString();
 		}
 		catch(Exception e)
 		{
 			Log.e("ROC","Unable to parse start time \"" + rocStartTimeTextView.getText().toString() + "\" from form.");
 
 			// If there is a previous ROC, fallback to that ROC's startTime
-			if(lastRocData != null)
+			if(lastRocData != null) {
 				data.startTime = lastRocData.startTime;
 				// Otherwise, revert to current time
-			else
-				data.startTime = Calendar.getInstance().getTime();
+			} else {
+				data.startTime = Calendar.getInstance().getTime().toString();
+			}
 		}
 
 		//================================================
