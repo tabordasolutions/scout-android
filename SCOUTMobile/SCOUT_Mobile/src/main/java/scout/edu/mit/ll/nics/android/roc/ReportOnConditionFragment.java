@@ -83,6 +83,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.text.ParseException;
 
 import scout.edu.mit.ll.nics.android.MainActivity;
 import scout.edu.mit.ll.nics.android.R;
@@ -853,7 +854,15 @@ public class ReportOnConditionFragment extends Fragment
 		setSpinnerValue(rocData.ownership, rocOwnershipSpinner);
 		rocJurisdictionTextView.setText(rocData.jurisdiction);
 		rocStartDateTextView.setText((new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())).format(rocData.startDate));
-		rocStartTimeTextView.setText((new SimpleDateFormat("HHmm", Locale.getDefault())).format(rocData.startTime));
+		SimpleDateFormat timeFormat = new SimpleDateFormat("HHmm");
+		try {
+			Date time = timeFormat.parse(rocData.startTime);
+			rocStartTimeTextView.setText((new SimpleDateFormat("HHmm", Locale.getDefault())).format(time));
+		} catch (ParseException ex) {
+			Log.v("Exception", ex.getLocalizedMessage());
+			rocStartTimeTextView.setText((new SimpleDateFormat("HHmm", Locale.getDefault())).format(rocData.startTime));
+		}
+
 
 		//================================================
 		// Vegetation Fire Incident Scope Fields
@@ -1991,7 +2000,7 @@ public class ReportOnConditionFragment extends Fragment
 			{
 				vegFireFuelTypeOakWoodlandCheckBox.setChecked(true);
 			}
-			if(lastRocData.fuelTypes.contains("Other"))
+			if(lastRocData.fuelTypes.contains("Other") && currentReportType != ROC_FINAL)
 			{
 				vegFireFuelTypeOtherCheckBox.setChecked(true);
 				vegFireOtherFuelTypeEditText.setText(lastRocData.otherFuelTypes);
@@ -4650,31 +4659,19 @@ public class ReportOnConditionFragment extends Fragment
 				data.startDate = Calendar.getInstance().getTime();
 		}
 
-
-		SimpleDateFormat startTimeFormatter = new SimpleDateFormat("HHmm", Locale.getDefault());
-		try
-		{
-			data.startTime = rocStartTimeTextView.getText().toString();
-		}
-		catch(Exception e)
-		{
-			Log.e("ROC","Unable to parse start time \"" + rocStartTimeTextView.getText().toString() + "\" from form.");
-
-			// If there is a previous ROC, fallback to that ROC's startTime
-			if(lastRocData != null) {
-				data.startTime = lastRocData.startTime;
-				// Otherwise, revert to current time
-			} else {
-				data.startTime = Calendar.getInstance().getTime().toString();
-			}
-		}
+		data.startTime = rocStartTimeTextView.getText().toString();
 
 		//================================================
 		// Vegetation Fire Incident Scope Fields
 		//================================================
 
 		data.acreage = vegFireAcreageEditText.getText().toString();
-		data.spreadRate = vegFireRateOfSpreadSpinner.getSelectedItem().toString();
+		String rateOfSpread = vegFireRateOfSpreadSpinner.getSelectedItem().toString();
+		if (!rateOfSpread.toLowerCase().equals("choose an option")) {
+			data.spreadRate = rateOfSpread;
+		} else {
+			data.spreadRate = "";
+		}
 
 
 		// Making an array of all checkboxes to iterate over to reduce code

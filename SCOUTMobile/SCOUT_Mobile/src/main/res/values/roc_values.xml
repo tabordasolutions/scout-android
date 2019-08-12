@@ -7,12 +7,12 @@
     <string name="roc_location_hint"><font size="12">(required)</font></string>
 
     <string-array name="roc_incident_type_checkbox_options">
+        <item>Vegetation Fire</item>
+        <item>Structure Fire</item>
         <item>Aircraft Accident</item>
         <item>Blizzard</item>
         <item>Civil Unrest</item>
         <item>Earthquake</item>
-        <item>Structure Fire</item>
-        <item>Vegetation Fire</item>
         <item>Flood</item>
         <item>Hazardous Materials</item>
         <item>Hurricane</item>
@@ -175,7 +175,7 @@
         <item>west</item>
         <item>south</item>
         <item>southwest</item>
-        <item>souteast</item>
+        <item>southeast</item>
     </string-array>
 
     <!-- ======================================================================================================================================================================== -->
