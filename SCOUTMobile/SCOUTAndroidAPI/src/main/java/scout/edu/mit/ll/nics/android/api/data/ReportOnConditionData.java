@@ -477,7 +477,7 @@ public class ReportOnConditionData
 				report.startDate = new Date(70,1,1);
 			}
 
-			String startTime = rocPayload.optString("starttime","");
+			String startTime = rocPayload.optString("startTime","");
 			if(!startTime.equals(""))
 			{
 				report.startTime = startTime;
@@ -689,7 +689,7 @@ public class ReportOnConditionData
 			// Parse the string to a Date object
 			SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
 			rocPayload.put("date", dateFormatter.format(startDate));
-			rocPayload.put("starttime", startTime);
+			rocPayload.put("startTime", startTime);
 
 			//================================================
 			// Vegetation Fire Incident Scope Fields
@@ -904,7 +904,7 @@ public class ReportOnConditionData
 			obj.put("directionFromNearestCommunity", directionFromNearestCommunity);
 
 			obj.put("startDate", dateFormatter.format(startDate));
-			obj.put("starttime", startTime);
+			obj.put("startTime", startTime);
 			obj.put("dpa", dpa);
 			obj.put("ownership", ownership);
 			obj.put("jurisdiction", jurisdiction);
@@ -994,7 +994,7 @@ public class ReportOnConditionData
 			data.milesFromNearestCommunity = obj.getString("milesFromNearestCommunity");
 			data.directionFromNearestCommunity = obj.getString("directionFromNearestCommunity");
 			data.startDate = dateFormatter.parse(obj.getString("startDate"));
-			data.startTime = obj.getString("starttime");
+			data.startTime = obj.getString("startTime");
 			data.dpa = obj.getString("dpa");
 			data.ownership = obj.getString("ownership");
 			data.jurisdiction = obj.getString("jurisdiction");
