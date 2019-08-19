@@ -78,6 +78,7 @@ public class ReportOnConditionResponseHandler extends AsyncHttpResponseHandler {
 
 		// TODO - We have a responseBody, does this responseBody contain the info of the incident created?
 
+
 		// Getting the report from the db
 		ReportOnConditionData rocData = mDataManager.getReportOnConditionStoreAndForward(mIncidentName, mCreationDate);
 

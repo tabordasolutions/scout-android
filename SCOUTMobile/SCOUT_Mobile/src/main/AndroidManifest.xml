@@ -33,14 +33,13 @@
 
     -->
 <manifest package="scout.edu.mit.ll.nics.android"
-          android:versionCode="16"
-          android:versionName="7.17_staging" xmlns:android="http://schemas.android.com/apk/res/android">
+          android:versionCode="18"
+          android:versionName="7.18_staging" xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-sdk android:minSdkVersion="10" android:targetSdkVersion="21" />
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
     <uses-feature android:name="android.hardware.camera"/>
-
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

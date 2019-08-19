@@ -904,7 +904,7 @@ public class ReportOnConditionData
 			obj.put("directionFromNearestCommunity", directionFromNearestCommunity);
 
 			obj.put("startDate", dateFormatter.format(startDate));
-			obj.put("startTime", startTime);
+			obj.put("starttime", startTime);
 			obj.put("dpa", dpa);
 			obj.put("ownership", ownership);
 			obj.put("jurisdiction", jurisdiction);
@@ -994,7 +994,7 @@ public class ReportOnConditionData
 			data.milesFromNearestCommunity = obj.getString("milesFromNearestCommunity");
 			data.directionFromNearestCommunity = obj.getString("directionFromNearestCommunity");
 			data.startDate = dateFormatter.parse(obj.getString("startDate"));
-			data.startTime = obj.getString("startTime");
+			data.startTime = obj.getString("starttime");
 			data.dpa = obj.getString("dpa");
 			data.ownership = obj.getString("ownership");
 			data.jurisdiction = obj.getString("jurisdiction");
