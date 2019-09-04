@@ -856,8 +856,11 @@ public class ReportOnConditionFragment extends Fragment
 		rocStartDateTextView.setText((new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())).format(rocData.startDate));
 		SimpleDateFormat timeFormat = new SimpleDateFormat("HHmm");
 		try {
-			Date time = timeFormat.parse(rocData.startTime);
-			rocStartTimeTextView.setText((new SimpleDateFormat("HHmm", Locale.getDefault())).format(time));
+			String startTime = rocData.startTime;
+			if (!startTime.isEmpty()) {
+				Date time = timeFormat.parse(rocData.startTime);
+				rocStartTimeTextView.setText((new SimpleDateFormat("HHmm", Locale.getDefault())).format(time));
+			}
 		} catch (ParseException ex) {
 			Log.v("Exception", ex.getLocalizedMessage());
 			rocStartTimeTextView.setText((new SimpleDateFormat("HHmm", Locale.getDefault())).format(rocData.startTime));
@@ -1038,7 +1041,7 @@ public class ReportOnConditionFragment extends Fragment
 		// --------- Setting the field values ---------
 		setSpinnerValue(rocData.calfireIncident, calFireIncidentSpinner);
 
-		// Making an array of all checkboxes to iterate over to reduce code
+		// Making an array of all checkboxes to iterate over to reduce code VIEW ONLY
 		CheckBox[] resourceCheckboxes = {
 				calFireResourcesNoneCheckBox,
 				calFireResourcesAirCheckBox,
@@ -1228,7 +1231,6 @@ public class ReportOnConditionFragment extends Fragment
 				calFireResourcesLatAssignedCheckBox,
 				calFireResourcesAllReleasedCheckBox
 		};
-
 
 		for(CheckBox checkBox : resourceCheckboxes)
 		{
@@ -2006,6 +2008,39 @@ public class ReportOnConditionFragment extends Fragment
 				vegFireOtherFuelTypeEditText.setText(lastRocData.otherFuelTypes);
 				vegFireOtherFuelTypeEditText.setVisibility(View.VISIBLE);
 				vegFireOtherFuelTypeLabelTextView.setVisibility(View.VISIBLE);
+			}
+			if (lastRocData.calfireIncident.toLowerCase().equals("yes")) {
+				calFireIncidentSpinner.setSelection(1);
+
+			} else if (lastRocData.calfireIncident.toLowerCase().equals("no")) {
+				calFireIncidentSpinner.setSelection(2);
+			}
+			// Making an array of all checkboxes to iterate over to reduce code
+			CheckBox[] resourceCheckboxes = {
+					calFireResourcesNoneCheckBox,
+					calFireResourcesAirCheckBox,
+					calFireResourcesGroundCheckBox,
+					calFireResourcesAirAndGroundCheckBox,
+					calFireResourcesAirAndGroundAugmentedCheckBox,
+					calFireResourcesAgencyRepOrderedCheckBox,
+					calFireResourcesAgencyRepAssignedCheckBox,
+					calFireResourcesContinuedCheckBox,
+					calFireResourcesSignificantAugmentationCheckBox,
+					calFireResourcesVlatOrderCheckBox,
+					calFireResourcesVlatAssignedCheckBox,
+					calFireResourcesNoDivertCheckBox,
+					calFireResourcesLatAssignedCheckBox,
+					calFireResourcesAllReleasedCheckBox
+			};
+			for(CheckBox checkBox : resourceCheckboxes) {
+				checkBox.setChecked(false);
+
+				for (String resource : lastRocData.resourcesAssigned) {
+					// Compare the strings in lower case to allow for different capitalizations
+					if (resource.toLowerCase().equals(checkBox.getText().toString().toLowerCase())) {
+						checkBox.setChecked(true);
+					}
+				}
 			}
 		}
 

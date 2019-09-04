@@ -832,7 +832,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="10dp"
-                            android:text="Date:"
+                            android:text="Start Date:"
                             android:textSize="18sp"/>
                         <TextView
                             android:id="@+id/rocStartDate"
@@ -1710,26 +1710,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
-                        <!--<CheckBox
-                            android:id="@+id/rocCalFireResourcesNone"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="No CAL FIRE Resources Assigned"/>
-                        <CheckBox
-                            android:id="@+id/rocCalFireResourcesAir"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="CAL FIRE Air Resources Assigned"/>
-                        <CheckBox
-                            android:id="@+id/rocCalFireResourcesGround"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="CAL FIRE Ground Resources Assigned"/>
-                        <CheckBox
-                            android:id="@+id/rocCalFireResourcesAllReleased"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="All CAL FIRE Resources Released"/>-->
                         <CheckBox
                             android:id="@+id/rocCalFireResourcesNone"
                             android:layout_width="match_parent"
