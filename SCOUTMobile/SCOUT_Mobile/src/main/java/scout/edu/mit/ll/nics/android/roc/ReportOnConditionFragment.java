@@ -1984,7 +1984,6 @@ public class ReportOnConditionFragment extends Fragment
 			rocJurisdictionTextView.setText(lastRocData.jurisdiction);
 			setSpinnerValue(lastRocData.county, rocInitialCountySpinner);
 
-
 			// Fuel Types Checkboxes
 			if(lastRocData.fuelTypes.contains("Grass"))
 			{
@@ -2759,7 +2758,9 @@ public class ReportOnConditionFragment extends Fragment
 
 
 					setUIStringField(data, "location", rocLocationTextView);
-					setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView);
+					if (rocInitialCountySpinner.getSelectedItemPosition() == 0) {
+						setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView);
+					}
 					setUIStringField(data, "state", incidentStateTextView);
 
 					if(reportTypeSpinner.getSelectedItem().toString().equals("NEW")) {
