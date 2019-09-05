@@ -1814,6 +1814,33 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="All CAL FIRE air and ground resources released"/>
+
+                        <CheckBox
+                            android:id="@+id/rocCalFireResourcesOther"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Other" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/otherCheckBoxLayout"
+                            android:layout_marginTop="10dp"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="Other Resources Assigned:"
+                                android:textSize="18sp"/>
+                            <AutoCompleteTextView
+                                android:id="@+id/rocCalFireResourcesOtherTextView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:completionThreshold="1"
+                                android:hint=""
+                                android:textSize="18sp"/>
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 

@@ -75,6 +75,7 @@ import android.widget.TimePicker;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -270,6 +271,9 @@ public class ReportOnConditionFragment extends Fragment
 	CheckBox calFireResourcesNoDivertCheckBox;
 	CheckBox calFireResourcesLatAssignedCheckBox;
 	CheckBox calFireResourcesAllReleasedCheckBox;
+	CheckBox calFireResourcesOtherCheckBox;
+	LinearLayout otherResourcesLayout;
+	AutoCompleteTextView calFireResourcesOtherTextView;
 
 
 	// Input Validation Error Views
@@ -845,7 +849,7 @@ public class ReportOnConditionFragment extends Fragment
 		//================================================
 
 		// --------- Setting the field values ---------
-		setSpinnerValue(rocData.county, rocInitialCountySpinner);
+		setInitialCountySpinnerValue(rocData.county, rocInitialCountySpinner);
 		Log.e("ROC","ROC - setupFormForViewingMode - additional counties = \"" + rocData.additionalAffectedCounties + "\"");
 
 		rocAdditionalCountiesTextView.setText(rocData.additionalAffectedCounties);
@@ -1062,7 +1066,8 @@ public class ReportOnConditionFragment extends Fragment
 				calFireResourcesVlatAssignedCheckBox,
 				calFireResourcesNoDivertCheckBox,
 				calFireResourcesLatAssignedCheckBox,
-				calFireResourcesAllReleasedCheckBox
+				calFireResourcesAllReleasedCheckBox,
+				calFireResourcesOtherCheckBox
 		};
 
 
@@ -1076,6 +1081,12 @@ public class ReportOnConditionFragment extends Fragment
 				if(resource.toLowerCase().equals(checkBox.getText().toString().toLowerCase()))
 				{
 					checkBox.setChecked(true);
+				}  else if (checkBox.getText().toString().toLowerCase().equals("other") && resource.toLowerCase().startsWith("other")) {
+					checkBox.setChecked(true);
+					otherResourcesLayout.setVisibility(View.VISIBLE);
+					String formattedResource = resource.replace("Other: ", "");
+					calFireResourcesOtherTextView.setText(formattedResource);
+					calFireResourcesOtherTextView.setEnabled(false);
 				}
 			}
 		}
@@ -1124,6 +1135,7 @@ public class ReportOnConditionFragment extends Fragment
 
 		rocInitialCountySpinner.setEnabled(false);
 		addInitalCountyView.setVisibility(View.GONE);
+		rocAddInitialCountyTextView.setEnabled(false);
 		rocAdditionalCountiesTextView.setEnabled(false);
 		rocLocationTextView.setEnabled(false);
 		rocLocationStreetEditText.setEnabled(false);
@@ -1236,7 +1248,8 @@ public class ReportOnConditionFragment extends Fragment
 				calFireResourcesVlatAssignedCheckBox,
 				calFireResourcesNoDivertCheckBox,
 				calFireResourcesLatAssignedCheckBox,
-				calFireResourcesAllReleasedCheckBox
+				calFireResourcesAllReleasedCheckBox,
+				calFireResourcesOtherCheckBox
 		};
 
 		for(CheckBox checkBox : resourceCheckboxes)
@@ -1726,6 +1739,7 @@ public class ReportOnConditionFragment extends Fragment
 			calFireResourcesNoDivertCheckBox.setVisibility(View.VISIBLE);
 			calFireResourcesLatAssignedCheckBox.setVisibility(View.VISIBLE);
 			calFireResourcesAllReleasedCheckBox.setVisibility(View.GONE);
+			calFireResourcesOtherCheckBox.setVisibility(View.VISIBLE);
 		}
 		if(currentReportType == ROC_UPDATE)
 		{
@@ -1747,6 +1761,7 @@ public class ReportOnConditionFragment extends Fragment
 			calFireResourcesNoDivertCheckBox.setVisibility(View.GONE);
 			calFireResourcesLatAssignedCheckBox.setVisibility(View.GONE);
 			calFireResourcesAllReleasedCheckBox.setVisibility(View.VISIBLE);
+			calFireResourcesOtherCheckBox.setVisibility(View.GONE);
 		}
 
 		//----------------------------------------------------------------------------
@@ -2036,7 +2051,8 @@ public class ReportOnConditionFragment extends Fragment
 					calFireResourcesVlatAssignedCheckBox,
 					calFireResourcesNoDivertCheckBox,
 					calFireResourcesLatAssignedCheckBox,
-					calFireResourcesAllReleasedCheckBox
+					calFireResourcesAllReleasedCheckBox,
+					calFireResourcesOtherCheckBox
 			};
 			for(CheckBox checkBox : resourceCheckboxes) {
 				checkBox.setChecked(false);
@@ -2045,6 +2061,11 @@ public class ReportOnConditionFragment extends Fragment
 					// Compare the strings in lower case to allow for different capitalizations
 					if (resource.toLowerCase().equals(checkBox.getText().toString().toLowerCase())) {
 						checkBox.setChecked(true);
+					} else if (checkBox.getText().toString().toLowerCase().equals("other") && resource.toLowerCase().startsWith("other")) {
+						checkBox.setChecked(true);
+						otherResourcesLayout.setVisibility(View.VISIBLE);
+						String formattedResource = resource.replace("Other: ", "");
+						calFireResourcesOtherTextView.setText(formattedResource);
 					}
 				}
 			}
@@ -2580,6 +2601,19 @@ public class ReportOnConditionFragment extends Fragment
 		calFireResourcesNoDivertCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesNoDivert);
 		calFireResourcesLatAssignedCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesLatAssigned);
 		calFireResourcesAllReleasedCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesAllReleased);
+		calFireResourcesOtherCheckBox = (CheckBox) mRootView.findViewById(R.id.rocCalFireResourcesOther);
+		calFireResourcesOtherTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocCalFireResourcesOtherTextView);
+		otherResourcesLayout = (LinearLayout) mRootView.findViewById(R.id.otherCheckBoxLayout);
+		calFireResourcesOtherCheckBox.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if (calFireResourcesOtherCheckBox.isChecked()) {
+					otherResourcesLayout.setVisibility(View.VISIBLE);
+				} else {
+					otherResourcesLayout.setVisibility(View.GONE);
+				}
+			}
+		});
 
 		// Retrieving the Error View field objects
 		calFireIncidentErrorView = (ImageView) mRootView.findViewById(R.id.rocCalFireIncidentError);
@@ -2664,6 +2698,26 @@ public class ReportOnConditionFragment extends Fragment
 		}
 
 		// Indicate that the string was not found as one of the spinner options
+		return false;
+	}
+
+	private boolean setInitialCountySpinnerValue(String value, Spinner spinner) {
+		// Iterate through the spinner's options, and select whichever one matches:
+		for(int i = 0; i <  spinner.getCount(); i++)
+		{
+			if(spinner.getItemAtPosition(i).toString().toLowerCase().equals(value.toLowerCase()))
+			{
+				spinner.setSelection(i);
+				// Indicate that we found the string in the spinner options
+				return true;
+			}
+		}
+
+		if (spinner.getSelectedItemPosition() == 0 && !value.isEmpty()) {
+			spinner.setSelection(1);
+			addInitalCountyView.setVisibility(View.VISIBLE);
+			rocAddInitialCountyTextView.setText(value);
+		}
 		return false;
 	}
 
@@ -3015,6 +3069,7 @@ public class ReportOnConditionFragment extends Fragment
 		calFireResourcesNoDivertCheckBox.setChecked(false);
 		calFireResourcesLatAssignedCheckBox.setChecked(false);
 		calFireResourcesAllReleasedCheckBox.setChecked(false);
+		calFireResourcesOtherCheckBox.setChecked(false);
 		//================================================
 		// Other Significant Info Fields
 		//================================================
@@ -4910,15 +4965,22 @@ public class ReportOnConditionFragment extends Fragment
 				calFireResourcesVlatAssignedCheckBox,
 				calFireResourcesNoDivertCheckBox,
 				calFireResourcesLatAssignedCheckBox,
-				calFireResourcesAllReleasedCheckBox
+				calFireResourcesAllReleasedCheckBox,
+				calFireResourcesOtherCheckBox
 		};
 
 		data.resourcesAssigned = new ArrayList<String>();
 
 		for(CheckBox checkBox : resourceCheckboxes)
 		{
-			if(checkBox.isChecked())
-				data.resourcesAssigned.add(checkBox.getText().toString());
+			if(checkBox.isChecked()) {
+				if (!checkBox.getText().toString().toLowerCase().equals("other")) {
+					data.resourcesAssigned.add(checkBox.getText().toString());
+				} else if (!calFireResourcesOtherTextView.getText().toString().isEmpty()){
+					String otherResource = "Other: " + calFireResourcesOtherTextView.getText().toString();
+					data.resourcesAssigned.add(otherResource);
+				}
+			}
 		}
 
 		//================================================
