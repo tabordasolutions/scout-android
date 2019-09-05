@@ -65,6 +65,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -85,6 +86,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.text.ParseException;
 
+import gov.nasa.worldwind.geom.Line;
 import scout.edu.mit.ll.nics.android.MainActivity;
 import scout.edu.mit.ll.nics.android.R;
 import scout.edu.mit.ll.nics.android.api.DataManager;
@@ -135,6 +137,7 @@ public class ReportOnConditionFragment extends Fragment
 	private LinearLayout emailSection;
 	private ImageView emailHeaderErrorView;
 
+	private LinearLayout addInitalCountyView;
 	private boolean shouldValidate;
 
 	//================================================
@@ -176,6 +179,7 @@ public class ReportOnConditionFragment extends Fragment
 	// ROC Incident Info Fields
 	//================================================
 	Spinner rocInitialCountySpinner;
+	AutoCompleteTextView rocAddInitialCountyTextView;
 	AutoCompleteTextView rocAdditionalCountiesTextView;
 	AutoCompleteTextView rocLocationTextView;
 	ImageButton incidentLocationInfoButton;
@@ -350,6 +354,7 @@ public class ReportOnConditionFragment extends Fragment
 		resourceCommitmentHeader.setVisibility(View.GONE);
 		otherInfoHeader.setVisibility(View.GONE);
 		emailHeader.setVisibility(View.GONE);
+		addInitalCountyView.setVisibility(View.GONE);
 
 
 		// ------------------------------------------------------------------------
@@ -842,6 +847,7 @@ public class ReportOnConditionFragment extends Fragment
 		// --------- Setting the field values ---------
 		setSpinnerValue(rocData.county, rocInitialCountySpinner);
 		Log.e("ROC","ROC - setupFormForViewingMode - additional counties = \"" + rocData.additionalAffectedCounties + "\"");
+
 		rocAdditionalCountiesTextView.setText(rocData.additionalAffectedCounties);
 		rocLocationTextView.setText(rocData.location);
 		rocLocationStreetEditText.setText(rocData.street);
@@ -1117,6 +1123,7 @@ public class ReportOnConditionFragment extends Fragment
 		//================================================
 
 		rocInitialCountySpinner.setEnabled(false);
+		addInitalCountyView.setVisibility(View.GONE);
 		rocAdditionalCountiesTextView.setEnabled(false);
 		rocLocationTextView.setEnabled(false);
 		rocLocationStreetEditText.setEnabled(false);
@@ -2271,6 +2278,7 @@ public class ReportOnConditionFragment extends Fragment
 		otherInfoSection = (LinearLayout) mRootView.findViewById(R.id.rocOtherInfoSection);
 		emailHeader = (TextView) mRootView.findViewById(R.id.rocEmailHeader);
 		emailSection = (LinearLayout) mRootView.findViewById(R.id.rocEmailSection);
+		addInitalCountyView = (LinearLayout) mRootView.findViewById(R.id.addInitialCountyView);
 
 		// Retrieving references to all section header error views
 		incidentInfoHeaderErrorView = (ImageView) mRootView.findViewById(R.id.rocIncidentInfoHeaderError);
@@ -2369,6 +2377,7 @@ public class ReportOnConditionFragment extends Fragment
 		//-----------------------------------------------------------------------------------------
 		// Retrieving all of the field objects
 		rocInitialCountySpinner = (Spinner) mRootView.findViewById(R.id.rocCounty);
+		rocAddInitialCountyTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocAddInitialCounty);
 		rocAdditionalCountiesTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocAdditionalCounties);
 		rocLocationTextView = (AutoCompleteTextView) mRootView.findViewById(R.id.rocLocation);
 		incidentLocationInfoButton = (ImageButton) mRootView.findViewById(R.id.incidentLocationInfoButton);
@@ -2409,7 +2418,7 @@ public class ReportOnConditionFragment extends Fragment
 		rocOwnershipErrorView = (ImageView) mRootView.findViewById(R.id.rocOwnershipError);
 
 		// Make interacting with the spinners hide the error views
-		setupSpinnerErrorView(rocInitialCountySpinner,rocCountyErrorView);
+       	setupInitialCountySpinner(rocInitialCountySpinner, rocCountyErrorView);
 		setupSpinnerErrorView(rocDPASpinner,rocDPAErrorView);
 		setupSpinnerErrorView(rocLocationDirectionFromNearestCommunitySpinner, rocLocationDirectionFromNearestCommunityErrorView);
 		setupSpinnerErrorView(rocOwnershipSpinner,rocOwnershipErrorView);
@@ -2758,9 +2767,15 @@ public class ReportOnConditionFragment extends Fragment
 
 
 					setUIStringField(data, "location", rocLocationTextView);
-					if (rocInitialCountySpinner.getSelectedItemPosition() == 0) {
-						setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView);
+					if (!setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView)) {
+						// Set option to "manually add"
+						rocInitialCountySpinner.setSelection(1);
+						addInitalCountyView.setVisibility(View.VISIBLE);
+						setUIStringField(data, "county", rocAddInitialCountyTextView);
+					} else {
+						addInitalCountyView.setVisibility(View.GONE);
 					}
+
 					setUIStringField(data, "state", incidentStateTextView);
 
 					if(reportTypeSpinner.getSelectedItem().toString().equals("NEW")) {
@@ -3425,6 +3440,38 @@ public class ReportOnConditionFragment extends Fragment
 				errorView.setVisibility(View.GONE);
 				if (shouldValidate) {
 					isFormInfoValid();
+				}
+			}
+
+			@Override
+			public void onNothingSelected (AdapterView<?> parent) {}
+
+		}.setErrorView(errorView));
+	}
+
+	private void setupInitialCountySpinner(Spinner spinner, ImageView errorView)
+	{
+		spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+			ImageView errorView;
+
+			public AdapterView.OnItemSelectedListener setErrorView(ImageView errorView)
+			{
+				this.errorView = errorView;
+				return this;
+			}
+
+			@Override
+			public void onItemSelected (AdapterView<?> parent, View view, int position, long id)
+			{
+				errorView.setVisibility(View.GONE);
+				if (shouldValidate) {
+					isFormInfoValid();
+				}
+				if (position == 1) {
+					addInitalCountyView.setVisibility(View.VISIBLE);
+				} else {
+					addInitalCountyView.setVisibility(View.GONE);
 				}
 			}
 
@@ -4664,7 +4711,11 @@ public class ReportOnConditionFragment extends Fragment
 		// ROC Incident Info Fields
 		//================================================
 
-		data.county = rocInitialCountySpinner.getSelectedItem().toString();
+        if (rocInitialCountySpinner.getSelectedItemPosition() > 1) {
+            data.county = rocInitialCountySpinner.getSelectedItem().toString();
+        } else if (rocInitialCountySpinner.getSelectedItemPosition() == 1) {
+            data.county = rocAddInitialCountyTextView.getText().toString();
+        }
 		data.additionalAffectedCounties = rocAdditionalCountiesTextView.getText().toString();
 		data.location = rocLocationTextView.getText().toString();
 		data.street = rocLocationStreetEditText.getText().toString();

@@ -592,6 +592,9 @@ public class OverviewFragment extends Fragment
 			mDialogBuilder.setMessage(null);
 			mDialogBuilder.setPositiveButton(null, null);
 			final HashMap<String, IncidentPayload> incidentsMap = mDataManager.getIncidents();
+			if (incidentsMap == null) {
+				return;
+			}
 			incidentArray = new String[incidentsMap.size()];
 			incidentsMap.keySet().toArray(incidentArray);
 

@@ -81,6 +81,7 @@
     </string-array>
     <string-array name="roc_incident_initial_county_spinner_options">
         <item>Choose an option (required)</item>
+        <item>Manually Add County</item>
         <item>Alameda</item>
         <item>Alpine</item>
         <item>Amador</item>
