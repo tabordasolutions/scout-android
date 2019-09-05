@@ -2821,14 +2821,17 @@ public class ReportOnConditionFragment extends Fragment
 
 
 					setUIStringField(data, "location", rocLocationTextView);
-					if (!setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView)) {
-						// Set option to "manually add"
-						rocInitialCountySpinner.setSelection(1);
-						addInitalCountyView.setVisibility(View.VISIBLE);
-						setUIStringField(data, "county", rocAddInitialCountyTextView);
-					} else {
-						addInitalCountyView.setVisibility(View.GONE);
+					if (rocInitialCountySpinner.getSelectedItemPosition() == 0) {
+						if (!setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView)) {
+							// Set option to "manually add"
+							rocInitialCountySpinner.setSelection(1);
+							addInitalCountyView.setVisibility(View.VISIBLE);
+							setUIStringField(data, "county", rocAddInitialCountyTextView);
+						} else {
+							addInitalCountyView.setVisibility(View.GONE);
+						}
 					}
+
 
 					setUIStringField(data, "state", incidentStateTextView);
 
