@@ -705,11 +705,35 @@ public class ReportOnConditionData
 			// Weather Information Fields
 			//================================================
 
-			rocPayload.put("temperature", temperature);
-			rocPayload.put("relHumidity", relHumidity);
-			rocPayload.put("windSpeed", windSpeed);
-			rocPayload.put("windDirection", windDirection);
-			rocPayload.put("windGust", windGusts);
+			if (temperature.isEmpty()) {
+				rocPayload.put("temperature", "null");
+			} else {
+				rocPayload.put("temperature", temperature);
+			}
+
+			if (relHumidity.isEmpty()) {
+				rocPayload.put("relHumidity", "null");
+			} else {
+				rocPayload.put("relHumidity", relHumidity);
+			}
+
+			if (windSpeed.isEmpty()) {
+				rocPayload.put("windSpeed", "null");
+			} else {
+				rocPayload.put("windSpeed", windSpeed);
+			}
+
+			if (windDirection.isEmpty() || windDirection.toLowerCase().equals("choose an option")) {
+				rocPayload.put("windDirection", "null");
+			} else {
+				rocPayload.put("windDirection", windDirection);
+			}
+
+			if (windGusts.isEmpty()) {
+				rocPayload.put("windGust", "null");
+			} else {
+				rocPayload.put("windGust", windGusts);
+			}
 
 			//================================================
 			// Threats & Evacuations Fields
