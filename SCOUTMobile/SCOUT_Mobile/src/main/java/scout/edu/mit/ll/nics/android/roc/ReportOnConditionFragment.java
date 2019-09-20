@@ -1083,10 +1083,12 @@ public class ReportOnConditionFragment extends Fragment
 					checkBox.setChecked(true);
 				}  else if (checkBox.getText().toString().toLowerCase().equals("other") && resource.toLowerCase().startsWith("other")) {
 					checkBox.setChecked(true);
-					otherResourcesLayout.setVisibility(View.VISIBLE);
-					String formattedResource = resource.replace("Other: ", "");
-					calFireResourcesOtherTextView.setText(formattedResource);
-					calFireResourcesOtherTextView.setEnabled(false);
+					if (currentReportType != ROC_FINAL) {
+                        otherResourcesLayout.setVisibility(View.VISIBLE);
+                        String formattedResource = resource.replace("Other: ", "");
+                        calFireResourcesOtherTextView.setText(formattedResource);
+                        calFireResourcesOtherTextView.setEnabled(false);
+                    }
 				}
 			}
 		}
@@ -1762,6 +1764,7 @@ public class ReportOnConditionFragment extends Fragment
 			calFireResourcesLatAssignedCheckBox.setVisibility(View.GONE);
 			calFireResourcesAllReleasedCheckBox.setVisibility(View.VISIBLE);
 			calFireResourcesOtherCheckBox.setVisibility(View.GONE);
+			otherResourcesLayout.setVisibility(View.GONE);
 		}
 
 		//----------------------------------------------------------------------------
@@ -2062,10 +2065,12 @@ public class ReportOnConditionFragment extends Fragment
 					if (resource.toLowerCase().equals(checkBox.getText().toString().toLowerCase())) {
 						checkBox.setChecked(true);
 					} else if (checkBox.getText().toString().toLowerCase().equals("other") && resource.toLowerCase().startsWith("other")) {
-						checkBox.setChecked(true);
-						otherResourcesLayout.setVisibility(View.VISIBLE);
-						String formattedResource = resource.replace("Other: ", "");
-						calFireResourcesOtherTextView.setText(formattedResource);
+                        if (currentReportType != ROC_FINAL) {
+                            checkBox.setChecked(true);
+                            otherResourcesLayout.setVisibility(View.VISIBLE);
+                            String formattedResource = resource.replace("Other: ", "");
+                            calFireResourcesOtherTextView.setText(formattedResource);
+                        }
 					}
 				}
 			}
