@@ -2826,7 +2826,7 @@ public class ReportOnConditionFragment extends Fragment
 
 
 					setUIStringField(data, "location", rocLocationTextView);
-					if (rocInitialCountySpinner.getSelectedItemPosition() == 0) {
+					if (rocInitialCountySpinner.getSelectedItemPosition() == 0 || currentReportType == ROC_NEW) {
 						if (!setUIStringSpinner(data, "county", rocInitialCountySpinner, rocCountyErrorView)) {
 							// Set option to "manually add"
 							rocInitialCountySpinner.setSelection(1);
