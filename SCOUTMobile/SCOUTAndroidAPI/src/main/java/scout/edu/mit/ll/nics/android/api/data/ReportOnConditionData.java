@@ -91,6 +91,7 @@ public class ReportOnConditionData
 	public String calfireIncident;
 	public ArrayList<String> resourcesAssigned;
 	public String email;
+	public String orgPrefix;
 	public double latitude;
 	public double longitude;
 	public boolean weatherDataAvailable;
@@ -564,6 +565,7 @@ public class ReportOnConditionData
 			// Other Fields
 			//================================================
 			report.weatherDataAvailable = rocPayload.optBoolean("weatherDataAvailable");
+			report.orgPrefix = rocPayload.optString("orgPrefix","");
 
 			Log.i("ROC","ReportOnConditionData - fromServerPayload - Parsed report JSON: " + report.toJSON().toString());
 			return report;
@@ -784,6 +786,12 @@ public class ReportOnConditionData
 			rocPayload.put("comments","");
 			rocPayload.put("rocDisplayName","");
 
+			if (orgPrefix != null && orgPrefix.isEmpty()) {
+				orgPrefix = "none";
+			} else if (orgPrefix == null) {
+				orgPrefix = "none";
+			}
+			rocPayload.put("orgPrefix", orgPrefix);
 
 			//--------------------------------------------
 			// Building the final payload:
@@ -791,8 +799,6 @@ public class ReportOnConditionData
 			messagePayload.put("report",rocPayload);
 			dateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 			messagePayload.put("datecreated",dateFormatter.format(datecreated));
-
-
 
 			//TODO - What should this be? How do we get the workspace id?
 			//TODO- is hardcoding the value of 1 okay?
@@ -805,6 +811,7 @@ public class ReportOnConditionData
 			payload.put("usersessionid",usersessionid);
 			payload.put("distributed", false);
 			payload.put("message",messagePayload.toString());
+
 			return payload;
 		}
 		catch(JSONException e)
@@ -841,6 +848,7 @@ public class ReportOnConditionData
 			incidentPayload.put("folder","");
 			incidentPayload.put("description","");
 			incidentPayload.put("bounds",null);
+			incidentPayload.put("orgPrefix", orgPrefix);
 
 			// Building the incident Types Array
 			JSONArray incidentTypesArray = new JSONArray();

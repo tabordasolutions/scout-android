@@ -1211,7 +1211,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 	@Override
 	public void onBackPressed ()
 	{
-
+		Fragment currentFragment = mFragmentManager.findFragmentById(R.id.container);
 		if (mDataManager.getTabletLayoutOn())
 		{
 			tabletBackButtonPressed();
@@ -1240,6 +1240,33 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			}
 		}
 
+		else if (currentFragment == mReportOnConditionFragment && mReportOnConditionFragment.isSubmittingROC == false) {
+			Log.d("roc_frag", "ROC");
+			Context context = this;
+			AlertDialog.Builder alert = new AlertDialog.Builder(context);
+			alert.setMessage("Are you sure you want to exit ROC?");
+			alert.setCancelable(true);
+
+			alert.setPositiveButton(
+					"Yes",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+							onNavigationItemSelected(mBackStack.pop(), -1);
+						}
+					});
+
+			alert.setNegativeButton(
+					"No",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
+						}
+					});
+
+			AlertDialog dialog = alert.create();
+			dialog.show();
+		}
 		//OES828 TODO - handle if we're backing out of a ROC form ( go back to the Action Menu)
 
 		else if (mBackStack.size() > 0)
@@ -1258,6 +1285,9 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			}
 			mIsBackKey = false;
 			moveTaskToBack(true);
+		}
+		if (mReportOnConditionFragment.isSubmittingROC == true) {
+			mReportOnConditionFragment.isSubmittingROC = false;
 		}
 	}
 

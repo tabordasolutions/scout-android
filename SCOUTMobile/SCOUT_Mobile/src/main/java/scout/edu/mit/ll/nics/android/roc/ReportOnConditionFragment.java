@@ -141,6 +141,8 @@ public class ReportOnConditionFragment extends Fragment
 	private LinearLayout addInitalCountyView;
 	private boolean shouldValidate;
 
+	public Boolean isSubmittingROC;
+
 	//================================================
 	// ROC Form Info Fields
 	//================================================
@@ -425,6 +427,8 @@ public class ReportOnConditionFragment extends Fragment
 	// This method is responsible for setting up the form every time the Fragment is shown
 	public void setupFragment()
 	{
+		isSubmittingROC = false;
+
 		rocFragment = this;
 		gotWeatherData = false;
 
@@ -4734,11 +4738,14 @@ public class ReportOnConditionFragment extends Fragment
 			}
 			// Add the prefix to the incident name:
 			data.incidentname = incidentNameStatePrefix + incidentNameOrgPrefix + incidentNameTextView.getText().toString();
-		}
+			data.orgPrefix = orgPayload.getPrefix() + " " + orgPayload.getState();
+ 		}
 		// If we're not creating a new incident, the incident name should already have this formatting
 		else
 		{
 			data.incidentname = incidentNameTextView.getText().toString();
+			OrganizationPayload orgPayload = mDataManager.getCurrentOrganziation();
+			data.orgPrefix = orgPayload.getPrefix() + " " + orgPayload.getState();
 		}
 
 		data.reportType = reportTypeSpinner.getSelectedItem().toString();
@@ -5022,6 +5029,13 @@ public class ReportOnConditionFragment extends Fragment
 		//-------------------------------------------------------------------------------------------------
 		data.sendStatus = ReportSendStatus.WAITING_TO_SEND;
 
+		OrganizationPayload orgPayload = mDataManager.getCurrentOrganziation();
+		if(orgPayload != null)
+		{
+			data.orgPrefix = orgPayload.getPrefix();
+		}
+
+
 		return data;
 	}
 
@@ -5057,6 +5071,7 @@ public class ReportOnConditionFragment extends Fragment
 				RestClient.postReportOnConditions();
 
 				mContext.getSupportFragmentManager().beginTransaction().remove(rocFragment).commit();
+				isSubmittingROC = true;
 				mContext.onBackPressed();
 			}
 		}
