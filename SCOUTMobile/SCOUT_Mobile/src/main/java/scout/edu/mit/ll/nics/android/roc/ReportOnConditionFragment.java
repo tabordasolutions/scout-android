@@ -5082,7 +5082,6 @@ public class ReportOnConditionFragment extends Fragment
 		@Override
 		public void onClick (View v)
 		{
-			mContext.getSupportFragmentManager().beginTransaction().remove(rocFragment).commit();
 			mContext.onBackPressed();
 		}
 	};
