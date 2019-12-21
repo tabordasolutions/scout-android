@@ -939,7 +939,7 @@ public class ReportOnConditionFragment extends Fragment
 		//================================================
 
 		// --------- Setting the field values ---------
-		weatherTempEditText.setText(rocData.temperature);
+		weatherTempEditText.setText(rocData.temperature.toString());
 		weatherRelativeHumidityEditText.setText(rocData.relHumidity);
 		weatherWindSpeedEditText.setText(rocData.windSpeed);
 		setSpinnerValue(rocData.windDirection, weatherWindDirectionSpinner);
@@ -4863,7 +4863,7 @@ public class ReportOnConditionFragment extends Fragment
 		// Weather Information Fields
 		//================================================
 
-		data.temperature = weatherTempEditText.getText().toString();
+		data.temperature = Double.parseDouble(weatherTempEditText.getText().toString());
 		data.relHumidity = weatherRelativeHumidityEditText.getText().toString();
 		data.windSpeed = weatherWindSpeedEditText.getText().toString();
 		data.windDirection = weatherWindDirectionSpinner.getSelectedItem().toString();
@@ -4992,7 +4992,7 @@ public class ReportOnConditionFragment extends Fragment
 				if (!checkBox.getText().toString().toLowerCase().equals("other")) {
 					data.resourcesAssigned.add(checkBox.getText().toString());
 				} else if (!calFireResourcesOtherTextView.getText().toString().isEmpty()){
-					String otherResource = "Other: " + calFireResourcesOtherTextView.getText().toString();
+					String otherResource = calFireResourcesOtherTextView.getText().toString();
 					data.resourcesAssigned.add(otherResource);
 				}
 			}

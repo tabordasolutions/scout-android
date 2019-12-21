@@ -76,7 +76,7 @@ public class ReportOnConditionData
 	public ArrayList<String> fuelTypes;
 	public String otherFuelTypes;
 	public String percentContained;
-	public String temperature;
+	public Double temperature;
 	public String relHumidity;
 	public String windSpeed;
 	public String windDirection;
@@ -504,7 +504,7 @@ public class ReportOnConditionData
 			// Weather Information Fields
 			//================================================
 
-			report.temperature = rocPayload.optString("temperature","");
+			report.temperature = rocPayload.optDouble("temperature",-99);
 			report.relHumidity = rocPayload.optString("relHumidity","");
 			report.windSpeed = rocPayload.optString("windSpeed","");
 			report.windDirection = rocPayload.optString("windDirection","");
@@ -707,10 +707,10 @@ public class ReportOnConditionData
 			// Weather Information Fields
 			//================================================
 
-			if (temperature.isEmpty()) {
+			if (temperature == null || temperature <= -99) {
 				rocPayload.put("temperature", "null");
 			} else {
-				rocPayload.put("temperature", temperature);
+				rocPayload.put("temperature", String.format("%.0f", temperature));
 			}
 
 			if (relHumidity.isEmpty()) {
@@ -848,7 +848,6 @@ public class ReportOnConditionData
 			incidentPayload.put("folder","");
 			incidentPayload.put("description","");
 			incidentPayload.put("bounds",null);
-			incidentPayload.put("orgPrefix", orgPrefix);
 
 			// Building the incident Types Array
 			JSONArray incidentTypesArray = new JSONArray();
@@ -1037,7 +1036,7 @@ public class ReportOnConditionData
 			data.fuelTypes = stringArrayFromJson(obj.getJSONArray("fuelTypes"));
 			data.otherFuelTypes = obj.getString("otherFuelTypes");
 			data.percentContained = obj.getString("percentContained");// FIXME - should be getDouble
-			data.temperature = obj.getString("temperature");// FIXME - should be getDouble
+			data.temperature = obj.getDouble("temperature");// FIXME - should be getDouble
 			data.relHumidity = obj.getString("relHumidity");// FIXME - should be getDouble
 			data.windSpeed = obj.getString("windSpeed");// FIXME - should be getDouble
 			data.windDirection = obj.getString("windDirection");
