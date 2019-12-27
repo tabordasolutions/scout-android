@@ -41,6 +41,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import scout.edu.mit.ll.nics.android.api.DataManager;
+import scout.edu.mit.ll.nics.android.api.data.userorg;
+import scout.edu.mit.ll.nics.android.api.payload.OrganizationPayload;
+
+
 public class ReportOnConditionData
 {
 	// Report metadata
@@ -368,16 +373,6 @@ public class ReportOnConditionData
 		{
 			return new JSONArray();
 		}
-
-		// If one element, return object with value
-		if(data.incidentTypes.size() == 1)
-		{
-			JSONObject obj = new JSONObject();
-			obj.put("incidenttype",incidentTypeStringToId(data.incidentTypes.get(0)));
-			return obj;
-		}
-
-		// Otherwise, add them as an array inside of an object
 
 		JSONObject obj = new JSONObject();
 
@@ -786,11 +781,12 @@ public class ReportOnConditionData
 			rocPayload.put("comments","");
 			rocPayload.put("rocDisplayName","");
 
-			if (orgPrefix != null && orgPrefix.isEmpty()) {
-				orgPrefix = "none";
-			} else if (orgPrefix == null) {
-				orgPrefix = "none";
-			}
+			OrganizationPayload orgPayload =  DataManager.getInstance().getCurrentOrganziation();
+			String state = orgPayload.getState();
+			if (state == null || state.isEmpty()) {
+			    state = "CA";
+            }
+			orgPrefix =  state + " " + orgPayload.getPrefix() ;
 			rocPayload.put("orgPrefix", orgPrefix);
 
 			//--------------------------------------------

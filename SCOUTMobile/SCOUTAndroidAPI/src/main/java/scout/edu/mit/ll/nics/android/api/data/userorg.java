@@ -38,7 +38,7 @@ public class userorg {
 	private long userid;
 	private long systemroleid;
 	
-	public long getUserorgid() {
+	public long getUserOrgId() {
 		return userorgid;
 	}
 	public void setUserorgid(long userorgid) {

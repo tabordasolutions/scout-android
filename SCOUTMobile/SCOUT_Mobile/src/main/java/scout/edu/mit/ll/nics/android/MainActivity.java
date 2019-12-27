@@ -1286,7 +1286,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.OnNavig
 			mIsBackKey = false;
 			moveTaskToBack(true);
 		}
-		if (mReportOnConditionFragment.isSubmittingROC == true) {
+		if (mReportOnConditionFragment.isSubmittingROC == null || mReportOnConditionFragment.isSubmittingROC == true) {
 			mReportOnConditionFragment.isSubmittingROC = false;
 		}
 	}

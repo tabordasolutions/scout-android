@@ -641,7 +641,7 @@ public class DataManager
 //	        data.setTopic(topic);
 			data.setNickname(getUserNickname());
 			data.setUserOrgName(getCurrentOrganziation().getName());
-			data.setUserorgid((long) getCurrentOrganziation().getUserorgs()[0].getUserorgid());
+			data.setUserorgid((long) getCurrentOrganziation().getUserorgs()[0].getUserOrgId());
 		}
 
 		if (data != null)

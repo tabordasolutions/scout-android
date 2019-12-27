@@ -44,6 +44,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -4734,18 +4735,27 @@ public class ReportOnConditionFragment extends Fragment
 			if(orgPayload != null)
 			{
 				incidentNameOrgPrefix = orgPayload.getPrefix() + " ";
-				incidentNameStatePrefix = orgPayload.getState() + " ";
+				if (TextUtils.isEmpty(orgPayload.getState())) {
+					incidentNameStatePrefix = "CA ";
+				} else {
+					incidentNameStatePrefix = orgPayload.getState() + " ";
+				}
 			}
 			// Add the prefix to the incident name:
+
 			data.incidentname = incidentNameStatePrefix + incidentNameOrgPrefix + incidentNameTextView.getText().toString();
-			data.orgPrefix = orgPayload.getPrefix() + " " + orgPayload.getState();
+			data.orgPrefix = orgPayload.getState() + " " + orgPayload.getPrefix();
  		}
 		// If we're not creating a new incident, the incident name should already have this formatting
 		else
 		{
 			data.incidentname = incidentNameTextView.getText().toString();
 			OrganizationPayload orgPayload = mDataManager.getCurrentOrganziation();
-			data.orgPrefix = orgPayload.getPrefix() + " " + orgPayload.getState();
+			String incidentNameStatePrefix = orgPayload.getState();
+			if (incidentNameStatePrefix == null || incidentNameStatePrefix.isEmpty()) {
+				incidentNameStatePrefix = "CA";
+			}
+			data.orgPrefix =  incidentNameStatePrefix + " " + orgPayload.getPrefix();;
 		}
 
 		data.reportType = reportTypeSpinner.getSelectedItem().toString();
@@ -4863,7 +4873,10 @@ public class ReportOnConditionFragment extends Fragment
 		// Weather Information Fields
 		//================================================
 
-		data.temperature = Double.parseDouble(weatherTempEditText.getText().toString());
+		String temperatureString = weatherTempEditText.getText().toString();
+		if (temperatureString != null && temperatureString.isEmpty() == false) {
+			data.temperature = Double.parseDouble(temperatureString);
+		}
 		data.relHumidity = weatherRelativeHumidityEditText.getText().toString();
 		data.windSpeed = weatherWindSpeedEditText.getText().toString();
 		data.windDirection = weatherWindDirectionSpinner.getSelectedItem().toString();
@@ -5028,13 +5041,6 @@ public class ReportOnConditionFragment extends Fragment
 		//-------------------------------------------------------------------------------------------------
 		//-------------------------------------------------------------------------------------------------
 		data.sendStatus = ReportSendStatus.WAITING_TO_SEND;
-
-		OrganizationPayload orgPayload = mDataManager.getCurrentOrganziation();
-		if(orgPayload != null)
-		{
-			data.orgPrefix = orgPayload.getPrefix();
-		}
-
 
 		return data;
 	}
